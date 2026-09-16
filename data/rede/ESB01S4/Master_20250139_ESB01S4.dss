@@ -1,0 +1,17 @@
+clear
+Redirect "CircuitoMT_20250139_ESB01S4_------1-----.dss"
+Redirect "CodCondutor_20250139_ESB01S4_------1-----.dss"
+Redirect "TransformadorMTMTMTBT_20250139_ESB01S4_------1-----.dss"
+Redirect "SegmentosMT_20250139_ESB01S4_------1-----.dss"
+Redirect "ChavesMT_20250139_ESB01S4_------1-----.dss"
+Redirect "SegmentosBT_20250139_ESB01S4_------1-----.dss"
+Redirect "RamaisBT_20250139_ESB01S4_------1-----.dss"
+Redirect "ReguladorMT_20250139_ESB01S4_------1-----.dss"
+Redirect "Medidores_20250139_ESB01S4_------1-----.dss"
+
+Set Voltagebases = [0.22 0.38 13.8]
+Calc Voltagebases
+Set tolerance = 0.0001
+Set maxcontroliter = 10
+
+buscoords buscoords.csv

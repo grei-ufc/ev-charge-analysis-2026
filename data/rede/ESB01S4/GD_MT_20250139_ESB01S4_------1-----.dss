@@ -1,0 +1,11 @@
+New "LoadShape.default_pv_daily_mt" npts=24 interval=1 
+~ mult = [0 0 0 0 0 0 0.1 0.2 0.3 0.5 0.8 0.9 1.0 1.0 0.99 0.9 0.7 0.4 0.1 0 0 0 0 0] 
+New "LoadShape.default_daily" npts=24 interval=1 
+~ mult = [0 0 0 0 0 0 0.1 0.2 0.3 0.5 0.8 0.9 1.0 1.0 0.99 0.9 0.7 0.4 0.1 0 0 0 0 0] 
+
+New "generator.GD.CE.000.267.563" phases=3 bus1=3871897438465872.1.2.3 basefreq=60 conn=Delta kv=13.8 pf=0.92 kw=112.5 daily=default_pv_daily_mt 
+
+New "generator.GD.CE.002.699.586" phases=3 bus1=3870426438467670.1.2.3 basefreq=60 conn=Delta kv=13.8 pf=0.92 kw=300.0 daily=default_pv_daily_mt 
+
+New "generator.GD.CE.000.291.645" phases=3 bus1=3871897438465872.1.2.3 basefreq=60 conn=Delta kv=13.8 pf=0.92 kw=112.5 daily=default_pv_daily_mt 
+

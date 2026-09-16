@@ -1,0 +1,45 @@
+Clear
+
+! ==============================================================================
+! 1. COMPILA A TOPOLOGIA PRINCIPAL (Sem Cargas)
+! ==============================================================================
+Compile (Master_20250139_ESB01S4.dss)
+
+! ==============================================================================
+! 2. REDIRECIONA AS CARGAS E CURVAS SINTÉTICAS (Modelagem Estocástica do TCC)
+! ==============================================================================
+Redirect "CurvaCarga_Sintetica_20250139_ESB01S4.dss"
+Redirect "CargasBT_Sintetico_20250139_ESB01S4.dss"
+Redirect "CargasMT_Sintetico_20250139_ESB01S4.dss"
+
+! ==============================================================================
+! 3. ADICIONA AS FONTES FOTOVOLTAICAS (PVSystems)
+! ==============================================================================
+Redirect ESB01S4_pv.dss
+
+! ==============================================================================
+! 4. CONFIGURAÇÕES DE CONTROLE
+! ==============================================================================
+Set ControlMode=Time
+! Desabilita tap changes temporariamente para agilizar convergência (opcional)
+!Batchedit RegControl..* maxtapchange=0
+!Set MaxControlIter=30
+
+! ==============================================================================
+! 5. MONITORES DA SUBESTAÇÃO
+! ==============================================================================
+New Monitor.Feeder_output_vi element=Vsource.SOURCE Terminal=1 mode=0
+New Monitor.Feeder_output_pq element=Vsource.SOURCE Terminal=1 mode=1 ppolar=no
+
+! ==============================================================================
+! 6. CONFIGURAÇÃO DA SIMULAÇÃO SEMANAL
+!    (168 horas totais / Resolução de 10 Minutos = 1008 Passos)
+! ==============================================================================
+Set mode=Daily
+Set stepsize=10m
+Set number=1008
+
+! ==============================================================================
+! 7. EXECUÇÃO
+! ==============================================================================
+Solve

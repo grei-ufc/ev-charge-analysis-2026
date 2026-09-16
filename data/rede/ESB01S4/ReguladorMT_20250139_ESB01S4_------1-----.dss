@@ -1,0 +1,12 @@
+New "Transformer.REG_RGEK0071A" phases=1 windings=2 buses=["3873535738464503.1.4" "3873535738464503F.1.4"] conns=[Wye Wye ] kvs=[7.967 7.967] kvas=[4200 4200] xhl=0.7 %loadloss=0.055471428571428574 %noloadloss=0.05
+New "Regcontrol.REG_RGEK0071A" transformer="REG_RGEK0071A" winding=2 vreg=104.0 band=2 ptratio=79.67433714816836 
+New "Reactor.TRF_RGEK0071A_P" phases=1 bus1="3873535738464503.4" R=15 X=0 basefreq=60 
+New "Reactor.TRF_RGEK0071A_S" phases=1 bus1="3873535738464503F.4" R=15 X=0 basefreq=60
+New "Transformer.REG_RGEK0071B" phases=1 windings=2 buses=["3873535738464503.2.4" "3873535738464503F.2.4"] conns=[Wye Wye ] kvs=[7.967 7.967] kvas=[4200 4200] xhl=0.7 %loadloss=0.055471428571428574 %noloadloss=0.05
+New "Regcontrol.REG_RGEK0071B" transformer="REG_RGEK0071B" winding=2 vreg=104.0 band=2 ptratio=79.67433714816836 
+New "Reactor.TRF_RGEK0071B_P" phases=1 bus1="3873535738464503.4" R=15 X=0 basefreq=60 
+New "Reactor.TRF_RGEK0071B_S" phases=1 bus1="3873535738464503F.4" R=15 X=0 basefreq=60
+New "Transformer.REG_RGEK0071C" phases=1 windings=2 buses=["3873535738464503.3.4" "3873535738464503F.3.4"] conns=[Wye Wye ] kvs=[7.967 7.967] kvas=[4200 4200] xhl=0.7 %loadloss=0.055471428571428574 %noloadloss=0.05
+New "Regcontrol.REG_RGEK0071C" transformer="REG_RGEK0071C" winding=2 vreg=104.0 band=2 ptratio=79.67433714816836 
+New "Reactor.TRF_RGEK0071C_P" phases=1 bus1="3873535738464503.4" R=15 X=0 basefreq=60 
+New "Reactor.TRF_RGEK0071C_S" phases=1 bus1="3873535738464503F.4" R=15 X=0 basefreq=60
