@@ -45,6 +45,11 @@ def rodar_pipeline_completo():
     # ---------------------------------------------------------
     print("\n[+] Consolidando e exportando CSV final...")
     df_opendss = pd.DataFrame(curvas_finais)
+    
+    # Adiciona a coluna de tempo exigida pelo simulador do Mosaik
+    datas = pd.date_range(start="2026-01-01 00:00:00", periods=len(df_opendss), freq="10min")
+    df_opendss.insert(0, "Date", datas)
+    
     caminho_csv = OUTPUT_DIR / "ev_loadshapes_normalized.csv"
     df_opendss.to_csv(caminho_csv, index=False)
     

@@ -1,94 +1,111 @@
 services:
-  # 1. API OpenDSS
   opendss:
     build: .
-    command: python -m simulators.opendss.api_opendss --remote 0.0.0.0:5771
+    command: python -m simulators.opendss.api_opendss --remote 0.0.0.0:5771 -t 600
     ports:
-      - "5771:5771"
+    - 5771:5771
     volumes:
-      - ./src:/app/src
-      - ./data:/app/data
-
-  # 2. Simulador de Bateria
+    - ./src:/app/src
+    - ./data:/app/data
+    restart: always
   battery:
     build: .
-    command: python -m simulators.battery.battery_sim --remote 0.0.0.0:5772
+    command: python -m simulators.battery.battery_sim --remote 0.0.0.0:5772 -t 600
     ports:
-      - "5772:5772"
+    - 5772:5772
     volumes:
-      - ./src:/app/src
-      - ./data:/app/data
-
-  # 3. Coletor de Dados
+    - ./src:/app/src
+    - ./data:/app/data
+    restart: always
   collector:
     build: .
-    command: python -m simulators.collector.collector --remote 0.0.0.0:5773
+    command: python -m simulators.collector.collector --remote 0.0.0.0:5773 -t 600
     ports:
-      - "5773:5773"
+    - 5773:5773
     volumes:
-      - ./src:/app/src
-      - ./output:/app/output
-
-  # 4. Simulador do Controlador da Bateria
+    - ./src:/app/src
+    - ./output:/app/output
+    restart: always
   controller:
     build: .
     command: python -m simulators.controller.controller_sim --remote 0.0.0.0:5774
+      -t 600
     ports:
-      - "5774:5774"
+    - 5774:5774
     volumes:
-      - ./src:/app/src
-
-  # 5. Simuladores CSV
+    - ./src:/app/src
+    restart: always
   csv-data-1:
     build: .
-    command: python -m simulators.collector.csv_sim_pandas --remote 0.0.0.0:5775
+    command: python -m simulators.collector.csv_sim_pandas --remote 0.0.0.0:5775 -t
+      600
     ports:
-      - "5775:5775"
+    - 5775:5775
     volumes:
-      - ./src:/app/src
-      - ./data:/app/data
-
+    - ./src:/app/src
+    - ./data:/app/data
+    restart: always
   csv-data-2:
     build: .
-    command: python -m simulators.collector.csv_sim_pandas --remote 0.0.0.0:5776
+    command: python -m simulators.collector.csv_sim_pandas --remote 0.0.0.0:5776 -t
+      600
     ports:
-      - "5776:5776"
+    - 5776:5776
     volumes:
-      - ./src:/app/src
-      - ./data:/app/data
-
-  # 6. Simulador de Inversor Padrão
+    - ./src:/app/src
+    - ./data:/app/data
+    restart: always
   inverter-std:
     build: .
     command: python -m simulators.inverter.inverter_simulator --remote 0.0.0.0:5777
+      -t 600
     ports:
-      - "5777:5777"
+    - 5777:5777
     volumes:
-      - ./src:/app/src
-
-  # 7. Simulador de Painéis PV
+    - ./src:/app/src
+    restart: always
   pv-panel:
     build: .
-    command: python -m simulators.pv.pv_panel_simulator --remote 0.0.0.0:5778
+    command: python -m simulators.pv.pv_panel_simulator --remote 0.0.0.0:5778 -t 600
     ports:
-      - "5778:5778"
+    - 5778:5778
     volumes:
-      - ./src:/app/src
-
-  # 8. Controle de Regulador de Tensão
+    - ./src:/app/src
+    restart: always
   regulator:
     build: .
     command: python -m simulators.controller.regulator_control --remote 0.0.0.0:5779
+      -t 600
     ports:
-      - "5779:5779"
+    - 5779:5779
     volumes:
-      - ./src:/app/src
-
-  # 9. Smart Inverter (OpenDER)
+    - ./src:/app/src
+    restart: always
   smart-inverter:
     build: .
     command: python -m simulators.inverter.smart_inverter_simulator --remote 0.0.0.0:5780
+      -t 600
     ports:
-      - "5780:5780"
+    - 5780:5780
     volumes:
-      - ./src:/app/src
+    - ./src:/app/src
+    restart: always
+  ev-charger:
+    build: .
+    command: python -m simulators.ev.ev_charger_simulator --remote 0.0.0.0:5781 -t
+      600
+    ports:
+    - 5781:5781
+    volumes:
+    - ./src:/app/src
+    restart: always
+  csv-data-3:
+    build: .
+    command: python -m simulators.collector.csv_sim_pandas --remote 0.0.0.0:5782 -t
+      600
+    ports:
+    - 5782:5782
+    volumes:
+    - ./src:/app/src
+    - ./data:/app/data
+    restart: always

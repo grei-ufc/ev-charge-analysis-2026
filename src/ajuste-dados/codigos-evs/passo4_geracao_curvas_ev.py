@@ -48,10 +48,11 @@ def criar_malha_de_potencia(df_semana: pd.DataFrame, potencia_carregador_kw: flo
     # O resultado será nosso vetor final de 1008 pontos!
     malha_10min = malha_1min.reshape(-1, 10).mean(axis=1)
             
-    # --- NORMALIZAÇÃO ---
-    max_potencia = np.max(malha_10min)
-    if max_potencia > 0:
-        malha_10min = malha_10min / max_potencia
+    # --- NORMALIZAÇÃO PELA POTÊNCIA NOMINAL ---
+    # Divide pela capacidade do carregador em vez do pico encontrado.
+    # Isso fará com que cargas normais fiquem em 1.0, e sobreposições (overlaps) ultrapassem 1.0 (ex: 2.0).
+    if potencia_carregador_kw > 0:
+        malha_10min = malha_10min / potencia_carregador_kw
         
     return malha_10min
 
@@ -91,6 +92,11 @@ if __name__ == "__main__":
     # 3. EXPORTAÇÃO (Apenas CSV)
     # Cria um único DataFrame onde cada coluna é a curva de um VE
     df_opendss = pd.DataFrame(curvas)
+    
+    # Adiciona a coluna de tempo exigida pelo simulador do Mosaik
+    datas = pd.date_range(start="2026-01-01 00:00:00", periods=len(df_opendss), freq="10min")
+    df_opendss.insert(0, "Date", datas)
+    
     caminho_csv = OUTPUT_DIR / "ev_loadshapes_normalized.csv"
     df_opendss.to_csv(caminho_csv, index=False)
     

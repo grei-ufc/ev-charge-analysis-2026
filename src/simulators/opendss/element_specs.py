@@ -327,6 +327,17 @@ def write_pvsystem(sim, name: str, values: dict[str, Any]) -> None:
     )
 
 
+def write_load(sim, name: str, values: dict[str, Any]) -> None:
+    """Permite que simuladores externos controlem P e Q de uma Carga."""
+    if "P_kw" in values or "Q_kvar" in values:
+        sim.dss_wrapper.set_power(
+            name,
+            p=values.get("P_kw"),
+            q=values.get("Q_kvar"),
+            element="Load",
+        )
+
+
 # ----------------------------------------------------------------------
 # Registry
 # ----------------------------------------------------------------------
@@ -348,6 +359,9 @@ MODEL_SPECS: dict[str, ModelSpec] = {
     "Load": ModelSpec(
         dss_class="Load",
         reader=read_phases,
+        writer=write_load,
+        public=True,
+        inputs={"P_kw": InputSpec(), "Q_kvar": InputSpec()},
         # Convenção do OpenDSS: carga consome com sinal positivo.
         attr_map=phase_attr_map(
             p_total=("P_out_mw",),

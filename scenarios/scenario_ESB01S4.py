@@ -68,7 +68,7 @@ def run_scenario():
         print(f"[ERRO]: Arquivo DSS não encontrado no Windows em:\n{CIRCUITO_DSS_HOST}")
         return
 
-    with mosaik.World(SIM_CONFIG) as world:
+    with mosaik.World(SIM_CONFIG, mosaik_config={'start_timeout': 600}) as world:
         print("--- Conectando aos Simuladores no Docker ---")
 
         # 1. Iniciando Simuladores via Rede
@@ -237,7 +237,7 @@ def run_scenario():
 
         print(f"\nInicializando simulação de {N_PASSOS} para (Step={STEP_SIZE}...)")
 
-        world.run(until=END_TIME, print_progress=False)
+        world.run(until=END_TIME, print_progress=True)
         print("Simulação concluída.")
 
         # --- Check Rápido ---

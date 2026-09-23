@@ -48,7 +48,7 @@ Focado na conversão de dados reais de irradiação solar brasileira (dataset BR
 - **Otimização de I/O:** Em vez de gerar um arquivo pesado e redundante de `LoadShape` para cada casa da rede, a arquitetura consolida as curvas solares em perfis matemáticos únicos (`shape_irrad_{id}`), reduzindo o peso computacional das simulações em mais de 90%.
 
 ### 3. Processamento de Veículos Elétricos (EVs)
-O pipeline matemático de modelagem dos VEs é orquestrado pelo arquivo `orquestrador_ev.py`, estruturado em 4 passos:
+Baseado no dataset norueguês da cooperativa Risvollan em Trondheim (*"Residential electric vehicle charging datasets from apartment buildings"*, Sørensen et al., 2021). O pipeline matemático de modelagem de ~6.800 sessões de recarga é orquestrado pelo arquivo `orquestrador_ev.py`, estruturado em 4 passos:
 1. **Passo 1 (Limpeza):** Sanitização de separadores decimais e formatação de datas via Pandas (filtrando apenas colunas necessárias para aliviar a RAM).
 2. **Passo 2 (Filtragem e Time-Shift):** Extração exata das semanas de Setembro. É aplicado um deslocamento de **+2.5 horas** no dataset norueguês para que o pico local coincida com o horário de pico residencial brasileiro (18h30 - 19h00).
 3. **Passo 3 (Agrupamento):** Organização hierárquica das sessões por usuário e por índice numérico da semana, garantindo que os carros que recarregam na virada da noite mantenham a integridade temporal.
@@ -58,7 +58,7 @@ O pipeline matemático de modelagem dos VEs é orquestrado pelo arquivo `orquest
 
 ## ⚙️ Arquitetura dos Simuladores
 
-O projeto divide a responsabilidade computacional através de microsserviços. O Mosaik troca dados no início de cada "step" com os seguintes contêineres:
+O projeto divide a responsabilidade computacional através de microsserviços. O Mosaik troca dados no início de cada "step" com os seguintes contêineres configurados com tolerância global a timeout (`-t 600` e `start_timeout: 600`):
 
 | Serviço Docker | Porta | Função |
 | :--- | :--- | :--- |
@@ -66,13 +66,15 @@ O projeto divide a responsabilidade computacional através de microsserviços. O
 | **pv-panel** | `5778` | Calcula a potência DC gerada com base no clima. |
 | **smart-inverter** | `5780` | Converte DC/AC aplicando funções de rede avançadas. |
 | **inverter-std** | `5777` | Converte DC/AC no modo clássico (sem funções de rede). |
-| **csv-data-1 e 2** | `5775 / 5776` | Injetam temperatura e irradiância a cada passo. |
-| **collector** | `5773` | Escuta os resultados de todos e agrupa no `result.csv`. |
+| **csv-data-1, 2** | `5775 / 5776` | Injetam séries temporais de Temperatura e Irradiância a cada passo. |
+| **csv-data-3** | `5782` | Injeta séries temporais de consumo normalizado dos Veículos Elétricos (EV). |
+| **collector** | `5773` | Escuta os resultados de todos e consolida de forma massiva no `result.csv`. |
 | **battery** | `5772` | Simula o armazenamento e despacho de baterias BESS. |
+| **ev-charger** | `5781` | Lê o fator de demanda e calcula a potência (`P_kw` e `Q_kvar`) drenada pelos carros. |
 
 ## 🛠️ Como Executar
 
-### 1. Preparação
+### 1. Preparação e Instalação
 Certifique-se de que você possui o **Docker** e o **uv** instalados. 
 
 #### Instalação do Docker
@@ -84,43 +86,46 @@ Antes de executar, é necessário ter o Docker (e o Docker Compose) instalados n
 **Para Linux**
 Se for usar Linux (ex.: Ubuntu/Debian), instale o Docker Engine seguindo a documentação oficial:
 - Guia de instalação do Docker Engine (Ubuntu): https://docs.docker.com/engine/install/ubuntu/
-- Guia geral de instalação: https://docs.docker.com/engine/install/
 
-Exemplo rápido (Ubuntu) — execute como root ou com `sudo`:
-```bash
-sudo apt update
-sudo apt install ca-certificates curl gnupg lsb-release
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-sudo systemctl enable --now docker
-```
-
-Para confirmar a instalação, verifique as versões:
-```bash
-docker --version
-docker compose version
-```
-
-> **Importante:** durante a execução o Docker precisa estar em execução. No Windows, abra o Docker Desktop e aguarde até o daemon estar ativo; no Linux, verifique que o serviço `docker` esteja em execução (`sudo systemctl status docker`).
+> **Importante:** Durante a execução o Docker precisa estar em execução. No Windows, abra o Docker Desktop e aguarde até o daemon estar ativo.
 
 #### Configurando dependências locais (uv)
-Para a primeira execução, instale as dependências e prepare o ambiente virtual executando na raiz do projeto:
+Para a primeira execução, instale as dependências executando na raiz do projeto:
 ```bash
 uv sync
 ```
 
-### 2. Iniciando os Simuladores
-Levante a infraestrutura Docker em background. Os contêineres ficarão num loop aguardando a conexão do Mosaik (regra `restart: always` garante que eles reabram a porta após um cenário terminar):
+### 2. Preparação de Dados e da Rede
+Antes de rodar a co-simulação, você deve gerar as curvas limpas e alocar os elementos dinâmicos (Veículos Elétricos) na rede do OpenDSS.
+
+**Passo 2.1:** Gere a matriz de recarga dos EVs a partir dos dados brutos:
+```bash
+uv run python src/ajuste-dados/codigos-evs/pipeline_ev.py
+```
+
+**Passo 2.2:** Sorteie e instancie as casas que possuirão carros elétricos (Isso modificará os arquivos `.dss`):
+```bash
+uv run python src/simulators/util/ev_creator.py
+```
+
+### 3. Iniciando os Simuladores
+Levante a infraestrutura Docker em background. Os contêineres ficarão aguardando a conexão do Mosaik (a regra `restart: always` e o parâmetro de timeout `--timeout 600` impedem que os simuladores morram caso redes muito grandes demorem a compilar no OpenDSS):
 ```bash
 docker compose up -d
 ```
 
-### 3. Executando um Cenário
-Dispare o script principal desejado através do `uv run`:
+### 4. Executando um Cenário
+Com o Docker no ar e as curvas geradas, dispare o script orquestrador do cenário escolhido. Uma barra de progresso do Mosaik indicará o andamento.
+
+**Cenário Completo (Rede + GD Solar + Veículos Elétricos):**
 ```bash
-uv run scenarios/scenario_ESB01S4.py
+uv run python scenarios/scenario_ESB01S4_EVs.py
 ```
-*(O andamento não imprimirá logs poluídos na tela, mas ao final será notificado a geração do CSV e do JSON da rede na pasta `output/`)*
+
+**Cenário Base (Apenas Rede + GD Solar):**
+```bash
+uv run python scenarios/scenario_ESB01S4.py
+```
+
+*(Ao final, um robusto arquivo CSV e o JSON da topologia da rede analisada serão exportados na pasta `output/`)*
 
