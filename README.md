@@ -1,8 +1,18 @@
-# Plataforma de Co-Simulação de Redes Elétricas (Mosaik + OpenDSS)
+# TCC: Análise dos Impactos do Aumento da Penetração de Carregadores de Veículos Elétricos na Rede de Distribuição de Baixa Tensão Brasileira via Co-simulação
 
-Plataforma desenvolvida para análise do impacto de Recursos Energéticos Distribuídos (DERs), como Veículos Elétricos (EVs) e Sistemas Fotovoltaicos (PVs), em redes elétricas de distribuição. O projeto utiliza co-simulação baseada na biblioteca [Mosaik](https://mosaik.offis.de/) e no simulador de redes [OpenDSS](https://www.epri.com/pages/sa/opendss), com regras de inversores inteligentes (Smart Inverters) baseadas na norma IEEE 1547-2018 (via OpenDER).
+Plataforma desenvolvida para análise do impacto da integração em larga escala de Veículos Elétricos (EVs) e Sistemas Fotovoltaicos (PVs) em redes elétricas de distribuição. O projeto utiliza co-simulação assíncrona baseada no framework [Mosaik](https://mosaik.offis.de/) e no motor de fluxo de potência [OpenDSS](https://www.epri.com/pages/sa/opendss), expandindo a infraestrutura modular do projeto OpenTES.
 
-Este projeto é uma adaptação da arquitetura `tsre-der-opentes` desenhada especialmente para estudos avançados em TCC.
+## 🎯 Objetivo e Escopo (TCC)
+
+Este repositório consolida o ambiente de testes do Trabalho de Conclusão de Curso (TCC). A pesquisa avalia diferentes **cenários de penetração** de veículos elétricos (ex: conservador, moderado e agressivo) alocados estocasticamente nas barras de baixa tensão. 
+
+O impacto na rede é mensurado segundo as seguintes métricas:
+* **Indicadores PRODIST:** Duração Relativa da Transgressão de Tensão Precarizada (DRP) e Tensão Crítica (DRC) em janelas semanais (1008 leituras de 10 min).
+* **Análise de Carregamento:** Avaliação térmica de alimentadores e sobrecarga em transformadores/barras críticas.
+* **VDI (Voltage Deviation Index):** Soma dos desvios quadráticos das tensões nas barras em relação a 1 pu.
+* **Outros:** Perdas ativas totais e níveis de desequilíbrio entre fases.
+
+**A Rede Elétrica:** Em vez de utilizar redes sintéticas ou sistemas padrão IEEE, a co-simulação é ancorada no **alimentador real ESB01S4 da subestação ESB (Eusébio)**, na Região Metropolitana de Fortaleza (ENEL), extraído da Base de Dados Geográfica da Distribuidora (BDGD) e convertido para OpenDSS através do `bdgd2dss`.
 
 ## 🚀 Tecnologias Utilizadas
 
