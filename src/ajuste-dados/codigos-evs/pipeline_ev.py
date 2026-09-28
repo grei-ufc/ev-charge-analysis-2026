@@ -6,11 +6,11 @@ from pathlib import Path
 from passo1_limpeza_dados_ev import RAW_CSV_PATH, OUTPUT_DIR, limpar_dados_ev
 from passo2_filtragem_setembro_ev import filtrar_semanas_setembro
 from passo3_agrupamento_semanal_ev import agrupar_sessoes_por_usuario_e_semana
-from passo4_geracao_curvas_ev import gerar_curvas_ev
+from passo4_geracao_sessoes_ev import gerar_csv_sessoes_ev
 
 def rodar_pipeline_completo():
     print("="*60)
-    print("      ORQUESTRADOR DE VEÍCULOS ELÉTRICOS (TCC)")
+    print("      ORQUESTRADOR DE VEÍCULOS ELÉTRICOS (CALDERA ICM)")
     print("="*60)
     
     start_time = time.time()
@@ -35,29 +35,24 @@ def rodar_pipeline_completo():
     dict_p3 = agrupar_sessoes_por_usuario_e_semana(df_p2)
     
     # ---------------------------------------------------------
-    # PASSO 4: Motor Físico de Potência
+    # PASSO 4: Motor Físico (Eventos, SoC e t_idle)
     # ---------------------------------------------------------
-    print("\n[4/4] Processando modelo de carga (Resample 1min -> 10min)...")
-    curvas_finais = gerar_curvas_ev(dict_p3)
+    print("\n[4/4] Processando modelo FÍSICO (Extração de SoC Inicial e Tapering)...")
+    df_eventos = gerar_csv_sessoes_ev(dict_p3)
     
     # ---------------------------------------------------------
     # EXPORTAÇÃO
     # ---------------------------------------------------------
-    print("\n[+] Consolidando e exportando CSV final...")
-    df_opendss = pd.DataFrame(curvas_finais)
+    print("\n[+] Consolidando e exportando CSV final de Eventos...")
     
-    # Adiciona a coluna de tempo exigida pelo simulador do Mosaik
-    datas = pd.date_range(start="2026-01-01 00:00:00", periods=len(df_opendss), freq="10min")
-    df_opendss.insert(0, "Date", datas)
-    
-    caminho_csv = OUTPUT_DIR / "ev_loadshapes_normalized.csv"
-    df_opendss.to_csv(caminho_csv, index=False)
+    caminho_csv = OUTPUT_DIR / "ev_sessions_caldera.csv"
+    df_eventos.to_csv(caminho_csv, index=False)
     
     end_time = time.time()
     
     print("="*60)
-    print(f"✅ PIPELINE CONCLUÍDO COM SUCESSO! Tempo: {(end_time - start_time):.2f} segundos.")
-    print(f"📊 Arquivo mestre disponível em: {caminho_csv.name}")
+    print(f"✅ PIPELINE FÍSICO CONCLUÍDO COM SUCESSO! Tempo: {(end_time - start_time):.2f} segundos.")
+    print(f"📊 Arquivo mestre de Eventos disponível em: {caminho_csv.name}")
     print("="*60)
 
 if __name__ == "__main__":
