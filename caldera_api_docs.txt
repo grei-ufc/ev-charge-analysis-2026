@@ -1,0 +1,282 @@
+=== EV_characteristics ===
+Help on class EV_characteristics in module Caldera_models:
+
+class EV_characteristics(pybind11_builtins.pybind11_object)
+ |  Method resolution order:
+ |      EV_characteristics
+ |      pybind11_builtins.pybind11_object
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  __getstate__(...)
+ |      __getstate__(self: Caldera_models.EV_characteristics, /) -> tuple
+ |
+ |  __init__(...)
+ |      __init__(self: Caldera_models.EV_characteristics, arg0: str, arg1: Caldera_models.battery_chemistry, arg2: typing.SupportsFloat, arg3: typing.SupportsFloat, arg4: typing.SupportsFloat, arg5: typing.SupportsFloat, arg6: bool, arg7: typing.SupportsFloat, arg8: typing.SupportsFloat) -> None
+ |
+ |  __setstate__(...)
+ |      __setstate__(self: Caldera_models.EV_characteristics, arg0: tuple) -> None
+ |
+ |  get_AC_charge_rate_kW(...)
+ |      get_AC_charge_rate_kW(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_DCFC_capable(...)
+ |      get_DCFC_capable(self: Caldera_models.EV_characteristics) -> bool
+ |
+ |  get_battery_size_Ah_1C(...)
+ |      get_battery_size_Ah_1C(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_battery_size_kWh(...)
+ |      get_battery_size_kWh(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_battery_size_with_stochastic_degradation_kWh(...)
+ |      get_battery_size_with_stochastic_degradation_kWh(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_charge_profile_peak_power_W_per_Wh(...)
+ |      get_charge_profile_peak_power_W_per_Wh(self: Caldera_models.EV_characteristics) -> dict[Caldera_models.battery_chemistry, dict[float, float]]
+ |
+ |  get_chemistry(...)
+ |      get_chemistry(self: Caldera_models.EV_characteristics) -> Caldera_models.battery_chemistry
+ |
+ |  get_efficiency_Wh_per_mile(...)
+ |      get_efficiency_Wh_per_mile(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_max_c_rate(...)
+ |      get_max_c_rate(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_pack_voltage_at_peak_power_V(...)
+ |      get_pack_voltage_at_peak_power_V(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_range_miles(...)
+ |      get_range_miles(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  get_type(...)
+ |      get_type(self: Caldera_models.EV_characteristics) -> str
+ |
+ |  get_usable_battery_size_kWh(...)
+ |      get_usable_battery_size_kWh(self: Caldera_models.EV_characteristics) -> float
+ |
+ |  ----------------------------------------------------------------------
+ |  Static methods inherited from pybind11_builtins.pybind11_object:
+ |
+ |  __new__(*args, **kwargs) class method of pybind11_builtins.pybind11_object
+ |      Create and return a new object.  See help(type) for accurate signature.
+
+
+=== EVSE_characteristics ===
+Help on class EVSE_characteristics in module Caldera_models:
+
+class EVSE_characteristics(pybind11_builtins.pybind11_object)
+ |  Method resolution order:
+ |      EVSE_characteristics
+ |      pybind11_builtins.pybind11_object
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  __getstate__(...)
+ |      __getstate__(self: Caldera_models.EVSE_characteristics, /) -> tuple
+ |
+ |  __init__(...)
+ |      __init__(self: Caldera_models.EVSE_characteristics, arg0: str, arg1: Caldera_models.EVSE_level, arg2: Caldera_models.EVSE_phase, arg3: typing.SupportsFloat, arg4: typing.SupportsFloat, arg5: typing.SupportsFloat, arg6: typing.SupportsFloat, arg7: typing.SupportsFloat) -> None
+ |
+ |  __setstate__(...)
+ |      __setstate__(self: Caldera_models.EVSE_characteristics, arg0: tuple) -> None
+ |
+ |  get_current_limit_A(...)
+ |      get_current_limit_A(self: Caldera_models.EVSE_characteristics) -> float
+ |
+ |  get_level(...)
+ |      get_level(self: Caldera_models.EVSE_characteristics) -> Caldera_models.EVSE_level
+ |
+ |  get_phase(...)
+ |      get_phase(self: Caldera_models.EVSE_characteristics) -> Caldera_models.EVSE_phase
+ |
+ |  get_power_limit_kW(...)
+ |      get_power_limit_kW(self: Caldera_models.EVSE_characteristics) -> float
+ |
+ |  get_standby_reactive_power_kW(...)
+ |      get_standby_reactive_power_kW(self: Caldera_models.EVSE_characteristics) -> float
+ |
+ |  get_standby_real_power_kW(...)
+ |      get_standby_real_power_kW(self: Caldera_models.EVSE_characteristics) -> float
+ |
+ |  get_type(...)
+ |      get_type(self: Caldera_models.EVSE_characteristics) -> str
+ |
+ |  get_volatge_limit_V(...)
+ |      get_volatge_limit_V(self: Caldera_models.EVSE_characteristics) -> float
+ |
+ |  ----------------------------------------------------------------------
+ |  Static methods inherited from pybind11_builtins.pybind11_object:
+ |
+ |  __new__(*args, **kwargs) class method of pybind11_builtins.pybind11_object
+ |      Create and return a new object.  See help(type) for accurate signature.
+
+
+=== pev_SE_pair ===
+Help on class pev_SE_pair in module Caldera_models:
+
+class pev_SE_pair(pybind11_builtins.pybind11_object)
+ |  Method resolution order:
+ |      pev_SE_pair
+ |      pybind11_builtins.pybind11_object
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  __init__(...)
+ |      __init__(self: Caldera_models.pev_SE_pair, arg0: str, arg1: str) -> None
+ |
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |
+ |  ev_type
+ |
+ |  se_type
+ |
+ |  ----------------------------------------------------------------------
+ |  Static methods inherited from pybind11_builtins.pybind11_object:
+ |
+ |  __new__(*args, **kwargs) class method of pybind11_builtins.pybind11_object
+ |      Create and return a new object.  See help(type) for accurate signature.
+
+
+=== charge_event_data ===
+Help on class charge_event_data in module Caldera_globals:
+
+class charge_event_data(pybind11_builtins.pybind11_object)
+ |  Method resolution order:
+ |      charge_event_data
+ |      pybind11_builtins.pybind11_object
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  __getstate__(...)
+ |      __getstate__(self: Caldera_globals.charge_event_data, /) -> tuple
+ |
+ |  __init__(...)
+ |      __init__(*args, **kwargs)
+ |      Overloaded function.
+ |
+ |      1. __init__(self: Caldera_globals.charge_event_data) -> None
+ |
+ |      2. __init__(self: Caldera_globals.charge_event_data, arg0: typing.SupportsInt, arg1: typing.SupportsInt, arg2: typing.SupportsInt, arg3: typing.SupportsInt, arg4: str, arg5: typing.SupportsFloat, arg6: typing.SupportsFloat, arg7: typing.SupportsFloat, arg8: typing.SupportsFloat, arg9: Caldera_globals.stop_charging_criteria, arg10: control_strategy_enums) -> None
+ |
+ |  __setstate__(...)
+ |      __setstate__(self: Caldera_globals.charge_event_data, arg0: tuple) -> None
+ |
+ |  ----------------------------------------------------------------------
+ |  Static methods defined here:
+ |
+ |  get_file_header(...) method of pybind11_builtins.pybind11_detail_function_record_v1_system_libstdcpp_gxx_abi_1xxx_use_cxx11_abi_1 instance
+ |      get_file_header() -> str
+ |
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |
+ |  SE_group_id
+ |
+ |  SE_id
+ |
+ |  arrival_SOC
+ |
+ |  arrival_unix_time
+ |
+ |  charge_event_id
+ |
+ |  control_enums
+ |
+ |  departure_SOC
+ |
+ |  departure_unix_time
+ |
+ |  stop_charge
+ |
+ |  vehicle_id
+ |
+ |  vehicle_type
+ |
+ |  ----------------------------------------------------------------------
+ |  Static methods inherited from pybind11_builtins.pybind11_object:
+ |
+ |  __new__(*args, **kwargs) class method of pybind11_builtins.pybind11_object
+ |      Create and return a new object.  See help(type) for accurate signature.
+
+
+=== interface_to_SE_groups ===
+Help on class interface_to_SE_groups in module Caldera_ICM:
+
+class interface_to_SE_groups(pybind11_builtins.pybind11_object)
+ |  Method resolution order:
+ |      interface_to_SE_groups
+ |      pybind11_builtins.pybind11_object
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  ES500_get_charging_needs(...)
+ |      ES500_get_charging_needs(self: Caldera_ICM.interface_to_SE_groups, arg0: typing.SupportsFloat, arg1: typing.SupportsFloat) -> ES500_aggregator_charging_needs
+ |
+ |  ES500_set_energy_setpoints(...)
+ |      ES500_set_energy_setpoints(self: Caldera_ICM.interface_to_SE_groups, arg0: ES500_aggregator_e_step_setpoints) -> None
+ |
+ |  __init__(...)
+ |      __init__(self: Caldera_ICM.interface_to_SE_groups, arg0: str, arg1: interface_to_SE_groups_inputs) -> None
+ |
+ |  add_charge_events(...)
+ |      add_charge_events(self: Caldera_ICM.interface_to_SE_groups, arg0: collections.abc.Sequence[charge_event_data]) -> None
+ |
+ |  add_charge_events_by_SE_group(...)
+ |      add_charge_events_by_SE_group(self: Caldera_ICM.interface_to_SE_groups, arg0: collections.abc.Sequence[SE_group_charge_event_data]) -> None
+ |
+ |  get_active_CEs_by_SE_groups(...)
+ |      get_active_CEs_by_SE_groups(self: Caldera_ICM.interface_to_SE_groups, arg0: collections.abc.Sequence[typing.SupportsInt]) -> dict[int, list[active_CE]]
+ |
+ |  get_active_CEs_by_SEids(...)
+ |      get_active_CEs_by_SEids(self: Caldera_ICM.interface_to_SE_groups, arg0: collections.abc.Sequence[typing.SupportsInt]) -> list[active_CE]
+ |
+ |  get_active_CEs_by_extCS(...)
+ |      get_active_CEs_by_extCS(self: Caldera_ICM.interface_to_SE_groups, arg0: collections.abc.Sequence[str]) -> dict[str, list[active_CE]]
+ |
+ |  get_all_active_CEs(...)
+ |      get_all_active_CEs(self: Caldera_ICM.interface_to_SE_groups) -> list[active_CE]
+ |
+ |  get_charging_power(...)
+ |      get_charging_power(self: Caldera_ICM.interface_to_SE_groups, arg0: typing.SupportsFloat, arg1: typing.SupportsFloat, arg2: collections.abc.Mapping[str, typing.SupportsFloat]) -> dict[str, tuple[float, float]]
+ |
+ |  set_PQ_setpoints(...)
+ |      set_PQ_setpoints(self: Caldera_ICM.interface_to_SE_groups, arg0: typing.SupportsFloat, arg1: collections.abc.Sequence[SE_setpoint]) -> None
+ |
+ |  stop_active_charge_events(...)
+ |      stop_active_charge_events(self: Caldera_ICM.interface_to_SE_groups, arg0: collections.abc.Sequence[typing.SupportsInt]) -> None
+ |
+ |  ----------------------------------------------------------------------
+ |  Static methods inherited from pybind11_builtins.pybind11_object:
+ |
+ |  __new__(*args, **kwargs) class method of pybind11_builtins.pybind11_object
+ |      Create and return a new object.  See help(type) for accurate signature.
+
+
+=== interface_to_SE_groups_inputs ===
+Help on class interface_to_SE_groups_inputs in module Caldera_globals:
+
+class interface_to_SE_groups_inputs(pybind11_builtins.pybind11_object)
+ |  Method resolution order:
+ |      interface_to_SE_groups_inputs
+ |      pybind11_builtins.pybind11_object
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  __init__(...)
+ |      __init__(self: Caldera_globals.interface_to_SE_groups_inputs, arg0: bool, arg1: collections.abc.Mapping[str, pev_charge_ramping], arg2: collections.abc.Sequence[pev_charge_ramping_workaround], arg3: charge_event_queuing_inputs, arg4: collections.abc.Sequence[SE_group_configuration], arg5: typing.SupportsFloat, arg6: typing.SupportsInt, arg7: collections.abc.Sequence[typing.SupportsFloat], arg8: collections.abc.Sequence[typing.SupportsFloat], arg9: typing.SupportsFloat, arg10: L2_control_strategy_parameters, arg11: bool) -> None
+ |
+ |  ----------------------------------------------------------------------
+ |  Static methods inherited from pybind11_builtins.pybind11_object:
+ |
+ |  __new__(*args, **kwargs) class method of pybind11_builtins.pybind11_object
+ |      Create and return a new object.  See help(type) for accurate signature.
+
