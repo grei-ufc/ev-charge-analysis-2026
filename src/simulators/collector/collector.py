@@ -72,9 +72,9 @@ class Collector(mosaik_api_v3.Simulator):
         df = pd.DataFrame.from_dict(df_dict)
         df = df.set_index("date")
         if time == 0:
-            df.to_csv(self.output_file, mode="w", header=True)
+            df.to_csv(self.output_file, mode="w", header=True, date_format="%Y-%m-%d %H:%M:%S")
         else:
-            df.to_csv(self.output_file, mode="a", header=False)
+            df.to_csv(self.output_file, mode="a", header=False, date_format="%Y-%m-%d %H:%M:%S")
 
         return None
 
