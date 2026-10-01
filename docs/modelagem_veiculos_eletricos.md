@@ -31,61 +31,76 @@ Sessões avulsas não funcionam bem em co-simulações dinâmicas. As semanas do
 ### 2.4. A Arquitetura do Pipeline de Processamento
 Todo o tratamento massivo e minucioso da base de dados estocástica é executado de forma estruturada dentro do diretório **`src/ajuste-dados/codigos-evs/`**. O processo é gerenciado pelo script orquestrador `pipeline_ev.py`, que executa 4 módulos sequenciais em RAM (evitando *I/O* em disco intermediário desnecessário):
 
-* **Passo 1 (`passo1_limpeza_dados_ev.py`):** Realiza a sanitização tipográfica (separadores decimais, adequação de *datetimes* para padrão ISO) e elimina dezenas de metadados textuais inúteis. O orquestrador roda com a *flag* de supressão (`manter_todas_colunas=False`), permitindo que apenas os carimbos de tempo e a energia demandada transitem pela memória.
-* **Passo 2 (`passo2_filtragem_setembro_ev.py`):** Módulo sociodemográfico. É aqui que ocorre a injeção do Time-Shift brasileiro (+2,5h) em cada timestamp de *plug-in* e *plug-out*. Na sequência, o script extrai exclusivamente semanas completas (segunda a domingo) do mês de Setembro de toda a base multianual.
-* **Passo 3 (`passo3_agrupamento_semanal_ev.py`):** Módulo de *clustering*. Para resolver o "Problema da Meia-Noite" — onde sessões que começam domingo e terminam segunda receberiam índices de semana divergentes —, o algoritmo aplica funções lógicas (`dt.floor('D')`) para atrelar cada evento linearmente ao índice da semana de sua criação inicial, formatando os dados em dicionários aninhados `{Usuario -> {Semana -> Sessões}}`.
-* **Passo 4 (`passo4_geracao_sessoes_ev.py`):** O Módulo Matemático. Substituindo o antigo gerador de blocos estáticos (`passo4_geracao_curvas_ev.py`), este novo script aplica as heurísticas de $t_{idle}$ e *Memória de Estado* para extrair o SoC inicial reverso (detalhado no Capítulo 4). O produto final desse processo inteiro é despejado no arquivo alvo otimizado **`ev_sessions_caldera.csv`**, que é a *Tabela-Verdade* consumida no *Runtime* pelo Caldera ICM.
+* **Passo 1 (`passo1_limpeza_dados_ev.py`):** Realiza a sanitização tipográfica e adequação de *datetimes* para padrão ISO, eliminando dezenas de metadados textuais inúteis. 
+* **Passo 2 (`passo2_filtragem_setembro_ev.py`):** Módulo sociodemográfico. É aqui que ocorre a injeção do Time-Shift brasileiro (+2,5h) e extrai-se exclusivamente semanas completas do mês de Setembro.
+* **Passo 3 (`passo3_agrupamento_semanal_ev.py`):** Módulo de *clustering*. Aplica funções lógicas (`dt.floor('D')`) para atrelar cada evento linearmente ao índice da semana inicial, contornando o "Problema da Meia-Noite".
+* **Passo 4 (`passo4_geracao_sessoes_ev.py`):** Módulo Matemático. Aplica as heurísticas de $t_{idle}$ e *Memória de Estado* para extrair o SoC inicial reverso (detalhado no Capítulo 4). O produto final é despejado no arquivo alvo otimizado **`ev_sessions_caldera.csv`**.
 
 ---
 
-## 3. A Frota Nacional de Veículos Elétricos e Alocação Física
+## 3. A Frota Nacional, Infraestrutura de Carregadores e Alocação Física
 
-A co-simulação no Caldera exige não apenas os tempos de pluge, mas um mapeamento claro do veículo (bateria, tensão nominal, conversor onboard). Em vez de usar modelos estrangeiros, a simulação adota frotas reais dominantes no mercado brasileiro, englobando BEVs (100% elétricos) e PHEVs (Híbridos Plug-in), já que ambos impactam o transformador de distribuição da mesma forma.
+A co-simulação no Caldera não permite "cargas fantasmas". Ela exige não apenas os tempos de pluge, mas um mapeamento claro e estrito do veículo (banco de baterias) e da infraestrutura de recarga (inversor/EVSE). Optou-se por utilizar parâmetros fidedignos dos modelos mais vendidos no Brasil.
 
-**Capacidade de Bateria - Top 10 Veículos Eletrificados Plug-in (Mercado Brasileiro):**
+### 3.1. Inventário de Veículos (Top 10 ABVE)
+A simulação engloba BEVs (100% elétricos) e PHEVs (Híbridos Plug-in). Embora os BEVs possuam baterias maiores, os PHEVs carregam frequentemente em residências e impactam o transformador da mesma forma.
 
-| Ranking | Modelo | Fabricante | Capacidade da Bateria | Tipo | Qtd. Vendida |
+| Ranking | Modelo | Fabricante | Capacidade da Bateria | Tipo | Qtd. Vendida (Jan/22-Ago/26) |
 | :---: | :--- | :--- | :--- | :--- | :--- |
-| 1 | BYD DOLPHIN MINI GS5EV | BYD | 38,88 kWh | BEV | 80820 |
-| 2 | BYD DOLPHIN GS 180EV | BYD | 44,9 kWh | BEV | 58259 |
-| 3 | BYD SONG PLUS GS DM | BYD | 18,3 kWh | PHEV | 57821 |
-| 4 | BYD SONG PRO GS DM | BYD | 18,3 kWh | PHEV | 40565 |
-| 5 | BYD KING GS DM | BYD | 18,3 kWh | PHEV | 22091 |
-| 6 | GEELY EX2 MAX | GEELY | 39,4 kWh | BEV | 17966 |
-| 7 | GWM HAVAL H6 PHEV 19 | GWM | 19,0 kWh | PHEV | 16980 |
-| 8 | BYD SONG PRO GL DM | BYD | 12,96 kWh | PHEV | 15848 |
-| 9 | BYD DOLPHIN MINI GS EV | BYD | 38,88 kWh | BEV | 15827 |
-| 10 | GWM HAVAL H6 GT | GWM | 35,00 kWh | PHEV | 14576 |
+| 1 | BYD DOLPHIN MINI GS5EV | BYD | 38,88 kWh | BEV | 80.820 |
+| 2 | BYD DOLPHIN GS 180EV | BYD | 44,90 kWh | BEV | 58.259 |
+| 3 | BYD SONG PLUS GS DM | BYD | 18,30 kWh | PHEV | 57.821 |
+| 4 | BYD SONG PRO GS DM | BYD | 18,30 kWh | PHEV | 40.565 |
+| 5 | BYD KING GS DM | BYD | 18,30 kWh | PHEV | 22.091 |
+| 6 | GEELY EX2 MAX | GEELY | 39,40 kWh | BEV | 17.966 |
+| 7 | GWM HAVAL H6 PHEV 19 | GWM | 19,00 kWh | PHEV | 16.980 |
+| 8 | BYD SONG PRO GL DM | BYD | 12,96 kWh | PHEV | 15.848 |
+| 9 | BYD DOLPHIN MINI GS EV | BYD | 38,88 kWh | BEV | 15.827 |
+| 10 | GWM HAVAL H6 GT | GWM | 35,00 kWh | PHEV | 14.576 |
 
-### Lógica de Atribuição de Frota (Monte Carlo com Restrição Eletromecânica)
-Ao processar uma casa do dataset norueguês, o algoritmo sorteia um dos 10 carros acima respeitando suas fatias de mercado (distribuição probabilística de Monte Carlo). Porém, aplica-se uma barreira física restritiva: **A energia consumida na maior sessão daquela casa ($E_{max}$) não pode exceder a capacidade real de fábrica da bateria do carro sorteado.** Se o sorteio tentar designar um BYD Song Plus (18,3 kWh) para um morador que demandou 30 kWh em uma única noite, o modelo é rejeitado e resorteado até garantir aderência termodinâmica total.
+### 3.2. Inventário de Carregadores Residenciais (EVSE / Wallboxes)
+Em conjunto com a bateria do carro (que recebe energia DC), o Caldera precisa da modelagem do equipamento retificador AC (o EVSE - *Electric Vehicle Supply Equipment*). Em vez de curvas teóricas, adotamos as potências reais das *Wallboxes* frequentemente instaladas nas residências brasileiras (geralmente enviadas como cortesia pela BYD e GWM na compra).
 
----
+| Fabricante | Equipamento (EVSE) | Potência Máxima | Corrente (Max) | Tensão AC de Operação |
+| --- | --- | --- | --- | --- |
+| **BYD** | BYD Wallbox AC | 7,0 kW | 32 A | 220 V (Fase-Neutro) |
+| **GWM** | GWM Wallbox Série G | 7,0 kW | 32 A | 220 V (Fase-Neutro) |
+| **GEELY** | Geely Wallbox AC | 6,6 kW | 32 A | 220 V (Fase-Neutro) |
+| **Padrão** | Carregador Portátil Emergência | 3,6 kW | 16 A | 220 V (Fase-Neutro) |
 
-## 4. Determinação do SoC Inicial e Retro-propagação
+**Implicação Topológica (Desbalanceamento Fase-Neutro):** 
+No estado do Ceará, a distribuição opera em 220/380V. Esses carregadores de 7 kW atingem sua tensão e corrente nominais sendo conectados entre **Fase e Neutro**. Portanto, na simulação, cada usuário que possui um EVSE representará uma carga de pico drástica ($32\text{A}$) pendurada em uma única fase do transformador trifásico, tornando-se o agente crítico de desbalanceamento de corrente do sistema elétrico.
 
-Para a ignição da simulação em *C++*, o Caldera exige o **Estado de Carga Inicial ($SoC_{0}$)**, o qual o *smart meter* não fornece. Utilizou-se um arcabouço matemático de regressão validado na literatura técnica (El-Hendawi et al., 2022).
-
-### 4.1. Equacionamento pelo Tempo Ocioso ($t_{idle}$)
-Partindo da premissa residencial de que todo pluge almeja os 100% de carga, rastreamos o SoC reverso filtrando o *Tempo Ocioso* na garagem (o tempo conectado subtraído do tempo estritamente necessário para transferir a energia em potência nominal):
-
-* **Se o veículo pernoita na garagem ($t_{idle} > 0$):**
-  Significa que houve tempo de sobra. O modelo assume atingimento pleno do alvo ($SoC = 100\%$). A equação de engenharia reversa para o $SoC_{0}$ torna-se:
-  $SOC_{0} = \left( 1.0 - \frac{E_{gasta}}{C_{bateria}} \right)$
-  Aqui o Caldera atua perfeitamente, exibindo sua rampa de decaimento natural (*tapering*).
-
-* **Se a sessão é interrompida ($t_{idle} \approx 0$):**
-  Veículos que puxaram potência máxima por 40 minutos e saíram de casa. Aqui a meta dos 100% fracassou. O modelo força um $SoC_{0}$ baixo aleatório, ancorando a eletroquímica na fase *Corrente Constante (CC)*, assegurando consumo retangular e bruto que mimetiza a assinatura dos *smart meters*.
-
-### 4.2. Memória de Estado (Micro-sessões)
-Uma "micro-sessão" ocorre quando o condutor desliga o plugue brevemente (ex: manobra rápida) e retorna. Se ignorado, o simulador reiniciaria a bateria com outra variável aleatória.
-Para resolver, aplica-se uma **Retro-propagação Temporal**: as conexões com gap temporal $\le 30$ min são soldadas logicamente. O simulador reverte o cálculo matemático para garantir que o $SoC$ de finalização da micro-sessão 1 seja travado como o $SoC_{0}$ de ignição da micro-sessão 2, dotando o fluxo de "memória de bateria" persistente.
+### 3.3. Lógica de Atribuição de Frota (Monte Carlo Físico)
+Ao processar uma casa do *dataset* norueguês para injetar um veículo brasileiro, o algoritmo usa uma roleta de probabilidades (*Monte Carlo*) baseada no *market-share* de vendas. Porém, existe uma restrição fundamental: **A capacidade real da bateria sorteada ($C_{bateria}$) deve ser maior ou igual ao maior evento de recarga registrado daquele morador na semana ($E_{max}$)**. 
+Se um morador consumiu 30 kWh da rede de uma só vez, o algoritmo bloqueia o sorteio de um *BYD Song Plus* (que possui apenas 18,3 kWh) e refaz o sorteio. Isso impede violações termodinâmicas no Caldera, garantindo consistência estrita.
 
 ---
 
-## 5. Arquitetura de Co-Simulação e Fluxo Ciberfísico
+## 4. Determinação do SoC Inicial e Retro-propagação da Memória
 
-O diagrama abaixo ilustra a arquitetura bipartida em ação. À esquerda, a engine física roda em C++ calculando bibliotecas antecipadas; à direita, a dinâmica de troca do Mosaik despacha potência reativa e ativa em runtime.
+Como dados empíricos de medidores residenciais (smart meters) apenas reportam consumo bruto e horários de conexão, o **Estado de Carga Inicial ($SoC_{0}$)** de cada sessão — parâmetro vital para o C++ iniciar a integração eletroquímica — é misteriosamente oculto. Resolvemos isso com um arcabouço matemático algorítmico baseado na literatura técnica (El-Hendawi et al., 2022).
+
+### 4.1. Equacionamento Matemático pelo Tempo Ocioso ($t_{idle}$)
+O cerne do modelo repousa na avaliação do tempo em que o veículo passa dormindo na garagem. Se subtrairmos o tempo que ele demoraria na teoria para absorver toda a energia ($E / P_{nom}$) do tempo em que ele de fato permaneceu plugado, temos o tempo ocioso ($t_{idle}$).
+
+* **Sessão Longa ($t_{idle} > 0$):**
+  Se houve folga temporal de madrugada, matematicamente o usuário completou sua meta (bateria chegou a 100%). A equação para rastrear o SoC inicial ($SoC_0$) em que ele chegou na garagem é simplesmente a engenharia reversa do "tanque cheio":
+  $$SoC_{0} = \left( 1.0 - \frac{E_{gasta}}{C_{bateria}} \right)$$
+  Sob essa condição matemática, o modelo Caldera se encaixa de forma majestosa, exibindo claramente o achatamento e a curva lenta do *tapering* quando a energia atinge as frações finais.
+
+* **Sessão Interrompida / Rápida ($t_{idle} \approx 0$):**
+  Aquele morador que deu uma carga rápida ao meio-dia e desplugou. Aqui, a premissa de alcançar 100% quebra. Nessas raras exceções, o algoritmo impõe um $SoC_{0}$ muito baixo, segurando propositalmente a eletroquímica na fase de **Corrente Constante (CC)** para que a absorção de energia do veículo seja mantida reta em potência máxima (sem tapering), imitando fielmente o corte estocástico das cargas parciais dos medidores originais.
+
+### 4.2. A "Memória" da Bateria (Retro-propagação)
+Sessões de recarga residenciais podem exibir falhas de "pluge rápido" (quando o motorista desliga e religa o carro na tomada logo depois para manobrar o veículo). Tratar essas sessões como coisas distintas causaria um reset irreal da bateria no Caldera.
+A solução aplicada foi a **Retro-propagação Temporal**: o pipeline junta conexões separadas por menos de 30 minutos em um *cluster*. O cálculo do SoC roda do futuro para o passado, amarrando forçadamente o *SoC Inicial* da segunda micro-sessão para que seja idêntico ao *SoC Final* em que a primeira havia sido abandonada. Isso dota a co-simulação de memória e persistência de dados ao longo de todo o mês.
+
+---
+
+## 5. Arquitetura de Co-Simulação e Fluxo Ciberfísico (Mosaik + C++)
+
+Uma co-simulação dessa magnitude não roda em um único arquivo. A arquitetura foi bipartida. 
 
 ```mermaid
 flowchart TB
@@ -147,35 +162,51 @@ flowchart TB
     class DSS grid;
 ```
 
-### 5.1. A Camada C++ e a Química NMC (Proxy para LFP)
-A camada interna de baterias exige mapeamentos de químicas estritas. As chinesas BYD e GWM utilizam largamente LFP (Lítio-Ferro-Fosfato). O Caldera oferece LTO, LMO e NMC. 
-Optou-se tecnicamente pela parametrização da bateria **NMC** (*Níquel-Manganês-Cobalto*). Diferente do LTO que é para usos industriais, o BMS embarcado no lítio tipo NMC compartilha com o LFP os exatos mesmos paradigmas termodinâmicos residenciais: carga retangular (CC) pesada acompanhada de rampa amortecida (CV) perto dos 90-100%. Para distúrbios AC macroscopicamente observáveis em medidores residenciais, o proxy NMC providencia resposta espetacular para veículos de passeio.
+### 5.1. A Camada C++ e a Química NMC (O Proxy para LFP)
+A modelagem C++ exige informar a química das células galvânicas da bateria. Os carros líderes do Brasil (BYD/GWM) dominam o uso da tecnologia *Blade Battery* ou químicas de **LFP** (Lítio-Ferro-Fosfato) pela segurança e resistência térmica. Entretanto, o motor compilado do Caldera possui classes pré-moldadas estritas apenas para LTO, LMO e **NMC**. 
 
-### 5.2. O Cálculo Dinâmico de Reativos (Normas IEC)
-O simulador Python repudia a visão de FP perfeitamente resistivo (1,0). Conforme as normativas IEC 61000-3-2 e IEC 61000-3-12 de compatibilidade eletromagnética, wallboxes residenciais modernas de 7.0 kW / 32A utilizam correção ativa (Active PFC), contudo, geram defasagem inerente.
-Sorteia-se para cada Wallbox brasileira um **Fator de Potência indutivo constante** ($\text{FP}_i \sim \mathcal{U}(0{,}98;\, 1{,}00)$).
-Usando trigonometria simples $\tan \varphi = \frac{\sqrt{1 - \text{FP}_i^2}}{\text{FP}_i}$, o Mosaik infere e calcula dinamicamente o consumo reativo ($Q_{kvar}$) acoplado à injeção de ativa ($P_{kw}$) em cada milissegundo.
+A solução de engenharia adotada foi forçar todas as baterias LFP como baterias **NMC** (*Níquel-Manganês-Cobalto*). O pretexto científico se baseia em que o BMS (Sistema de Gerenciamento da Bateria) atua nas LFP de forma quase idêntica às NMC para salvaguarda: uma pesada carga em Corrente Constante (CC) em tensões nominais que sobem, e no final, grampeamento em Tensão Constante (CV) fazendo o *tapering*. O "erro" do proxy é puramente interno, pois, olhando macroscopicamente do lado da rede elétrica AC (OpenDSS), a demanda temporal desenhada se mostra excepcional para ambas tecnologias.
+
+### 5.2. Cálculo Dinâmico do Fator de Potência e Injeção de Reativos (Normas IEC)
+Outro diferencial desta modelagem é não tratar VEs como cargas inteiramente resistivas (como lâmpadas incandescentes onde a potência reativa $Q = 0$).
+
+Os circuitos AC/DC dos carregadores automotivos (on-board e off-board) possuem retificadores com pontes de diodos e capacitores. Para impedir a poluição com altas taxas de THDi (Distorção Harmônica), eles empregam a técnica de Correção Ativa do Fator de Potência (*Active PFC*), exigida pelas normas globais **IEC 61000-3-2** (para portáteis de 16A) e **IEC 61000-3-12** (para Wallboxes pesadas >16A).
+
+Ainda que o PFC esforce a corrente a imitar o formato senoidal da tensão — mantendo o Fator de Potência (FP) extremamente próximo de 1,0 —, os filtros passivos EMI da entrada causam defasagem residual, tornando o conjunto **ligeiramente indutivo** ou **capacitivo** na perspectiva da concessionária. 
+
+A nossa simulação emula rigorosamente este fenômeno:
+1. **Sorteio do Fator de Potência Estocástico:** Na inicialização da simulação, toda residência que possua um VE sorteia um fator inalterável entre 0,98 e 1,00 para aquela semana. $\text{FP}_i \sim \mathcal{U}(0{,}98;\, 1{,}00)$
+2. **Cálculo de Deslocamento Angular:** A partir de trigonometria de potência fundamental (onde $\text{FP} = \cos \varphi$), achamos o fator multíplice de injeção reativa:
+   $$\tan \varphi = \frac{\sin \varphi}{\cos \varphi} = \frac{\sqrt{1 - \text{FP}_i^2}}{\text{FP}_i}$$
+3. **Injeção em Tempo de Execução:** Em cada milissegundo de passo simulado (`step(t)`), se o carro do morador puxar exatos $6,8\text{ kW}$ da matriz física C++, a camada Python Mosaik aplica simultaneamente um puxão reativo correspondente (ex: $Q = 6,8 \cdot \tan \varphi \approx 1,38\text{ kVAr}$ indutivos).
+Isso pune a tensão do transformador da rua tanto pelo lado ativo quanto reativo, aumentando o desbalanceamento real.
 
 ---
 
 ## 6. Override Dinâmico no OpenDSS (Portas Abertas)
 
-No formato nativo do OpenDSS, as cargas (Loads) obedecem a perfis de horários cegos (`.dss`). Para que o Mosaik passe a comandar os nós eletronicamente na modelagem veicular, sem precisar violar ou injetar o código-fonte C++ do simulador EPRI, utilizou-se um *override* na API COM (`write_load` presente no `element_specs.py` do wrapper em Python).
+No ambiente nativo, o motor de fluxo de potência da EPRI (OpenDSS) costuma operar sozinho: você escreve um perfil longo `.dss`, liga e espera o fim. Contudo, em uma co-simulação de rede elétrico-computacional acoplada, quem detém a inteligência do que a casa consome é o *Mosaik* e o *Caldera*, não mais o arquivo estático.
 
-A porta `P_kw` e `Q_kvar` foram transformadas de componentes puramente passivos em portas públicas bidirecionais (*Inputs*). Assim que o `caldera_ev_sim.py` deduz o $P_{kw}$ (da C++) e o $Q_{kvar}$ (da IEC), ele comanda diretamente o OpenDSS via *COM Interface* a registrar e atualizar imediatamente o estado elétrico daquela residência conectada. Essa arquitetura viabiliza uma verdadeira resposta elétrica ciberfísica no milissegundo de cada passo da simulação de distribuição.
+Para impor isso sem ter de reconstruir o núcleo C++ do OpenDSS, escrevemos uma "cláusula de *Override*" na API COM (a ponte Python `dss_wrapper` e no `element_specs.py`). 
+
+A rotina reclassifica a variável nativa `Load` e declara que suas propriedades `P_kw` e `Q_kvar` são **Inputs Públicos Bidirecionais**. 
+Quando a função `write_load` escuta o vetor do Caldera chegando a cada *step* (ex: aos 12 minutos e 40 segundos da simulação), ela emite um comando COM direto para a engine do OpenDSS: 
+```python
+sim.dss_wrapper.set_power(name="Load.casa_1", p=7.0, q=1.38, element="Load")
+```
+Essa invasão na memória permite que a rede de distribuição responda em malha instantânea à estocástica norueguesa, processando e avaliando o comportamento do afundamento nodal de modo 100% dinâmico.
 
 ---
 
-## 7. Fontes e Referências Referidas
+## 7. Fontes e Referências Técnicas Referidas
 
-1. **Dataset Original de Comportamento:** 
-   SØRENSEN, A. L., *et al*. "Residential electric vehicle charging datasets from apartment buildings". *Data in Brief*, v. 36, p. 107105, 2021. Disponível em base acadêmica livre. (Responsável pela topologia temporal e registros reais de PLUG-IN/PLUG-OUT de 2300 usuários).
-2. **Engenharia Reversa do SoC e Estocástica:** 
-   EL-HENDAWI, M., *et al*. "Electric Vehicle Charging Model in the Urban Residential Sector". *Energies*, v. 15, n. 21, p. 7979, 2022. (Matrizes de regressão baseando SoC pelo limite natural de consumo veicular noturno).
-3. **Simulador de Baterias (Caldera ICM):**
-   *Idaho National Laboratory (INL)*. Caldera Infrastructure Charging Models (ICM). Engine Open-source em C++ para termodinâmica e comportamento elétrico-químico CC-CV em frotas veiculares. Repositório: [idaholab/Caldera_ICM](https://github.com/idaholab/Caldera_ICM).
-4. **Normativas Técnicas de Despacho Reativo e Limites:** 
-   INTERNATIONAL ELECTROTECHNICAL COMMISSION (IEC). *IEC 61000-3-2 / IEC 61000-3-12: Electromagnetic compatibility (EMC)*. Legislações globais adotadas para as margens limites de FP aceitáveis em carregadores residenciais AC e Wallboxes em ambiente unifilar 220V/380V.
-5. **Dados de Frota e Modelos VEs:** 
-   Fichas técnicas públicas fornecidas pelas montadoras locais vigentes no Brasil (*Build Your Dreams - BYD*, *Great Wall Motors - GWM* e *Geely*) sobre os arranjos químicos NMC e LFP, validadas a partir dos volumes de venda reportados pela Associação Brasileira do Veículo Elétrico (ABVE) - Período Jan/2022 a Ago/2026.
-
+1. **Dataset Original de Comportamento e Telemetria:** 
+   SØRENSEN, A. L., *et al*. "Residential electric vehicle charging datasets from apartment buildings". *Data in Brief*, v. 36, p. 107105, 2021. Disponível em repositório acadêmico livre. (Alicerçou a base estocástica para transpor os 10.080 minutos de pluge/despluge de 2.300 residentes).
+2. **Engenharia Reversa Estocástica do SoC ($t_{idle}$):** 
+   EL-HENDAWI, M., *et al*. "Electric Vehicle Charging Model in the Urban Residential Sector". *Energies*, v. 15, n. 21, p. 7979, 2022. (Metodologia analítica e matemática adotada para derivar o SoC ignorado pelo dataset via limitação da janela ociosa na madrugada).
+3. **Engine Física de Baterias (Caldera ICM):**
+   *Idaho National Laboratory (INL)*. Caldera Infrastructure Charging Models (ICM). Biblioteca Open-source em C++ para termodinâmica, degradação química, L2, DCFC e controle vetorial CC-CV no domínio do tempo. [idaholab/Caldera_ICM](https://github.com/idaholab/Caldera_ICM).
+4. **Normativas Técnicas de Despacho Reativo e Limites THDi:** 
+   INTERNATIONAL ELECTROTECHNICAL COMMISSION (IEC). *IEC 61000-3-2 (Ate 16A) / IEC 61000-3-12 (Até 75A)*: Electromagnetic compatibility (EMC). Normas globais mandatórias aplicadas na justificação matemática do ruído capacitivo/indutivo nas pontes retificadoras e *Active PFC* dos carregadores em baixa tensão AC.
+5. **Inventário Oficial da Frota ABVE (Jan/2022 a Ago/2026):** 
+   Associação Brasileira do Veículo Elétrico (ABVE) - Catálogo e *market-share* de eletrificados brasileiro. Fichas técnicas das montadoras *Build Your Dreams (BYD)*, *Great Wall Motors (GWM)* e *Geely*. Usadas para validar nominalidade de baterias e Wallboxes monofásicas de $7\text{ kW}$ e $6,6\text{ kW}$ aplicadas no método *Monte Carlo*.
