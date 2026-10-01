@@ -28,6 +28,14 @@ Com o deslocamento temporal, o pico global de carregamentos concentra-se cirurgi
 ### 2.3. Agrupamento Semanal e Integridade Cronológica
 Sessões avulsas não funcionam bem em co-simulações dinâmicas. As semanas do mês de Setembro (típicas de meia-estação) foram agrupadas em malhas contínuas de 10.080 minutos (7 dias). Isso garante que veículos que dormem plugados na transição de domingo para segunda-feira não sofram interrupções artificiais nos cálculos físicos do fluxo de potência.
 
+### 2.4. A Arquitetura do Pipeline de Processamento
+Todo o tratamento massivo e minucioso da base de dados estocástica é executado de forma estruturada dentro do diretório **`src/ajuste-dados/codigos-evs/`**. O processo é gerenciado pelo script orquestrador `pipeline_ev.py`, que executa 4 módulos sequenciais em RAM (evitando *I/O* em disco intermediário desnecessário):
+
+* **Passo 1 (`passo1_limpeza_dados_ev.py`):** Realiza a sanitização tipográfica (separadores decimais, adequação de *datetimes* para padrão ISO) e elimina dezenas de metadados textuais inúteis. O orquestrador roda com a *flag* de supressão (`manter_todas_colunas=False`), permitindo que apenas os carimbos de tempo e a energia demandada transitem pela memória.
+* **Passo 2 (`passo2_filtragem_setembro_ev.py`):** Módulo sociodemográfico. É aqui que ocorre a injeção do Time-Shift brasileiro (+2,5h) em cada timestamp de *plug-in* e *plug-out*. Na sequência, o script extrai exclusivamente semanas completas (segunda a domingo) do mês de Setembro de toda a base multianual.
+* **Passo 3 (`passo3_agrupamento_semanal_ev.py`):** Módulo de *clustering*. Para resolver o "Problema da Meia-Noite" — onde sessões que começam domingo e terminam segunda receberiam índices de semana divergentes —, o algoritmo aplica funções lógicas (`dt.floor('D')`) para atrelar cada evento linearmente ao índice da semana de sua criação inicial, formatando os dados em dicionários aninhados `{Usuario -> {Semana -> Sessões}}`.
+* **Passo 4 (`passo4_geracao_sessoes_ev.py`):** O Módulo Matemático. Substituindo o antigo gerador de blocos estáticos (`passo4_geracao_curvas_ev.py`), este novo script aplica as heurísticas de $t_{idle}$ e *Memória de Estado* para extrair o SoC inicial reverso (detalhado no Capítulo 4). O produto final desse processo inteiro é despejado no arquivo alvo otimizado **`ev_sessions_caldera.csv`**, que é a *Tabela-Verdade* consumida no *Runtime* pelo Caldera ICM.
+
 ---
 
 ## 3. A Frota Nacional de Veículos Elétricos e Alocação Física
@@ -170,3 +178,4 @@ A porta `P_kw` e `Q_kvar` foram transformadas de componentes puramente passivos 
    INTERNATIONAL ELECTROTECHNICAL COMMISSION (IEC). *IEC 61000-3-2 / IEC 61000-3-12: Electromagnetic compatibility (EMC)*. Legislações globais adotadas para as margens limites de FP aceitáveis em carregadores residenciais AC e Wallboxes em ambiente unifilar 220V/380V.
 5. **Dados de Frota e Modelos VEs:** 
    Fichas técnicas públicas fornecidas pelas montadoras locais vigentes no Brasil (*Build Your Dreams - BYD*, *Great Wall Motors - GWM* e *Geely*) sobre os arranjos químicos NMC e LFP, validadas a partir dos volumes de venda reportados pela Associação Brasileira do Veículo Elétrico (ABVE) - Período Jan/2022 a Ago/2026.
+
