@@ -68,3 +68,32 @@ Implementa a interface vital do orquestrador (`mosaik_api_v3.Simulator`).
 Em respeito às exigências internacionais de distorção e injeção harmônica das Wallboxes modernas, o carregador abandona a premissa de um $FP=1,0$.
 Para cada Wallbox, um fator de potência permanente é instanciado aleatoriamente $\text{FP}_i \sim \mathcal{U}(0{,}98;\, 1{,}00)$.
 Sempre que há afluxo de corrente ativa superior a 50W, a camada deriva o vetor reativo pela trigonometria intrínseca de deslocamento ($\tan \varphi$), despachando para o alimentador do OpenDSS a combinação fiel da potência aparente, simulando com máxima acurácia o estresse reativo no transformador da rua e o desbalanceamento fasorial da rede de distribuição.
+
+---
+
+## 5. Abertura de Portas no Simulador OpenDSS (Override Dinâmico)
+
+No ecossistema OpenDSS/Mosaik tradicional, os elementos de carga (`Load`) são entidades "fechadas" que seguem perfis estáticos nativos do motor (`.dss`). Para permitir o controle externo sem alterar o código-fonte C++ do simulador elétrico, interveio-se no *Wrapper* em Python (especificamente no `element_specs.py`).
+
+### 5.1. A Função Escritora (`write_load`)
+Foi injetada uma função customizada na camada de tradução do OpenDSS para o Mosaik:
+```python
+def write_load(sim, name: str, values: dict[str, Any]) -> None:
+    if "P_kw" in values or "Q_kvar" in values:
+        sim.dss_wrapper.set_power(name, p=values.get("P_kw"), q=values.get("Q_kvar"), element="Load")
+```
+Isso permite que os vetores de potência $P$ e $Q$ emitidos a cada minuto pelo simulador Caldera atinjam a API (COM) do OpenDSS e sobrescrevam momentaneamente a potência exigida daquela carga elétrica, bypassando as mecânicas nativas.
+
+### 5.2. Exposição do Contrato (ModelSpec)
+O elemento `Load` teve seu escopo alterado de um bloco puramente passivo para um elemento ativo bidirecional (`public=True`). As portas de comunicação `P_kw` e `Q_kvar` foram oficialmente cadastradas como **Inputs** no Mosaik, dizendo ao orquestrador que os nós de bateria do simulador de VE podem ser roteados diretamente (via arestas de grafo) para os barramentos residenciais da rede de distribuição.
+
+---
+
+## 6. O Fluxo de Dados Completo em Co-Simulação (Pipeline Ciberfísico)
+
+O avanço e sincronia do sistema flui da seguinte maneira durante o *Runtime*:
+
+1. **Leitura de Eventos (CSV):** O motor lê o arquivo de inventário estocástico de sessões (`ev_sessions_caldera.csv`), identificando IDs de usuário e timestamps de chegada e partida.
+2. **Processamento Físico (Caldera em C++):** A camada `caldera_wrapper.py` recebe esses eventos e projeta o SoC. Instancia digitalmente o equipamento (ex: Wallbox 7kW Monofásica, bateria NMC 50kWh). Calcula eletroquimicamente a demanda minuto a minuto, devolvendo a curva pronta com rampa/tapering (*Corrente Constante / Tensão Constante*).
+3. **Simulador de VE (Mosaik - `caldera_ev_sim.py`):** Recebe o fluxo ativo (W) da camada C++. Calcula a porção Reativa Indutiva baseada no Fator de Potência estocástico fixado do nó (Normas IEC).
+4. **Simulador OpenDSS (Mosaik - `api_opendss.py`):** Recebe os valores pontuais em $P_{kw}$ e $Q_{kvar}$. Atualiza a matriz de admitância (Fluxo de Carga) incorporando a demanda veicular e devolve as tensões nodais resultantes (perdas, afundamentos de tensão e desbalanceamentos fasoriais).
