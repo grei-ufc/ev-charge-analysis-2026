@@ -100,7 +100,18 @@ A solução aplicada foi a **Retro-propagação Temporal**: o pipeline junta con
 
 ## 5. Arquitetura de Co-Simulação e Fluxo Ciberfísico (Mosaik + C++)
 
-Uma co-simulação dessa magnitude não roda em um único arquivo. A arquitetura foi bipartida. 
+Uma co-simulação multiobjetivo (física de baterias + fluxo de carga na rede) impõe enormes gargalos de processamento. Para mitigar isso, o modelo arquitetural do sistema não calcula a eletroquímica "passo a passo" sincronicamente, mas sim através de uma assimetria temporal.
+
+### O Paradigma de Pré-cálculo em Lote (Batch Processing) do Caldera
+Se o Mosaik pedisse ao núcleo C++ do Caldera para resolver as equações diferenciais da bateria de cada um dos milhares de carros a cada minuto simulado, o *overhead* de comunicação e travamento (I/O) entre Python e C++ paralisaria a simulação. Em vez disso, a ponte via *PyBind11* explora o potencial máximo da linguagem de baixo nível resolvendo tudo em **Lote (*Batch*) no tempo zero**:
+
+1. **Injeção Massiva no $t=0$:** Antes mesmo do relógio da co-simulação no Mosaik começar a bater, a camada Python (o *Wrapper*) lê o arquivo de agenda global `ev_sessions_caldera.csv`. Ela empacota os milhares de eventos da semana (ID do carro, Modelo da Bateria, Wallbox, SoC inicial, Hora de Pluge e Despluge) e dispara esse array massivo de uma única vez para a memória do C++.
+2. **Resolução Eletroquímica C++:** Isolado, o núcleo do Caldera compila toda a física pesada (curvas de Corrente Constante - Tensão Constante, degradação, *tapering*) para todas as sessões solicitadas. Ele simula os 10.080 minutos de todos os carros em poucos milissegundos e gera as trajetórias completas na sua RAM interna.
+3. **Consulta de Tabela $O(1)$:** O motor C++ expõe uma ponte rápida de leitura. Quando a simulação do Mosaik finalmente inicia o *Runtime* avançando no tempo (`step`), o *Simulador Python* não realiza e não aguarda cálculos matemáticos das baterias. Ele simplesmente pergunta ao Caldera: *"Quanto de potência o Veículo X está puxando neste milissegundo Y?"*, realizando uma consulta direta na memória com complexidade $O(1)$. 
+
+Essa separação cirúrgica — onde o C++ atua como uma fábrica acelerada de curvas que trabalha antecipadamente, e o Python atua apenas como um despachante sincronizador de dados — é o que permite plugar a termodinâmica complexa do INL na pesada malha elétrica do OpenDSS de forma limpa e assustadoramente performática.
+
+O diagrama abaixo ilustra essa arquitetura bipartida em ação. À esquerda, a *engine* física pré-compilando perfis; à direita, a dinâmica temporal do Mosaik despachando potências ativas e reativas em tempo real.
 
 ```mermaid
 flowchart TB
