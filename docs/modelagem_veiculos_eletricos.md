@@ -162,12 +162,20 @@ flowchart TB
     class DSS grid;
 ```
 
-### 5.1. A Camada C++ e a Química NMC (O Proxy para LFP)
+### 5.1. Engenharia Reversa da API do Caldera (PyBind11)
+Uma das maiores barreiras de desenvolvimento enfrentadas na integração foi a total ausência de documentação Python para a biblioteca do Caldera ICM. O motor do *Idaho National Laboratory* é puramente construído em *C++* e exposto ao Python como um binário compilado (Shared Object `.so`) através da biblioteca `pybind11`. 
+
+Isso significa que o código-fonte legível fica oculto; IDEs não conseguem inferir tipos, métodos ou assinaturas, e a biblioteca se comporta como uma "caixa preta". Para viabilizar a arquitetura, procedeu-se com uma autêntica **Engenharia Reversa da Interface**:
+1. **Inspeção de Memória em Tempo de Execução:** Desenvolvemos scripts temporários exploratórios (`dir()`, `getattr`) para varrer e listar ativamente os objetos carregados em memória ao importar os módulos `Caldera_models` e `Caldera_ICM_Aux`.
+2. **Extração de Assinaturas (Help Dumps):** Capturamos o fluxo de saída da função nativa `help()` do Python e o redirecionamos para arquivos de texto, gerando o artefato `src/simulators/ev/caldera_api_docs_full.txt`. Esse "Dicionário" revelou a existência e as exigências contratuais da classe mestra `CP_interface_v2`.
+3. **Mapeamento de Enumeradores Estritos:** Foi vasculhando o atributo de baixo nível `.__members__` das classes C++ que descobrimos restrições vitais que não constavam em manual algum, como a descoberta de que o motor limitava as químicas de bateria (`battery_chemistry`) exclusivamente a três opções internas: `LTO`, `LMO` e `NMC`, o que forçou a próxima decisão arquitetural de *proxy* detalhada abaixo.
+
+### 5.2. A Camada C++ e a Química NMC (O Proxy para LFP)
 A modelagem C++ exige informar a química das células galvânicas da bateria. Os carros líderes do Brasil (BYD/GWM) dominam o uso da tecnologia *Blade Battery* ou químicas de **LFP** (Lítio-Ferro-Fosfato) pela segurança e resistência térmica. Entretanto, o motor compilado do Caldera possui classes pré-moldadas estritas apenas para LTO, LMO e **NMC**. 
 
 A solução de engenharia adotada foi forçar todas as baterias LFP como baterias **NMC** (*Níquel-Manganês-Cobalto*). O pretexto científico se baseia em que o BMS (Sistema de Gerenciamento da Bateria) atua nas LFP de forma quase idêntica às NMC para salvaguarda: uma pesada carga em Corrente Constante (CC) em tensões nominais que sobem, e no final, grampeamento em Tensão Constante (CV) fazendo o *tapering*. O "erro" do proxy é puramente interno, pois, olhando macroscopicamente do lado da rede elétrica AC (OpenDSS), a demanda temporal desenhada se mostra excepcional para ambas tecnologias.
 
-### 5.2. Cálculo Dinâmico do Fator de Potência e Injeção de Reativos (Normas IEC)
+### 5.3. Cálculo Dinâmico do Fator de Potência e Injeção de Reativos (Normas IEC)
 Outro diferencial desta modelagem é não tratar VEs como cargas inteiramente resistivas (como lâmpadas incandescentes onde a potência reativa $Q = 0$).
 
 Os circuitos AC/DC dos carregadores automotivos (on-board e off-board) possuem retificadores com pontes de diodos e capacitores. Para impedir a poluição com altas taxas de THDi (Distorção Harmônica), eles empregam a técnica de Correção Ativa do Fator de Potência (*Active PFC*), exigida pelas normas globais **IEC 61000-3-2** (para portáteis de 16A) e **IEC 61000-3-12** (para Wallboxes pesadas >16A).
@@ -210,3 +218,4 @@ Essa invasão na memória permite que a rede de distribuição responda em malha
    INTERNATIONAL ELECTROTECHNICAL COMMISSION (IEC). *IEC 61000-3-2 (Ate 16A) / IEC 61000-3-12 (Até 75A)*: Electromagnetic compatibility (EMC). Normas globais mandatórias aplicadas na justificação matemática do ruído capacitivo/indutivo nas pontes retificadoras e *Active PFC* dos carregadores em baixa tensão AC.
 5. **Inventário Oficial da Frota ABVE (Jan/2022 a Ago/2026):** 
    Associação Brasileira do Veículo Elétrico (ABVE) - Catálogo e *market-share* de eletrificados brasileiro. Fichas técnicas das montadoras *Build Your Dreams (BYD)*, *Great Wall Motors (GWM)* e *Geely*. Usadas para validar nominalidade de baterias e Wallboxes monofásicas de $7\text{ kW}$ e $6,6\text{ kW}$ aplicadas no método *Monte Carlo*.
+
