@@ -102,8 +102,13 @@ A solução aplicada foi a **Retro-propagação Temporal**: o pipeline junta con
 
 Uma co-simulação multiobjetivo (física de baterias + fluxo de carga na rede) impõe enormes gargalos de processamento. Para mitigar isso, o modelo arquitetural do sistema não calcula a eletroquímica "passo a passo" sincronicamente, mas sim através de uma assimetria temporal.
 
-### O Paradigma de Pré-cálculo em Lote (Batch Processing) do Caldera
-Se o Mosaik pedisse ao núcleo C++ do Caldera para resolver as equações diferenciais da bateria de cada um dos milhares de carros a cada minuto simulado, o *overhead* de comunicação e travamento (I/O) entre Python e C++ paralisaria a simulação. Em vez disso, a ponte via *PyBind11* explora o potencial máximo da linguagem de baixo nível resolvendo tudo em **Lote (*Batch*) no tempo zero**:
+### 5.1. A Ponte Ciberfísica: O Papel do PyBind11
+Para entender a performance da integração, é preciso compreender a ferramenta subjacente: o **PyBind11**. Trata-se de uma biblioteca *header-only* open-source desenhada para criar *bindings* (pontes de ligação) nativos entre a linguagem C++ e o Python. 
+
+O motor do Caldera ICM possui uma estrutura extremamente complexa baseada em equações diferenciais contínuas, o que o torna inviável para rodar de forma puramente interpretada (Python) devido ao altíssimo custo de CPU. Ao compilar o código do INL usando PyBind11, geramos um arquivo binário compartilhável (Shared Object / `.so` no Linux ou `.pyd` no Windows). Esse artifício permite que os objetos e métodos eletroquímicos nativos do C++ sejam instanciados e importados como se fossem pacotes Python comuns, entregando "o melhor dos dois mundos": a facilidade de orquestração assíncrona da linguagem Python (via Mosaik) atrelada ao poder de esmagamento numérico e gerenciamento de memória bruta de baixo nível do C++.
+
+### 5.2. O Paradigma de Pré-cálculo em Lote (Batch Processing)
+Se o Mosaik pedisse ao núcleo C++ do Caldera para resolver as equações diferenciais da bateria de cada um dos milhares de carros a cada minuto simulado, o *overhead* de comunicação e travamento (I/O) através do PyBind11 a todo instante paralisaria a simulação. Em vez disso, a ponte explora o potencial máximo da linguagem de baixo nível resolvendo tudo em **Lote (*Batch*) no tempo zero**:
 
 1. **Injeção Massiva no $t=0$:** Antes mesmo do relógio da co-simulação no Mosaik começar a bater, a camada Python (o *Wrapper*) lê o arquivo de agenda global `ev_sessions_caldera.csv`. Ela empacota os milhares de eventos da semana (ID do carro, Modelo da Bateria, Wallbox, SoC inicial, Hora de Pluge e Despluge) e dispara esse array massivo de uma única vez para a memória do C++.
 2. **Resolução Eletroquímica C++:** Isolado, o núcleo do Caldera compila toda a física pesada (curvas de Corrente Constante - Tensão Constante, degradação, *tapering*) para todas as sessões solicitadas. Ele simula os 10.080 minutos de todos os carros em poucos milissegundos e gera as trajetórias completas na sua RAM interna.
@@ -173,7 +178,7 @@ flowchart TB
     class DSS grid;
 ```
 
-### 5.1. Engenharia Reversa da API do Caldera (PyBind11)
+### 5.3. Engenharia Reversa da API do Caldera (PyBind11)
 Uma das maiores barreiras de desenvolvimento enfrentadas na integração foi a total ausência de documentação Python para a biblioteca do Caldera ICM. O motor do *Idaho National Laboratory* é puramente construído em *C++* e exposto ao Python como um binário compilado (Shared Object `.so`) através da biblioteca `pybind11`. 
 
 Isso significa que o código-fonte legível fica oculto; IDEs não conseguem inferir tipos, métodos ou assinaturas, e a biblioteca se comporta como uma "caixa preta". Para viabilizar a arquitetura, procedeu-se com uma autêntica **Engenharia Reversa da Interface**:
@@ -181,12 +186,12 @@ Isso significa que o código-fonte legível fica oculto; IDEs não conseguem inf
 2. **Extração de Assinaturas (Help Dumps):** Capturamos o fluxo de saída da função nativa `help()` do Python e o redirecionamos para arquivos de texto, gerando o artefato `src/simulators/ev/caldera_api_docs_full.txt`. Esse "Dicionário" revelou a existência e as exigências contratuais da classe mestra `CP_interface_v2`.
 3. **Mapeamento de Enumeradores Estritos:** Foi vasculhando o atributo de baixo nível `.__members__` das classes C++ que descobrimos restrições vitais que não constavam em manual algum, como a descoberta de que o motor limitava as químicas de bateria (`battery_chemistry`) exclusivamente a três opções internas: `LTO`, `LMO` e `NMC`, o que forçou a próxima decisão arquitetural de *proxy* detalhada abaixo.
 
-### 5.2. A Camada C++ e a Química NMC (O Proxy para LFP)
+### 5.4. A Camada C++ e a Química NMC (O Proxy para LFP)
 A modelagem C++ exige informar a química das células galvânicas da bateria. Os carros líderes do Brasil (BYD/GWM) dominam o uso da tecnologia *Blade Battery* ou químicas de **LFP** (Lítio-Ferro-Fosfato) pela segurança e resistência térmica. Entretanto, o motor compilado do Caldera possui classes pré-moldadas estritas apenas para LTO, LMO e **NMC**. 
 
 A solução de engenharia adotada foi forçar todas as baterias LFP como baterias **NMC** (*Níquel-Manganês-Cobalto*). O pretexto científico se baseia em que o BMS (Sistema de Gerenciamento da Bateria) atua nas LFP de forma quase idêntica às NMC para salvaguarda: uma pesada carga em Corrente Constante (CC) em tensões nominais que sobem, e no final, grampeamento em Tensão Constante (CV) fazendo o *tapering*. O "erro" do proxy é puramente interno, pois, olhando macroscopicamente do lado da rede elétrica AC (OpenDSS), a demanda temporal desenhada se mostra excepcional para ambas tecnologias.
 
-### 5.3. Cálculo Dinâmico do Fator de Potência e Injeção de Reativos (Normas IEC)
+### 5.5. Cálculo Dinâmico do Fator de Potência e Injeção de Reativos (Normas IEC)
 Outro diferencial desta modelagem é não tratar VEs como cargas inteiramente resistivas (como lâmpadas incandescentes onde a potência reativa $Q = 0$).
 
 Os circuitos AC/DC dos carregadores automotivos (on-board e off-board) possuem retificadores com pontes de diodos e capacitores. Para impedir a poluição com altas taxas de THDi (Distorção Harmônica), eles empregam a técnica de Correção Ativa do Fator de Potência (*Active PFC*), exigida pelas normas globais **IEC 61000-3-2** (para portáteis de 16A) e **IEC 61000-3-12** (para Wallboxes pesadas >16A).
