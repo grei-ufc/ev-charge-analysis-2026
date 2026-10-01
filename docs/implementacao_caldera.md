@@ -61,10 +61,7 @@ Para fins de registro e defesa acadêmica, é importante documentar como ocorre 
 
 
 
-## ⚪ Fase 4: Orquestração no Cenário Principal (Pendente)
-*Espaço reservado para documentar a fiação das portas (connects) do Caldera injetando a curva P/Q realista no OpenDSS (`scenario_ESB01S4_EVs.py`).*
 
----
 
 ## Anexo: Parametrização da Frota Brasileira (Capacidade de Baterias)
 Para garantir a aderência da simulação à realidade da rede de Baixa Tensão brasileira, a capacidade das baterias virtuais será distribuída com base nos **10 veículos eletrificados plug-in mais vendidos no Brasil entre janeiro de 2022 e agosto de 2026**. 

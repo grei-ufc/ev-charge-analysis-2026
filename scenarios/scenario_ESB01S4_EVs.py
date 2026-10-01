@@ -5,18 +5,20 @@ from mosaik.util import connect_many_to_one
 from simulators.util.topologia import exportar_topologia
 
 # ==============================================================================
-# 1. CAMINHOS NO HOST (Windows)
+# 1. CAMINHOS LOCAIS DO PROJETO (Nativo - Sem Docker)
 # ==============================================================================
 CURRENT_DIR = Path(__file__).parent.resolve()
 PROJECT_ROOT = CURRENT_DIR.parent
-DATA_DIR_HOST = PROJECT_ROOT / "data" / "rede" / "ESB01S4"
-CIRCUITO_DSS_HOST = DATA_DIR_HOST / "run_ESB01S4.dss"
-OUTPUT_DIR_HOST = PROJECT_ROOT / "output"
-OUTPUT_DIR_HOST.mkdir(parents=True, exist_ok=True)
-ARQUIVO_RESULTADOS_CSV_HOST = OUTPUT_DIR_HOST / 'result_run_ESB01S4_EVs.csv'
-JSON_SAIDA = str(PROJECT_ROOT / 'output' / 'topologia_ESB01S4_EVs.json')
+DATA_DIR = PROJECT_ROOT / "data" / "rede" / "ESB01S4"
+CIRCUITO_DSS = DATA_DIR / "run_ESB01S4.dss"
+OUTPUT_DIR = PROJECT_ROOT / "output"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+ARQUIVO_RESULTADOS_CSV = OUTPUT_DIR / "result_run_ESB01S4_EVs.csv"
+JSON_SAIDA = str(OUTPUT_DIR / "topologia_ESB01S4_EVs.json")
 
-EV_CSV_HOST = PROJECT_ROOT / "data" / "datasets" / "veiculos-eletricos" / "ev_loadshapes_normalized.csv"
+SESSIONS_EV_CSV = (
+    PROJECT_ROOT / "data" / "datasets" / "veiculos-eletricos" / "ev_sessions_caldera.csv"
+)
 
 # ==============================================================================
 # 2. CONFIGURAÇÕES DE TEMPO E PASSOS
@@ -28,114 +30,123 @@ DIAS_SIMULACAO = 7
 N_PASSOS = DIAS_SIMULACAO * 24 * (60 // STEP_MINUTES)
 END_TIME = N_PASSOS * STEP_SIZE
 
-# ==============================================================================
-# 3. CAMINHOS NO CONTAINER (Linux/Docker)
-# ==============================================================================
-CONTAINER_DATA = "/app/data/rede/ESB01S4"
-CIRCUITO_DSS_CONT = f"{CONTAINER_DATA}/run_ESB01S4.dss"
-
 IRRADIANCE_CSV_NAME = f"ESB01S4_shape_pv_{STEP_MINUTES}min.csv"
 TEMPERATURE_CSV_NAME = f"ESB01S4_temperature_{STEP_MINUTES}min.csv"
-
-IRRADIANCE_CONT = f"{CONTAINER_DATA}/{IRRADIANCE_CSV_NAME}"
-TEMPERATURE_CONT = f"{CONTAINER_DATA}/{TEMPERATURE_CSV_NAME}"
-ARQUIVO_RESULTADOS_CSV_CONT = "/app/output/result_run_ESB01S4_EVs.csv"
-
-EV_CSV_CONT = "/app/data/datasets/veiculos-eletricos/ev_loadshapes_normalized.csv"
+IRRADIANCE_PATH = DATA_DIR / IRRADIANCE_CSV_NAME
+TEMPERATURE_PATH = DATA_DIR / TEMPERATURE_CSV_NAME
 
 # ==============================================================================
-# 4. CONFIGURAÇÃO DE CONEXÃO (DOCKER)
+# 3. CONFIGURAÇÃO DE SIMULADORES (MOSAIK NATIVO EM PYTHON)
 # ==============================================================================
 SIM_CONFIG = {
-    'DSS': {
-        'connect': 'localhost:5771',
+    "DSS": {
+        "python": "simulators.opendss.api_opendss:OpenDSSSimulator",
     },
-    'PVSimulator': {
-        'connect': 'localhost:5778'
+    "PVSimulator": {
+        "python": "simulators.pv.pv_panel_simulator:PVPanelSim",
     },
-    'InverterSim': {
-        'connect': 'localhost:5780' # Porta 5780 = inverter-smart
+    "InverterSim": {
+        "python": "simulators.inverter.smart_inverter_simulator:SmartInverterSim",
     },
-    'CSV_Irr': {
-        'connect': 'localhost:5775' # Porta 5775 = csv-data-1
+    "CSV_Irr": {
+        "python": "simulators.collector.csv_sim_pandas:CSV",
     },
-    'CSV_Temp': {
-        'connect': 'localhost:5776' # Porta 5776 = csv-data-2
+    "CSV_Temp": {
+        "python": "simulators.collector.csv_sim_pandas:CSV",
     },
-    'CSV_EV': {
-        'connect': 'localhost:5782' # Porta 5782 = csv-data-3
+    "CalderaEV": {
+        "python": "simulators.ev.caldera_ev_sim:CalderaEVSim",
     },
-    'EVCharger': {
-        'connect': 'localhost:5781' # Porta 5781 = ev-charger
-    },
-    'Collector': {
-        'connect': 'localhost:5773',
+    "Collector": {
+        "python": "simulators.collector.collector:Collector",
     },
 }
 
+
 def run_scenario():
-    if not CIRCUITO_DSS_HOST.exists():
-        print(f"[ERRO]: Arquivo DSS não encontrado no Windows em:\n{CIRCUITO_DSS_HOST}")
+    if not CIRCUITO_DSS.exists():
+        print(f"[ERRO]: Arquivo DSS não encontrado em:\n{CIRCUITO_DSS}")
         return
 
-    with mosaik.World(SIM_CONFIG, mosaik_config={'start_timeout': 600}) as world:
-        print("--- Conectando aos Simuladores no Docker ---")
+    with mosaik.World(SIM_CONFIG, mosaik_config={"start_timeout": 60}) as world:
+        print("--- Iniciando Co-simulação Nativa com Veículos Elétricos (Caldera ICM) ---")
 
-        dss_sim = world.start('DSS', topofile=CIRCUITO_DSS_CONT, step_size=STEP_SIZE)
-        pv_sim = world.start('PVSimulator', step_size=STEP_SIZE)
-        inv_sim = world.start('InverterSim', step_size=STEP_SIZE)
-        csv_sim_irr = world.start('CSV_Irr', sim_start=START_DATE, datafile=IRRADIANCE_CONT)
-        csv_sim_temp = world.start('CSV_Temp', sim_start=START_DATE, datafile=TEMPERATURE_CONT)
-        csv_sim_ev = world.start('CSV_EV', sim_start=START_DATE, datafile=EV_CSV_CONT)
-        ev_sim = world.start('EVCharger', step_size=STEP_SIZE)
+        # 1. Instanciando Simuladores Nativos
+        dss_sim = world.start("DSS", topofile=str(CIRCUITO_DSS), step_size=STEP_SIZE)
+        pv_sim = world.start("PVSimulator", step_size=STEP_SIZE)
+        inv_sim = world.start("InverterSim", step_size=STEP_SIZE)
+        csv_sim_irr = world.start("CSV_Irr", sim_start=START_DATE, datafile=str(IRRADIANCE_PATH))
+        csv_sim_temp = world.start("CSV_Temp", sim_start=START_DATE, datafile=str(TEMPERATURE_PATH))
 
-        collector = world.start('Collector', start_date=START_DATE, output_file=ARQUIVO_RESULTADOS_CSV_CONT, print_results=False)
+        # Simulador físico Caldera ICM (C++ & IEC 61000)
+        ev_sim = world.start("CalderaEV", step_size=STEP_SIZE)
+
+        collector = world.start(
+            "Collector",
+            start_date=START_DATE,
+            output_file=str(ARQUIVO_RESULTADOS_CSV),
+            print_results=False,
+        )
 
         print("Instanciando a Grid do OpenDSS...")
         grid = dss_sim.Grid()
         csv_data_irr = csv_sim_irr.Data.create(1)
         csv_data_temp = csv_sim_temp.Data.create(1)
-        csv_data_ev = csv_sim_ev.Data.create(1)
         monitor = collector.Monitor()
 
         # ====================================================================
         # ALGORITMO DE INSTANCIAÇÃO E CONEXÃO DO SMART INVERTER E PV
         # ====================================================================
-        print("Mapeando PVs...")
+        print("Mapeando PVs e Inversores...")
         pv_info = dss_sim.get_detected_pvsystems()
-        pvs_dss_map = {e.eid: e for e in grid.children if e.type == 'PVSystem'}
-        buses_map = {e.eid: e for e in grid.children if e.type == 'Bus'}
+        pvs_dss_map = {e.eid: e for e in grid.children if e.type == "PVSystem"}
+        buses_map = {e.eid: e for e in grid.children if e.type == "Bus"}
 
         for info in pv_info:
-            pv_name = info['name']
-            eid_dss = info['eid_dss']
-            bus_full = info.get('bus', '')
-            bus_base = bus_full.split('.')[0]
+            pv_name = info["name"]
+            eid_dss = info["eid_dss"]
+            bus_full = info.get("bus", "")
+            bus_base = bus_full.split(".")[0]
 
             if eid_dss in pvs_dss_map:
                 pv_dss_obj = pvs_dss_map[eid_dss]
                 bus_eid = f"Bus-{bus_base}"
-                
+
                 if bus_eid not in buses_map:
                     continue
                 bus_obj = buses_map[bus_eid]
 
                 pv_panel_obj = pv_sim.PVPanel.create(
-                    1, P_mpp=info['pmpp'], irradiance_base=1.0,
-                    pt_curve_x=info['pt_curve_x'], pt_curve_y=info['pt_curve_y'],
-                    bus_name=bus_base
+                    1,
+                    P_mpp=info["pmpp"],
+                    irradiance_base=1.0,
+                    pt_curve_x=info["pt_curve_x"],
+                    pt_curve_y=info["pt_curve_y"],
+                    bus_name=bus_base,
                 )[0]
 
                 inv_obj = inv_sim.Inverter.create(
-                    1, kVA=info['kva'], eff_curve_x=info['eff_curve_x'],
-                    eff_curve_y=info['eff_curve_y'], ctrl_config={}, bus_name=bus_base
+                    1,
+                    kVA=info["kva"],
+                    eff_curve_x=info["eff_curve_x"],
+                    eff_curve_y=info["eff_curve_y"],
+                    ctrl_config={},
+                    bus_name=bus_base,
                 )[0]
 
-                cols_irr = [c for c in pd.read_csv(DATA_DIR_HOST / IRRADIANCE_CSV_NAME, nrows=0).columns if c.lower() not in ['time', 'date']]
-                cols_tmp = [c for c in pd.read_csv(DATA_DIR_HOST / TEMPERATURE_CSV_NAME, nrows=0).columns if c.lower() not in ['time', 'date']]
-                
+                cols_irr = [
+                    c
+                    for c in pd.read_csv(IRRADIANCE_PATH, nrows=0).columns
+                    if c.lower() not in ["time", "date"]
+                ]
+                cols_tmp = [
+                    c
+                    for c in pd.read_csv(TEMPERATURE_PATH, nrows=0).columns
+                    if c.lower() not in ["time", "date"]
+                ]
+
                 if len(cols_irr) > 1:
-                    pv_number = ''.join(filter(str.isdigit, pv_name)) or '1'
+                    pv_number = "".join(filter(str.isdigit, pv_name)) or "1"
                     col_irrad = f"my_shape{pv_number}_irrad"
                     col_irrad = col_irrad if col_irrad in cols_irr else cols_irr[0]
                     col_temp = f"my_shape{pv_number}_temperature"
@@ -143,89 +154,102 @@ def run_scenario():
                 else:
                     col_irrad, col_temp = cols_irr[0], cols_tmp[0]
 
-                world.connect(csv_data_irr[0], pv_panel_obj, (col_irrad, 'irradiance'))
-                world.connect(csv_data_temp[0], pv_panel_obj, (col_temp, 'temperature'))
-                world.connect(pv_panel_obj, inv_obj, ('P_dc', 'P_dc'))
+                world.connect(csv_data_irr[0], pv_panel_obj, (col_irrad, "irradiance"))
+                world.connect(csv_data_temp[0], pv_panel_obj, (col_temp, "temperature"))
+                world.connect(pv_panel_obj, inv_obj, ("P_dc", "P_dc"))
 
-                world.connect(bus_obj, inv_obj,
-                                ('V1_pu', 'V_meas_1'), ('V2_pu', 'V_meas_2'), ('V3_pu', 'V_meas_3'),
-                                time_shifted=True, initial_data={'V1_pu': 1.0, 'V2_pu': 1.0, 'V3_pu': 1.0})
+                world.connect(
+                    bus_obj,
+                    inv_obj,
+                    ("V1_pu", "V_meas_1"),
+                    ("V2_pu", "V_meas_2"),
+                    ("V3_pu", "V_meas_3"),
+                    time_shifted=True,
+                    initial_data={"V1_pu": 1.0, "V2_pu": 1.0, "V3_pu": 1.0},
+                )
 
-                world.connect(inv_obj, pv_dss_obj, ('P_ac', 'P_des'), ('Q_ac', 'Q_des'))
+                world.connect(inv_obj, pv_dss_obj, ("P_ac", "P_des"), ("Q_ac", "Q_des"))
 
-                world.connect(pv_panel_obj, monitor, 'irradiance', 'temperature', 'P_dc')
-                world.connect(inv_obj, monitor, 'P_ac', 'Q_ac')
-                world.connect(pv_dss_obj, monitor, 'P_meas', 'Q_meas')
-                world.connect(pv_dss_obj, monitor, 'P1', 'P2', 'P3', 'Q1', 'Q2', 'Q3')
-
+                world.connect(pv_panel_obj, monitor, "irradiance", "temperature", "P_dc")
+                world.connect(inv_obj, monitor, "P_ac", "Q_ac")
+                world.connect(pv_dss_obj, monitor, "P_meas", "Q_meas")
+                world.connect(pv_dss_obj, monitor, "P1", "P2", "P3", "Q1", "Q2", "Q3")
 
         # ====================================================================
-        # ALGORITMO DE INSTANCIAÇÃO E CONEXÃO DOS VEÍCULOS ELÉTRICOS (EV)
+        # ALGORITMO DE INSTANCIAÇÃO E CONEXÃO DOS VEÍCULOS ELÉTRICOS (CALDERA)
         # ====================================================================
-        print("Mapeando Veículos Elétricos...")
-        ev_dss_map = {e.eid: e for e in grid.children if e.type == 'Load' and 'EV_' in e.eid}
-        
-        # Mapeamento reverso para encontrar a coluna exata do CSV
-        cols_ev = [c for c in pd.read_csv(EV_CSV_HOST, nrows=0).columns if c.lower() not in ['time', 'date']]
-        ev_col_map = {c.replace('.', '_'): c for c in cols_ev}
+        print("Mapeando e instanciando Veículos Elétricos com física Caldera...")
+        ev_dss_map = {e.eid: e for e in grid.children if e.type == "Load" and "ev_" in e.eid.lower()}
 
+        df_sessions = pd.read_csv(SESSIONS_EV_CSV)
+        perfis_disponiveis = set(df_sessions["Profile_Name"].unique())
+        perfis_map = {p.lower(): p for p in perfis_disponiveis}
+
+        count_evs = 0
         for eid_dss, ev_dss_obj in ev_dss_map.items():
-            # eid_dss vem no formato "Load-EV_User_1_semana_1_7_2kW_1"
-            nome_id = eid_dss.replace('Load-EV_', '')
-            
-            # Remove o sufixo numérico (_1, _2) que foi adicionado no ev_creator
-            nome_id_limpo = '_'.join(nome_id.split('_')[:-1])
-            
-            col_csv = ev_col_map.get(nome_id_limpo)
-            
-            if not col_csv:
-                print(f"[AVISO] Curva não encontrada no CSV para o VE: {nome_id_limpo}")
+            # eid_dss vem no formato "Load-ev_ado1-1_semana_2_7p2kw_10" ou similar
+            nome_raw = eid_dss.split("-", 1)[1] if "-" in eid_dss else eid_dss
+            if nome_raw.lower().startswith("ev_"):
+                nome_id = nome_raw[3:]
+            else:
+                nome_id = nome_raw
+
+            # Remove o sufixo numérico (_1, _2...)
+            profile_slug = "_".join(nome_id.split("_")[:-1])
+            profile_name = perfis_map.get(profile_slug.lower())
+
+            if not profile_name:
+                print(f"[AVISO] Perfil não encontrado no dataset Caldera: {profile_slug}")
                 continue
 
-            potencia = 3.6 if '3.6kW' in col_csv else 7.2
+            # Instancia a entidade de Veículo Elétrico com o modelo físico
+            ev_obj = ev_sim.CalderaEV.create(1, profile_name=profile_name)[0]
 
-            ev_charger_obj = ev_sim.EVCharger.create(
-                1,
-                charger_capacity_kw=potencia,
-                power_factor=1.0,
-                bus_name=nome_id
-            )[0]
+            # Injeta potência ativa (kW) e potência reativa indutiva (kVAr) na barra do OpenDSS
+            world.connect(ev_obj, ev_dss_obj, ("P_kw", "P_kw"), ("Q_kvar", "Q_kvar"))
 
-            # Conecta a coluna de demanda (CSV) no Carregador
-            world.connect(csv_data_ev[0], ev_charger_obj, (col_csv, 'normalized_power'))
-            
-            # Conecta o Carregador na Carga do OpenDSS (Injeção de P e Q)
-            world.connect(ev_charger_obj, ev_dss_obj, ('P_kw', 'P_kw'), ('Q_kvar', 'Q_kvar'))
-            
-            # Monitoramento
-            world.connect(ev_charger_obj, monitor, 'P_kw', 'Q_kvar')
+            # Registra no Monitor/Coletor de dados
+            world.connect(ev_obj, monitor, "P_kw", "Q_kvar", "fp", "is_charging")
+            count_evs += 1
 
+        print(f"Total de {count_evs} Veículos Elétricos conectados à rede com sucesso.")
 
         # ====================================================================
         # MONITORES DE REDE
         # ====================================================================
-        print("Conectando apenas 5 barras ao monitor (modo teste)...")
-        barras_teste = [e for e in grid.children if e.type == 'Bus'][:5]
-        connect_many_to_one(world, barras_teste, monitor, 'V1_pu', 'V2_pu', 'V3_pu')
+        print("Conectando barras e linhas ao monitor...")
+        barras_teste = [e for e in grid.children if e.type == "Bus"][:5]
+        connect_many_to_one(world, barras_teste, monitor, "V1_pu", "V2_pu", "V3_pu")
 
-        print("Conectando apenas 5 linhas ao monitor (modo teste)...")
-        linhas_teste = [e for e in grid.children if e.type == 'Line'][:5]
+        linhas_teste = [e for e in grid.children if e.type == "Line"][:5]
         connect_many_to_one(
-            world, linhas_teste, monitor,
-            'I1_A', 'I1_ang', 'I2_A', 'I2_ang', 'I3_A', 'I3_ang',
-            'P1_w', 'Q1_var', 'P2_w', 'Q2_var', 'P3_w', 'Q3_var'
+            world,
+            linhas_teste,
+            monitor,
+            "I1_A",
+            "I1_ang",
+            "I2_A",
+            "I2_ang",
+            "I3_A",
+            "I3_ang",
+            "P1_w",
+            "Q1_var",
+            "P2_w",
+            "Q2_var",
+            "P3_w",
+            "Q3_var",
         )
 
-        print(f"\nInicializando simulação de {N_PASSOS} passos (Step={STEP_SIZE}s)...")
-
+        print(f"\nInicializando simulação nativa de {N_PASSOS} passos (Step={STEP_SIZE}s)...")
         world.run(until=END_TIME, print_progress=True)
-        print("Simulação concluída.")
+        print("Simulação concluída com sucesso!")
 
-        if ARQUIVO_RESULTADOS_CSV_HOST.exists():
-            print(f"\nResultados salvos em: {ARQUIVO_RESULTADOS_CSV_HOST}")
+        if ARQUIVO_RESULTADOS_CSV.exists():
+            print(f"\nResultados salvos em: {ARQUIVO_RESULTADOS_CSV}")
+
 
 print("Gerando topologia do cenário...")
-exportar_topologia(CIRCUITO_DSS_HOST, JSON_SAIDA)
+exportar_topologia(CIRCUITO_DSS, JSON_SAIDA)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_scenario()

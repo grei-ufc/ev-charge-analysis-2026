@@ -1,3 +1,4 @@
+import math
 import os
 import sys
 from pathlib import Path
@@ -30,6 +31,7 @@ META = {
             "attrs": [
                 "P_kw",          # Potência Ativa demandada da rede AC (kW)
                 "Q_kvar",        # Potência Reativa (kVAr)
+                "fp",            # Fator de Potência estocástico [0.98, 1.00]
                 "is_charging",   # Status booleano indicando recarga ativa
             ],
         },
@@ -44,11 +46,18 @@ class CalderaEVModel:
     nas físicas de bateria, inversores e tapering do Caldera ICM (C++).
     """
 
-    def __init__(self, eid: str, profile_name: str, power_series: np.ndarray):
+    def __init__(self, eid: str, profile_name: str, power_series: np.ndarray, fp: float = 1.0):
         self.eid = eid
         self.profile_name = profile_name
         self.power_series = power_series  # Array de 10080 minutos
         self.total_minutes = len(power_series)
+        self.fp = float(fp)
+
+        # tan(phi) = sqrt(1 - fp^2) / fp para cálculo de potência reativa indutiva (IEC 61000)
+        if 0.0 < self.fp < 1.0:
+            self.tan_phi = math.sqrt(1.0 - self.fp**2) / self.fp
+        else:
+            self.tan_phi = 0.0
 
         # Estados dinâmicos expostos ao Mosaik
         self.P_kw = 0.0
@@ -59,8 +68,12 @@ class CalderaEVModel:
         # Trata repetições cíclicas de semana se a simulação passar de 7 dias
         idx = current_minute % self.total_minutes
         self.P_kw = float(self.power_series[idx])
-        self.Q_kvar = 0.0  # FP unitário padrão nas Wallboxes residenciais AC
         self.is_charging = self.P_kw > 0.05
+        # Potência reativa indutiva estocástica conforme normas IEC 61000-3-2 e IEC 61000-3-12
+        if self.is_charging:
+            self.Q_kvar = round(float(self.P_kw * self.tan_phi), 4)
+        else:
+            self.Q_kvar = 0.0
 
 
 class CalderaEVSim(mosaik_api_v3.Simulator):
@@ -138,8 +151,12 @@ class CalderaEVSim(mosaik_api_v3.Simulator):
                         else:
                             power_series[min_abs] = 0.0  # Concluído e ocioso na tomada
 
+            # Sorteio do fator de potência estocástico por veículo constante durante a semana
+            # FP ~ U(0.98, 1.00) conforme normas IEC 61000-3-2 e IEC 61000-3-12
+            fp_ev = round(float(np.random.uniform(0.98, 1.00)), 4)
+
             # Instancia o modelo da entidade
-            ev_model = CalderaEVModel(eid, profile_name, power_series)
+            ev_model = CalderaEVModel(eid, profile_name, power_series, fp=fp_ev)
             self.entities[eid] = ev_model
             entities_info.append({"eid": eid, "type": model})
 

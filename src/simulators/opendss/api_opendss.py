@@ -511,7 +511,7 @@ class OpenDSSSimulator(mosaik_api_v3.Simulator):
         for name in pv_infos:
             dss.text(
                 f"Edit PVSystem.{name} %cutin=0.0001 %cutout=0.0001 "
-                f"EffCurve=EffIdeal_Cosim P-TCurve=PTIdeal_Cosim"
+                f"EffCurve=EffIdeal_Cosim P-TCurve=PTIdeal_Cosim daily=\"\" TDaily=\"\" irradiance=0.0"
             )
 
     def _check_load_profile(self, eid, name):

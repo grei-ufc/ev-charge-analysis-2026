@@ -11,6 +11,8 @@ dependencies = [
     "pandas>=2.3.2",
     "py-dss-interface>=2.3.0",
     "pybind11>=3.1.0",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
     "scikit-learn>=1.6.1",
     "scipy>=1.13.1",
     "setuptools==69.5.1",
