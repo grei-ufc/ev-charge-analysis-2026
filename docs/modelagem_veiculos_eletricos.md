@@ -222,7 +222,100 @@ Essa invasão na memória permite que a rede de distribuição responda em malha
 
 ---
 
-## 7. Fontes e Referências Técnicas Referidas
+## 7. Pipeline de Alocação Dinâmica de VEs e Cenários de Penetração (`ev_creator.py`)
+
+Para viabilizar a análise paramétrica de diferentes níveis de penetração de mobilidade elétrica na rede de distribuição sem a necessidade de reescrever scripts ou editar arquivos OpenDSS manualmente, foi desenvolvido o módulo de alocação estocástica dinâmico **[`src/simulators/util/ev_creator.py`](file:///mnt/c/Users/pvict/OneDrive/TCC/ev-analysis-2026/src/simulators/util/ev_creator.py)**.
+
+### 7.1. Metodologia Científica: Adoção Domiciliar vs. Barras da Rede
+
+Na literatura de sistemas de distribuição de energia elétrica (IEEE PES, CIGRE, NREL), a taxa de penetração de veículos elétricos residenciais é formalmente quantificada com base no número de domicílios atendidos pela rede de Baixa Tensão (BT), critério denominado **Taxa de Adoção Residencial / Domiciliar** (*Household EV Adoption Rate*):
+
+$$N_{\text{VE}} = \text{round}\left( \frac{P_{\%}}{100} \times N_{\text{domicílios BT}} \right)$$
+
+**Justificativa Metodológica:**
+1. **Distorção por Barras de Média Tensão (MT):** Um alimentador de distribuição real possui centenas de barras de Média Tensão (como chaves, religadores e derivações primárias) onde não existem consumidores residenciais monofásicos conectados. Considerar o total de barras do alimentador dilui artificialmente o impacto da frota nos ramais de BT.
+2. **Modelagem de Cargas Sintéticas da Distribuidora:** No alimentador real estudado (`ESB01S4`), a distribuidora modela cada unidade consumidora (UC) através de duas componentes de carga (`_M1` para corrente constante e `_M2` para impedância constante), totalizando 3.238 cargas para **1.619 domicílios residenciais únicos** em 1.143 barras BT. O algoritmo agrupa essas componentes por ID de consumidor para identificar a quantidade real de residências físicas disponíveis.
+
+O módulo suporta três bases de cálculo (`base_calculo`):
+* **`"residencial_bt"` (Padrão e Recomendado):** Calcula os VEs sobre o universo de unidades consumidoras residenciais BT ($N_{\text{domicílios}} = 1.619$). Uma penetração de 10% resulta em exatamente 162 VEs.
+* **`"barras_bt"`:** Calcula os VEs sobre as barras físicas de Baixa Tensão que hospedam cargas ($N_{\text{barras BT}} = 1.143$). Uma penetração de 5% resulta em 57 VEs.
+* **`"total_barras"`:** Calcula sobre todas as barras do alimentador ($N_{\text{total}} = 2.586$, incluindo MT e BT). Uma penetração de 2% resulta em 52 VEs.
+
+### 7.2. Amostragem Estocástica e Conexão Física na Rede
+
+1. **Amostragem Sem Reposição:** Para $N_{\text{VE}} \le N_{\text{domicílios}}$, o sorteio dos domicílios que receberão um VE é realizado sem reposição (`random.sample`), garantindo no máximo 1 VE por residência para taxas de penetração realistas ($\le 100\%$).
+2. **Adequação de Fase e Tensão Nominal:** Cada residência tem suas fases mapeadas diretamente da topologia compilada pelo OpenDSS. Caso a residência seja monofásica, o carregador é alocado naquela fase específica; caso trifásica, sorteia-se uma das fases disponíveis. A conexão é sempre monofásica fase-neutro com neutro aterrado (`.fase.4`) a 220 V nominais ($k\text{V} = 0{,}220$).
+3. **Atribuição de Perfis Caldera:** A cada VE alocado é sorteado um perfil comportamental do dataset Caldera (`ev_sessions_caldera.csv`), atribuindo-se a potência nominal compatível (3,6 kW para carregadores portáteis e 7,2 kW para Wallboxes de 32 A).
+4. **Reprodutibilidade Estrita:** A semente (`seed`) controla todo o processo pseudoaleatório (sorteio de residências, fases e perfis), permitindo comparar diferentes cenários sob condições perfeitamente controladas.
+
+### 7.3. Interface Programática (Python API)
+
+A função principal pode ser chamada diretamente de qualquer script ou notebook de experimentação:
+
+```python
+from simulators.util.ev_creator import alocar_evs
+
+# 1. Alocação por quantidade fixa (ex: 50 VEs)
+info = alocar_evs(quantidade=50, seed=42)
+
+# 2. Alocação por taxa de adoção domiciliar (ex: 20% das residências BT)
+info = alocar_evs(penetracao_pct=20.0, base_calculo="residencial_bt", seed=42)
+
+# 3. Alocação por porcentagem de barras BT (ex: 10% das barras BT)
+info = alocar_evs(penetracao_pct=10.0, base_calculo="barras_bt", seed=42)
+```
+
+O retorno é um dicionário informativo com metadados do circuito e da alocação gerada:
+```python
+{
+    "qtd_evs": 162,
+    "penetracao_pct": 10.0,
+    "base_calculo": "residencial_bt",
+    "metrica": "10.0% de Adoção Domiciliar BT (162 VEs sobre 1619 domicílios)",
+    "seed": 42,
+    "total_domicilios_bt": 1619,
+    "total_barras_bt": 1143,
+    "total_barras_feeder": 2586,
+    "output_file": ".../data/rede/ESB01S4/ESB01S4_evs.dss"
+}
+```
+
+### 7.4. Integração no Cenário Mosaik (`scenario_ESB01S4_EVs.py`)
+
+A função [`run_scenario`](file:///mnt/c/Users/pvict/OneDrive/TCC/ev-analysis-2026/scenarios/scenario_ESB01S4_EVs.py#L70) recebe os parâmetros de alocação e regera automaticamente o arquivo `ESB01S4_evs.dss` e o arquivo de topologia `topologia_ESB01S4_EVs.json` antes de iniciar a simulação:
+
+```python
+from scenarios.scenario_ESB01S4_EVs import run_scenario
+
+# Executa simulação com 15% de penetração domiciliar
+run_scenario(penetracao_pct=15.0, base_calculo="residencial_bt", seed=42)
+```
+
+**Mecanismo de Cache e Forçamento (`reexecutar_alocacao`):**
+- Por padrão, chamadas a `run_scenario()` sem novos parâmetros reaproveitam o arquivo de VEs já gravado em disco, economizando tempo de compilação.
+- Para forçar um novo sorteio de VEs com a mesma quantidade mas semente diferente, utiliza-se `reexecutar_alocacao=True` (ou `--realocar` via CLI).
+
+### 7.5. Uso via Linha de Comando (CLI)
+
+Ambos os scripts oferecem interfaces de linha de comando estruturadas via `argparse`:
+
+```bash
+# Executa apenas o gerador de VEs para 20% de penetração residencial
+uv run python src/simulators/util/ev_creator.py --penetracao 20 --base residencial_bt
+
+# Executa apenas o gerador com 30 VEs e semente específica
+uv run python src/simulators/util/ev_creator.py --qtd 30 --seed 123
+
+# Executa a co-simulação Mosaik completa alocando dinamicamente 10% de VEs
+uv run python scenarios/scenario_ESB01S4_EVs.py --penetracao 10 --base residencial_bt
+
+# Executa a co-simulação forçando novo sorteio estocástico
+uv run python scenarios/scenario_ESB01S4_EVs.py --realocar --seed 99
+```
+
+---
+
+## 8. Fontes e Referências Técnicas Referidas
 
 1. **Dataset Original de Comportamento e Telemetria:** 
    SØRENSEN, A. L., *et al*. "Residential electric vehicle charging datasets from apartment buildings". *Data in Brief*, v. 36, p. 107105, 2021. Disponível em repositório acadêmico livre. (Alicerçou a base estocástica para transpor os 10.080 minutos de pluge/despluge de 2.300 residentes).

@@ -2,6 +2,7 @@ import mosaik
 import pandas as pd
 from pathlib import Path
 from mosaik.util import connect_many_to_one
+from simulators.util.ev_creator import alocar_evs
 from simulators.util.topologia import exportar_topologia
 
 # ==============================================================================
@@ -66,10 +67,38 @@ SIM_CONFIG = {
 }
 
 
-def run_scenario():
+def run_scenario(
+    qtd_evs: int | None = None,
+    penetracao_pct: float | None = None,
+    base_calculo: str = "residencial_bt",
+    seed: int = 42,
+    reexecutar_alocacao: bool = False,
+):
     if not CIRCUITO_DSS.exists():
         print(f"[ERRO]: Arquivo DSS não encontrado em:\n{CIRCUITO_DSS}")
         return
+
+    evs_dss_path = DATA_DIR / "ESB01S4_evs.dss"
+    if (
+        qtd_evs is not None
+        or penetracao_pct is not None
+        or reexecutar_alocacao
+        or not evs_dss_path.exists()
+    ):
+        print("Configurando alocação de Veículos Elétricos...")
+        info_aloc = alocar_evs(
+            quantidade=qtd_evs,
+            penetracao_pct=penetracao_pct,
+            base_calculo=base_calculo,
+            seed=seed,
+            caminho_dss=CIRCUITO_DSS,
+            output_dss=evs_dss_path,
+            ev_sessions_csv=SESSIONS_EV_CSV,
+        )
+        print(f"Alocação concluída: {info_aloc['metrica']}")
+
+    print("Gerando topologia do cenário...")
+    exportar_topologia(CIRCUITO_DSS, JSON_SAIDA)
 
     with mosaik.World(SIM_CONFIG, mosaik_config={"start_timeout": 60}) as world:
         print("--- Iniciando Co-simulação Nativa com Veículos Elétricos (Caldera ICM) ---")
@@ -287,8 +316,40 @@ def run_scenario():
             print(f"\nResultados salvos em: {ARQUIVO_RESULTADOS_CSV}")
 
 
-print("Gerando topologia do cenário...")
-exportar_topologia(CIRCUITO_DSS, JSON_SAIDA)
-
 if __name__ == "__main__":
-    run_scenario()
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Co-simulação Mosaik do alimentador ESB01S4 com Veículos Elétricos (Caldera ICM)."
+    )
+    parser.add_argument(
+        "--qtd-evs", "-n", type=int, default=None,
+        help="Quantidade fixa de VEs para alocar"
+    )
+    parser.add_argument(
+        "--penetracao", "-p", type=float, default=None,
+        help="Taxa de penetração de VEs em porcentagem (ex: 20 para 20%%)"
+    )
+    parser.add_argument(
+        "--base", "-b", type=str, default="residencial_bt",
+        choices=["residencial_bt", "barras_bt", "total_barras"],
+        help="Base de cálculo da penetração (padrão: residencial_bt)"
+    )
+    parser.add_argument(
+        "--seed", "-s", type=int, default=42,
+        help="Semente pseudoaleatória (padrão: 42)"
+    )
+    parser.add_argument(
+        "--realocar", action="store_true",
+        help="Força nova alocação estocástica antes de iniciar a simulação"
+    )
+
+    args = parser.parse_args()
+
+    run_scenario(
+        qtd_evs=args.qtd_evs,
+        penetracao_pct=args.penetracao,
+        base_calculo=args.base,
+        seed=args.seed,
+        reexecutar_alocacao=args.realocar,
+    )
