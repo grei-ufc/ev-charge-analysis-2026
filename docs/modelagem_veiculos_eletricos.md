@@ -235,3 +235,4 @@ Essa invasão na memória permite que a rede de distribuição responda em malha
 5. **Inventário Oficial da Frota ABVE (Jan/2022 a Ago/2026):** 
    Associação Brasileira do Veículo Elétrico (ABVE) - Catálogo e *market-share* de eletrificados brasileiro. Fichas técnicas das montadoras *Build Your Dreams (BYD)*, *Great Wall Motors (GWM)* e *Geely*. Usadas para validar nominalidade de baterias e Wallboxes monofásicas de $7\text{ kW}$ e $6,6\text{ kW}$ aplicadas no método *Monte Carlo*.
 
+ 

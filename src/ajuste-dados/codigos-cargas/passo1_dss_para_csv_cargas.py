@@ -23,11 +23,11 @@ def interpolar_pchip_diario(mults):
     y = mults + [mults[0]]
     
     # 25 pontos de hora em hora (das 00:00 até 00:00 do dia seguinte)
-    idx_1h = pd.date_range("2026-01-01", periods=25, freq="h")
+    idx_1h = pd.date_range("2024-09-09", periods=25, freq="h")
     s = pd.Series(y, index=idx_1h)
     
     # 145 pontos de 10 em 10 min
-    idx_10min = pd.date_range("2026-01-01", periods=145, freq="10min")
+    idx_10min = pd.date_range("2024-09-09", periods=145, freq="10min")
     
     # Interpolação PCHIP e reindexação
     s_interp = s.reindex(idx_10min).interpolate(method='pchip')

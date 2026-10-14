@@ -94,7 +94,7 @@ if __name__ == "__main__":
     df_opendss = pd.DataFrame(curvas)
     
     # Adiciona a coluna de tempo exigida pelo simulador do Mosaik
-    datas = pd.date_range(start="2026-01-01 00:00:00", periods=len(df_opendss), freq="10min")
+    datas = pd.date_range(start="2024-09-09 00:00:00", periods=len(df_opendss), freq="10min")
     df_opendss.insert(0, "Date", datas)
     
     caminho_csv = OUTPUT_DIR / "ev_loadshapes_normalized.csv"

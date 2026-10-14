@@ -19,7 +19,7 @@ JSON_SAIDA = str(OUTPUT_DIR / "topologia_ESB01S4.json")
 # ==============================================================================
 # 2. CONFIGURAÇÕES DE TEMPO E PASSOS
 # ==============================================================================
-START_DATE = "2026-01-01 00:00:00"
+START_DATE = "2024-09-09 00:00:00"
 STEP_MINUTES = 10
 STEP_SIZE = 60 * STEP_MINUTES
 DIAS_SIMULACAO = 7
@@ -50,6 +50,9 @@ SIM_CONFIG = {
     "CSV_Temp": {
         "python": "simulators.collector.csv_sim_pandas:CSV",
     },
+    "Regulator": {
+        "python": "simulators.controller.regulator_control:RegulatorSimulator",
+    },
     "Collector": {
         "python": "simulators.collector.collector:Collector",
     },
@@ -65,6 +68,7 @@ def run_scenario():
         print("--- Iniciando Co-simulação Mosaik Nativa (Sem Docker) ---")
 
         # 1. Iniciando Simuladores Nativamente em Python
+        reg_sim = world.start("Regulator", step_size=STEP_SIZE)
         dss_sim = world.start("DSS", topofile=str(CIRCUITO_DSS), step_size=STEP_SIZE)
         pv_sim = world.start("PVSimulator", step_size=STEP_SIZE)
         inv_sim = world.start("InverterSim", step_size=STEP_SIZE)
@@ -88,6 +92,36 @@ def run_scenario():
         buses_map = {e.eid: e for e in grid.children if e.type == "Bus"}
 
         # ====================================================================
+        
+        # ====================================================================
+        # ALGORITMO DE INSTANCIAÇÃO E CONEXÃO DOS REGULADORES
+        # ====================================================================
+        print("Mapeando Reguladores...")
+        reg_info_list = dss_sim.get_detected_regulators()
+        regs_dss_map = {e.eid: e for e in grid.children if e.type == "RegControl"}
+        
+        for r_info in reg_info_list:
+            r_name = r_info["name"]
+            r_eid = f"RegControl-{r_name}"
+            
+            # Instancia o controle no RegulatorSimulator
+            ctrl_model = reg_sim.RegController.create(1, 
+                delay=r_info["delay"],
+                tap_delay=r_info["tap_delay"],
+                vreg=r_info["vreg"],
+                band=r_info["band"],
+                pt_ratio=r_info["pt_ratio"],
+                ct_primary=r_info["ct_primary"],
+                R=r_info["R"],
+                X=r_info["X"],
+                tap_ini=r_info["tap_ini"]
+            )
+            
+            # Conecta OpenDSS -> Regulator -> OpenDSS
+            dss_reg = regs_dss_map[r_eid]
+            world.connect(dss_reg, ctrl_model[0], "v_meas", "i_meas")
+            world.connect(ctrl_model[0], dss_reg, ("tap_cmd", "tap"), time_shifted=True, initial_data={"tap_cmd": r_info["tap_ini"]})
+
         # ALGORITMO DE INSTANCIAÇÃO E CONEXÃO DO SMART INVERTER
         # ====================================================================
         print("Mapeando PVs e Inversores...")
@@ -194,7 +228,7 @@ def run_scenario():
         )
 
         print(f"\nInicializando simulação nativa de {N_PASSOS} passos (Step={STEP_SIZE}s)...")
-        world.run(until=END_TIME, print_progress=True)
+        world.run(until=END_TIME, print_progress=False)
         print("Simulação concluída com sucesso!")
 
         if ARQUIVO_RESULTADOS_CSV.exists():

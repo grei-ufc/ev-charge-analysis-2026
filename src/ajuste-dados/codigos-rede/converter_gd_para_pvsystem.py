@@ -24,7 +24,7 @@ STEP = '10min'
 DIAS = 7
 T_SIMULATION_MIN = DIAS * 24 * 60
 NPTS_ORIGIN = ceil(T_SIMULATION_MIN / 15)
-START_DATE = "2026-01-01 00:00:00"
+START_DATE = "2024-09-09 00:00:00"
 
 # ==============================================================================
 # FUNÇÕES DE EXTRAÇÃO
@@ -46,10 +46,16 @@ def extrair_geradores(dss_file: Path):
             m_kw = re.search(r'kw=([\d\.]+)', linha, re.IGNORECASE)
             
             if m_phases and m_bus and m_kv and m_kw:
+                phases = int(m_phases.group(1))
+                kv = float(m_kv.group(1))
+                # Correção de Topologia: Geradores trifásicos em rede 380/220V com kv=0.22 devem ser kv=0.38
+                if phases >= 2 and abs(kv - 0.22) < 0.05:
+                    kv = 0.38
+                
                 geradores.append({
-                    'PV_phases': int(m_phases.group(1)),
+                    'PV_phases': phases,
                     'PV_bus': m_bus.group(1),
-                    'PV_kv': float(m_kv.group(1)),
+                    'PV_kv': kv,
                     'PV_kva': float(m_kw.group(1))
                 })
     return geradores
@@ -223,7 +229,7 @@ class PVGenerator:
                 f"kV={pv.kv} kVA={pv.kva} irrad={pv.irrad/1000} Pmpp={pv.pmpp}\n"
                 f"~ temperature={pv.temperature} PF={pv.pf} EffCurve=MyEff P-TCurve=MyPvsT\n"
                 f"~ Daily=shape_irrad_{c_id} TDaily=shape_temp_{c_id}\n"
-                f"~ Vminpu={pv.vminpu} Model={pv.model}\n"
+                f"~ Model={pv.model} Vminpu={pv.vminpu}\n"
             )
             dss_lines.append(pv_command)
 

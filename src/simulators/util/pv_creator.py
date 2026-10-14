@@ -24,7 +24,7 @@ __version__ = "1.1.1"
 #    - The script expects a directory (SOLAR_STATION_FILES) containing one CSV file
 #      per solar station, named exactly as specified in the metadata (e.g., 'station_01.csv').
 #    - Each CSV must have at least the following columns (with exactly these names):
-#        * datetime               : timestamp string (e.g., '2026-01-01 00:00:00')
+#        * datetime               : timestamp string (e.g., '2024-09-09 00:00:00')
 #        * poa_irradiance_wm2     : plane‑of‑array irradiance (W/m²)
 #        * panel_temperature_celsius : PV panel temperature (°C)
 #    - The metadata file (INFO_PV_FILE) is a CSV with at least the columns:
@@ -38,7 +38,7 @@ __version__ = "1.1.1"
 #      points automatically (npts_origin).
 #    - step : desired output time step (Pandas offset alias, e.g., '5min', '1h', '30s').
 #    - start_date : start date/time for the interpolated output series. Must be a
-#      string compatible with Pandas (e.g., "2026-01-01 00:00:00").
+#      string compatible with Pandas (e.g., "2024-09-09 00:00:00").
 #    - my_seed : random seed for reproducible bus sampling.
 #
 # 4. OUTPUT LOCATION
@@ -96,7 +96,7 @@ logger = logging.getLogger(__name__)
 t_simulation = 24 * 60 * 1              # Total simulation time in minutes
 npts_origin = ceil(t_simulation/15)     # Original data points (15-min base)
 step = '5min'                           # Target simulation time step (e.g., '5s', '5min', '2h')
-start_date = "2026-01-01 00:00:00"      # Target simulation start timestamp for the final outputs 
+start_date = "2024-09-09 00:00:00"      # Target simulation start timestamp for the final outputs 
 my_seed = 25                            # Seed for reproducibility of random bus sampling
 
 # --- Paths Configurations ---
@@ -263,7 +263,7 @@ class PVGenerator:
         Args:
             new_rate (str): Pandas offset alias for the target frequency (e.g., '5s', '5min', '2h').
             npts_base_15min (int): Number of points in the original 15-minute resolution time series.
-            start_date (str): Start date/time for the new interpolated timeline (format e.g., "2026-01-01 00:00:00").
+            start_date (str): Start date/time for the new interpolated timeline (format e.g., "2024-09-09 00:00:00").
         """
 
         # Define Timedelta parameters natively to handle any scale (seconds, minutes, hours)
@@ -309,7 +309,7 @@ class PVGenerator:
         Args:
             new_rate (str): Pandas offset alias for the target frequency (e.g., '5s', '5min', '2h').
             npts_base_15min (int): Number of points in the original 15-minute resolution time series.
-            start_date (str): Start date/time for the new interpolated timeline (format e.g., "2026-01-01 00:00:00").
+            start_date (str): Start date/time for the new interpolated timeline (format e.g., "2024-09-09 00:00:00").
         """
 
         # Define Timedelta parameters natively to handle any scale (seconds, minutes, hours)

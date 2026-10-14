@@ -23,7 +23,7 @@ SESSIONS_EV_CSV = (
 # ==============================================================================
 # 2. CONFIGURAÇÕES DE TEMPO E PASSOS
 # ==============================================================================
-START_DATE = "2026-01-01 00:00:00"
+START_DATE = "2024-09-09 00:00:00"
 STEP_MINUTES = 10
 STEP_SIZE = 60 * STEP_MINUTES
 DIAS_SIMULACAO = 7
@@ -57,6 +57,9 @@ SIM_CONFIG = {
     "CalderaEV": {
         "python": "simulators.ev.caldera_ev_sim:CalderaEVSim",
     },
+    "Regulator": {
+        "python": "simulators.controller.regulator_control:RegulatorSimulator",
+    },
     "Collector": {
         "python": "simulators.collector.collector:Collector",
     },
@@ -72,6 +75,7 @@ def run_scenario():
         print("--- Iniciando Co-simulação Nativa com Veículos Elétricos (Caldera ICM) ---")
 
         # 1. Instanciando Simuladores Nativos
+        reg_sim = world.start("Regulator", step_size=STEP_SIZE)
         dss_sim = world.start("DSS", topofile=str(CIRCUITO_DSS), step_size=STEP_SIZE)
         pv_sim = world.start("PVSimulator", step_size=STEP_SIZE)
         inv_sim = world.start("InverterSim", step_size=STEP_SIZE)
@@ -95,6 +99,36 @@ def run_scenario():
         monitor = collector.Monitor()
 
         # ====================================================================
+        
+        # ====================================================================
+        # ALGORITMO DE INSTANCIAÇÃO E CONEXÃO DOS REGULADORES
+        # ====================================================================
+        print("Mapeando Reguladores...")
+        reg_info_list = dss_sim.get_detected_regulators()
+        regs_dss_map = {e.eid: e for e in grid.children if e.type == "RegControl"}
+        
+        for r_info in reg_info_list:
+            r_name = r_info["name"]
+            r_eid = f"RegControl-{r_name}"
+            
+            # Instancia o controle no RegulatorSimulator
+            ctrl_model = reg_sim.RegController.create(1, 
+                delay=r_info["delay"],
+                tap_delay=r_info["tap_delay"],
+                vreg=r_info["vreg"],
+                band=r_info["band"],
+                pt_ratio=r_info["pt_ratio"],
+                ct_primary=r_info["ct_primary"],
+                R=r_info["R"],
+                X=r_info["X"],
+                tap_ini=r_info["tap_ini"]
+            )
+            
+            # Conecta OpenDSS -> Regulator -> OpenDSS
+            dss_reg = regs_dss_map[r_eid]
+            world.connect(dss_reg, ctrl_model[0], "v_meas", "i_meas")
+            world.connect(ctrl_model[0], dss_reg, ("tap_cmd", "tap"), time_shifted=True, initial_data={"tap_cmd": r_info["tap_ini"]})
+
         # ALGORITMO DE INSTANCIAÇÃO E CONEXÃO DO SMART INVERTER E PV
         # ====================================================================
         print("Mapeando PVs e Inversores...")
@@ -218,8 +252,13 @@ def run_scenario():
         # MONITORES DE REDE
         # ====================================================================
         print("Conectando barras e linhas ao monitor...")
-        barras_teste = [e for e in grid.children if e.type == "Bus"][:5]
-        connect_many_to_one(world, barras_teste, monitor, "V1_pu", "V2_pu", "V3_pu")
+        # barras_teste = [e for e in grid.children if e.type == "Bus"][:5]
+        # connect_many_to_one(world, barras_teste, monitor, "V1_pu", "V2_pu", "V3_pu")
+        
+        # Conectando todas as barras de Baixa Tensão (BT)
+        barras_bt = [e for e in grid.children if e.type == "Bus" and e.extra_info.get("kv_base", 13.8) < 1.0]
+        print(f"Total de {len(barras_bt)} barras BT encontradas. Conectando ao monitor...")
+        connect_many_to_one(world, barras_bt, monitor, "V1_pu", "V2_pu", "V3_pu")
 
         linhas_teste = [e for e in grid.children if e.type == "Line"][:5]
         connect_many_to_one(
