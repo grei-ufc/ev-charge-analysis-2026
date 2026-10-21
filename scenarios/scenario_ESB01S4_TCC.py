@@ -26,6 +26,10 @@ Características principais:
 """
 
 import argparse
+import asyncio
+import concurrent.futures
+import contextlib
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -34,6 +38,27 @@ import pandas as pd
 from mosaik.util import connect_many_to_one
 from simulators.util.ev_creator import alocar_evs
 from simulators.util.topologia import exportar_topologia
+
+
+@contextlib.contextmanager
+def suprimir_stdout_c():
+    """
+    Silencia no nível do sistema operacional (C / libc) saídas diretas no stdout (FD 1),
+    como as mensagens repetitivas '>>Waiting...' e 'Actor 1: Job done' emitidas pela DLL
+    do OpenDSS a cada passo de solução.
+    """
+    try:
+        devnull_fd = os.open(os.devnull, os.O_WRONLY)
+        saved_stdout_fd = os.dup(1)
+        os.dup2(devnull_fd, 1)
+        os.close(devnull_fd)
+        try:
+            yield
+        finally:
+            os.dup2(saved_stdout_fd, 1)
+            os.close(saved_stdout_fd)
+    except Exception:
+        yield
 
 # ==============================================================================
 # 1. CAMINHOS LOCAIS DO PROJETO
@@ -98,7 +123,7 @@ SIM_CONFIG = {
 }
 
 
-def run_scenario(
+def _run_scenario_impl(
     qtd_evs: Optional[int] = None,
     penetracao_pct: Optional[float] = None,
     base_calculo: str = "residencial_bt",
@@ -106,6 +131,7 @@ def run_scenario(
     usar_pv_mosaik: bool = False,
     nome_cenario: Optional[str] = None,
     reexecutar_alocacao: bool = False,
+    mostrar_progresso: bool = False,
 ):
     """
     Executa o cenário principal de co-simulação com Mosaik.
@@ -176,7 +202,8 @@ def run_scenario(
 
     # 3. Exportação e Atualização da Topologia
     print("Atualizando topologia do cenário...")
-    exportar_topologia(CIRCUITO_DSS, JSON_SAIDA)
+    with suprimir_stdout_c():
+        exportar_topologia(CIRCUITO_DSS, JSON_SAIDA)
 
     # 4. Inicialização da Co-simulação no Mosaik
     with mosaik.World(SIM_CONFIG, mosaik_config={"start_timeout": 60}) as world:
@@ -401,10 +428,71 @@ def run_scenario(
 
         # 4.6. Execução da Simulação
         print(f"\nInicializando simulação de {N_PASSOS} passos (Step={STEP_SIZE}s, Total={DIAS_SIMULACAO} dias)...")
-        world.run(until=END_TIME, print_progress=True)
+        with suprimir_stdout_c():
+            world.run(until=END_TIME, print_progress=mostrar_progresso)
         print(f"\nSimulação concluída com sucesso! Resultados em: {arquivo_resultados_csv.name}")
 
     return arquivo_resultados_csv
+
+
+def run_scenario(
+    qtd_evs: Optional[int] = None,
+    penetracao_pct: Optional[float] = None,
+    base_calculo: str = "residencial_bt",
+    seed: int = 42,
+    usar_pv_mosaik: bool = False,
+    nome_cenario: Optional[str] = None,
+    reexecutar_alocacao: bool = False,
+    mostrar_progresso: bool = False,
+):
+    """
+    Despacha a execução do cenário garantindo compatibilidade com Jupyter Notebooks
+    e scripts normais, evitando colisões com event loops existentes do asyncio.
+    """
+    # 1. Aplica nest_asyncio caso disponível
+    try:
+        import nest_asyncio2 as nest_asyncio
+        nest_asyncio.apply()
+    except ImportError:
+        try:
+            import nest_asyncio
+            nest_asyncio.apply()
+        except ImportError:
+            pass
+
+    # 2. Verifica se a thread atual já possui um event loop ativo (ex: IPython / Jupyter)
+    loop_ativo = None
+    try:
+        loop_ativo = asyncio.get_running_loop()
+    except RuntimeError:
+        loop_ativo = None
+
+    if loop_ativo is not None and loop_ativo.is_running():
+        # Executa em uma thread separada com event loop limpo para o Mosaik
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(
+                _run_scenario_impl,
+                qtd_evs=qtd_evs,
+                penetracao_pct=penetracao_pct,
+                base_calculo=base_calculo,
+                seed=seed,
+                usar_pv_mosaik=usar_pv_mosaik,
+                nome_cenario=nome_cenario,
+                reexecutar_alocacao=reexecutar_alocacao,
+                mostrar_progresso=mostrar_progresso,
+            )
+            return future.result()
+    else:
+        return _run_scenario_impl(
+            qtd_evs=qtd_evs,
+            penetracao_pct=penetracao_pct,
+            base_calculo=base_calculo,
+            seed=seed,
+            usar_pv_mosaik=usar_pv_mosaik,
+            nome_cenario=nome_cenario,
+            reexecutar_alocacao=reexecutar_alocacao,
+            mostrar_progresso=mostrar_progresso,
+        )
 
 
 if __name__ == "__main__":
@@ -440,6 +528,10 @@ if __name__ == "__main__":
         "--realocar", action="store_true",
         help="Força nova alocação estocástica de VEs antes de iniciar."
     )
+    parser.add_argument(
+        "--progresso", action="store_true", default=False,
+        help="Exibe a barra de progresso durante a co-simulação (padrão: False)."
+    )
 
     args = parser.parse_args()
 
@@ -451,5 +543,6 @@ if __name__ == "__main__":
         usar_pv_mosaik=args.usar_pv_mosaik,
         nome_cenario=args.cenario_nome,
         reexecutar_alocacao=args.realocar,
+        mostrar_progresso=args.progresso,
     )
 

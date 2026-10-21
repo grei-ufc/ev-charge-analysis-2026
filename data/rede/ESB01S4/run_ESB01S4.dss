@@ -14,8 +14,6 @@ Redirect ESB01S4_evs.dss
 
 ! Configuracoes de controle
 Set ControlMode=Time
-Set Maxiterations=150
-Set MaxControlIter=50
 ! Desabilita controle automatico interno do OpenDSS para delegar o controle ao RegulatorSimulator do Mosaik
 Batchedit RegControl..* maxtapchange=0
 
