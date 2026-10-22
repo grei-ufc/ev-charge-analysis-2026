@@ -316,15 +316,20 @@ def _run_scenario_impl(
                         kVA=info["kva"],
                         eff_curve_x=info["eff_curve_x"],
                         eff_curve_y=info["eff_curve_y"],
-                        ctrl_config={},
+                        ctrl_config={
+                            "reactive_mode": "none",  # Volt-VAr desligado (FP=1.0, realidade regulatória atual)
+                            "volt_watt": None,        # Volt-Watt desligado (sem curtailment de potência ativa)
+                        },
                         bus_name=bus_base,
                     )[0]
 
                     if len(cols_irr) > 1:
                         pv_num = "".join(filter(str.isdigit, pv_name)) or "1"
-                        col_irrad = f"my_shape{pv_num}_irrad"
+                        cand_irrad = f"shape_irrad_{pv_num}"
+                        col_irrad = cand_irrad if cand_irrad in cols_irr else f"my_shape{pv_num}_irrad"
                         col_irrad = col_irrad if col_irrad in cols_irr else cols_irr[0]
-                        col_temp = f"my_shape{pv_num}_temperature"
+                        cand_temp = f"shape_temp_{pv_num}"
+                        col_temp = cand_temp if cand_temp in cols_tmp else f"my_shape{pv_num}_temperature"
                         col_temp = col_temp if col_temp in cols_tmp else cols_tmp[0]
                     else:
                         col_irrad, col_temp = cols_irr[0], cols_tmp[0]
