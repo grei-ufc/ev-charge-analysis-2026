@@ -1,0 +1,85 @@
+{
+    "Base": {
+        "n_passos": 1008,
+        "pv": {
+            "num_pvs": 303,
+            "p_dc_pico_kw": 3228.114858623042,
+            "energia_dc_mwh": 89.08307411624662
+        },
+        "ev": {
+            "num_evs": 0,
+            "p_ev_pico_kw": 0.0,
+            "energia_ev_mwh": 0.0,
+            "max_ve_simultaneos": 0,
+            "media_ve_simultaneos": 0.0
+        },
+        "voltage_all": {
+            "num_nos": 15,
+            "v_min": 1.0007416993867813,
+            "v_min_local": "243862438tr-V1_pu",
+            "v_min_data": "2024-09-09 00:10:00",
+            "v_max": 1.0457396620341564,
+            "v_max_local": "3872701038464980-V2_pu",
+            "v_max_data": "2024-09-10 04:30:00",
+            "v_med": 1.0256050722151733,
+            "pct_adeq": 100.0,
+            "pct_sub": 0.0,
+            "pct_sob": 0.0
+        },
+        "voltage_common": {
+            "num_nos": 6,
+            "v_min": 1.0007416993867813,
+            "v_min_local": "243862438tr-V1_pu",
+            "v_min_data": "2024-09-09 00:10:00",
+            "v_max": 1.0422642653776946,
+            "v_max_local": "243862438tr-V1_pu",
+            "v_max_data": "2024-09-15 18:30:00",
+            "v_med": 1.021193930637083,
+            "pct_adeq": 100.0,
+            "pct_sub": 0.0,
+            "pct_sob": 0.0
+        }
+    },
+    "EVs": {
+        "n_passos": 1008,
+        "pv": {
+            "num_pvs": 303,
+            "p_dc_pico_kw": 3228.114858623042,
+            "energia_dc_mwh": 89.08307411624662
+        },
+        "ev": {
+            "num_evs": 50,
+            "p_ev_pico_kw": 60.86956521739122,
+            "data_pico_ev": "2024-09-12 23:50:00",
+            "energia_ev_mwh": 2.189148495872836,
+            "max_ve_simultaneos": 8,
+            "media_ve_simultaneos": 1.7371031746031746
+        },
+        "voltage_all": {
+            "num_nos": 6630,
+            "v_min": 0.8556797780816059,
+            "v_min_local": "3861951838457432-V2_pu",
+            "v_min_data": "2024-09-14 23:30:00",
+            "v_max": 1.2076907284894192,
+            "v_max_local": "3857980038462787-V2_pu",
+            "v_max_data": "2024-09-12 14:30:00",
+            "v_med": 1.011727255866169,
+            "pct_adeq": 96.25402031560924,
+            "pct_sub": 0.6503527336860669,
+            "pct_sob": 3.095626950704696
+        },
+        "voltage_common": {
+            "num_nos": 6,
+            "v_min": 1.0021581344421615,
+            "v_min_local": "243862438tr-V1_pu",
+            "v_min_data": "2024-09-09 00:10:00",
+            "v_max": 1.045768700821682,
+            "v_max_local": "243862438tr-V2_pu",
+            "v_max_data": "2024-09-12 14:30:00",
+            "v_med": 1.024095863807039,
+            "pct_adeq": 100.0,
+            "pct_sub": 0.0,
+            "pct_sob": 0.0
+        }
+    }
+}
