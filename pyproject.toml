@@ -5,12 +5,15 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
+    "geopandas>=1.0.1",
+    "jinja2>=3.1.6",
     "mosaik==3.5.0",
     "mosaik-pandapower==0.2.2",
     "opender==2.1.6",
     "pandas>=2.3.2",
     "py-dss-interface>=2.3.0",
     "pybind11>=3.1.0",
+    "pyogrio>=0.11.1",
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "scikit-learn>=1.6.1",

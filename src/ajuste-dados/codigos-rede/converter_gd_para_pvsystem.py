@@ -26,11 +26,36 @@ T_SIMULATION_MIN = DIAS * 24 * 60
 NPTS_ORIGIN = ceil(T_SIMULATION_MIN / 15)
 START_DATE = "2024-09-09 00:00:00"
 
+# Mapeamento de barras que fisicamente possuem apenas 1 fase + neutro na rede BT (evita nós flutuantes)
+BARRAS_MONOFASICAS_BT = {
+    "3866974338468827": "3866974338468827.3.4",
+    "3858807938464405": "3858807938464405.1.4",
+    "3857601938460002": "3857601938460002.1.4",
+    "3858371138460380": "3858371138460380.1.4",
+    "3857773338459146": "3857773338459146.1.4",
+    "3856380038463820": "3856380038463820.1.4",
+    "3866354038468928": "3866354038468928.1.4",
+    "3859103838474718": "3859103838474718.1.4",
+    "3872701038464502": "3872701038464502.1.4",
+    "3857881438458524": "3857881438458524.1.4",
+    "3858218938460615": "3858218938460615.1.4",
+    "3857343438464427": "3857343438464427.1.4",
+    "3858922838474457": "3858922838474457.3.4",
+    "3873424138463998": "3873424138463998.1.4",
+    "3862115538458927": "3862115538458927.1.4",
+    "3876796438462655": "3876796438462655.3.4",
+    "3873369138464025": "3873369138464025.1.4",
+    "3873397138464000": "3873397138464000.1.4",
+    "3859057838459073": "3859057838459073.1.4",
+    "3857411438459173": "3857411438459173.1.4",
+    "3872644238464508": "3872644238464508.1.4",
+}
+
 # ==============================================================================
 # FUNÇÕES DE EXTRAÇÃO
 # ==============================================================================
 def extrair_geradores(dss_file: Path):
-    """Lê um arquivo .dss de GD (BDGD) e extrai fases, barra, tensão e potência."""
+    """Lê um arquivo .dss de GD (BDGD) e extrai fases, barra, conexão, tensão e potência."""
     geradores = []
     if not dss_file.exists():
         return geradores
@@ -44,19 +69,33 @@ def extrair_geradores(dss_file: Path):
             m_bus = re.search(r'bus1=([^\s]+)', linha, re.IGNORECASE)
             m_kv = re.search(r'kv=([\d\.]+)', linha, re.IGNORECASE)
             m_kw = re.search(r'kw=([\d\.]+)', linha, re.IGNORECASE)
+            m_conn = re.search(r'conn=([^\s]+)', linha, re.IGNORECASE)
             
             if m_phases and m_bus and m_kv and m_kw:
                 phases = int(m_phases.group(1))
+                bus = m_bus.group(1)
                 kv = float(m_kv.group(1))
-                # Correção de Topologia: Geradores trifásicos em rede 380/220V com kv=0.22 devem ser kv=0.38
-                if phases >= 2 and abs(kv - 0.22) < 0.05:
-                    kv = 0.38
+                kw = float(m_kw.group(1))
+                conn = m_conn.group(1).capitalize() if m_conn else ("Delta" if phases >= 3 else "Wye")
+
+                # Checagem de nós flutuantes em barras monofásicas BT
+                bus_base = bus.split('.')[0]
+                if bus_base in BARRAS_MONOFASICAS_BT:
+                    phases = 1
+                    bus = BARRAS_MONOFASICAS_BT[bus_base]
+                    kv = 0.22
+                    conn = "Wye"
+                else:
+                    # Correção de Topologia: Geradores trifásicos em rede 380/220V com kv=0.22 devem ser kv=0.38
+                    if phases >= 2 and abs(kv - 0.22) < 0.05:
+                        kv = 0.38
                 
                 geradores.append({
                     'PV_phases': phases,
-                    'PV_bus': m_bus.group(1),
+                    'PV_bus': bus,
+                    'PV_conn': conn,
                     'PV_kv': kv,
-                    'PV_kva': float(m_kw.group(1))
+                    'PV_kva': kw
                 })
     return geradores
 
@@ -66,7 +105,7 @@ def extrair_geradores(dss_file: Path):
 class PVGenerator:
     _solar_cache = {}
 
-    def __init__(self, PV_id, PV_phases, PV_bus, PV_kv, PV_kva, PV_curve_id, PV_list, start=96):
+    def __init__(self, PV_id, PV_phases, PV_bus, PV_kv, PV_kva, PV_curve_id, PV_list, PV_conn="Delta", start=96):
         self.curve_id = PV_curve_id
         self.curve = PV_list.iloc[self.curve_id - 1]['id']
         self.FILE_CSV = self.curve + '.csv'
@@ -80,6 +119,7 @@ class PVGenerator:
         self.name = f'PV{PV_id}'
         self.phases = PV_phases
         self.bus = PV_bus
+        self.conn = PV_conn
         self.kv = PV_kv
         self.kva = PV_kva
         
@@ -87,7 +127,8 @@ class PVGenerator:
         self.pmpp = self.kva
         self.temperature = 25
         self.pf = 1
-        self.vminpu = 0.001
+        self.vminpu = 0.80
+        self.vmaxpu = 1.20
         self.model = 1
 
         self.effcurve = 'New XYCurve.MyEff npts=4 xarray=[0.1, 0.2, 0.4, 1.0] yarray=[0.86, 0.90, 0.93, 0.97]'
@@ -225,11 +266,11 @@ class PVGenerator:
                 processed_curves.add(c_id)
             
             pv_command = (
-                f"New PVSystem.{pv.name} phases={pv.phases} Bus1={pv.bus} "
+                f"New PVSystem.{pv.name} phases={pv.phases} conn={pv.conn} Bus1={pv.bus} "
                 f"kV={pv.kv} kVA={pv.kva} irrad={pv.irrad/1000} Pmpp={pv.pmpp}\n"
                 f"~ temperature={pv.temperature} PF={pv.pf} EffCurve=MyEff P-TCurve=MyPvsT\n"
                 f"~ Daily=shape_irrad_{c_id} TDaily=shape_temp_{c_id}\n"
-                f"~ Model={pv.model} Vminpu={pv.vminpu}\n"
+                f"~ Model={pv.model} Vminpu={pv.vminpu} Vmaxpu={pv.vmaxpu}\n"
             )
             dss_lines.append(pv_command)
 
@@ -290,6 +331,7 @@ def processar_gds(alimentador):
                     PV_id=i+1,
                     PV_phases=gen_data['PV_phases'],
                     PV_bus=gen_data['PV_bus'],
+                    PV_conn=gen_data['PV_conn'],
                     PV_kv=gen_data['PV_kv'],
                     PV_kva=gen_data['PV_kva'],
                     PV_curve_id=curve_id,

@@ -1,0 +1,68 @@
+[
+  {
+    "passos_totais": 144,
+    "passos_convergidos": 144,
+    "pct_convergencia": 100.0,
+    "media_iteracoes": 2.07,
+    "min_iteracoes": 2,
+    "max_iteracoes": 4,
+    "vmin_pu_global": 1.0146,
+    "vmax_pu_global": 1.042,
+    "cenario": "Cenário 1: Apenas Rede MT",
+    "descricao": "SegmentosMT, ChavesMT, ReguladorMT, CargasMT_Sintetico, GD_MT"
+  },
+  {
+    "passos_totais": 144,
+    "passos_convergidos": 144,
+    "pct_convergencia": 100.0,
+    "media_iteracoes": 2.03,
+    "min_iteracoes": 2,
+    "max_iteracoes": 4,
+    "vmin_pu_global": 1.0299,
+    "vmax_pu_global": 1.0391,
+    "cenario": "Cenário 2: Rede MT + BT em Vazio",
+    "descricao": "Master completo (linhas MT e BT + transformadores em vazio)",
+    "snapshot": {
+      "converged": true,
+      "iterations": 2,
+      "vmin_pu": 1.0298,
+      "vmax_pu": 1.0326
+    }
+  },
+  {
+    "passos_totais": 144,
+    "passos_convergidos": 144,
+    "pct_convergencia": 100.0,
+    "media_iteracoes": 2.0,
+    "min_iteracoes": 2,
+    "max_iteracoes": 2,
+    "vmin_pu_global": 1.03,
+    "vmax_pu_global": 1.0329,
+    "cenario": "Cenário 3: Rede MT + BT Completa (Original)",
+    "descricao": "Master + CargasBT (vminpu=0.5) + PVs originais (com nós flutuantes e sem conn=Delta) + EVs"
+  },
+  {
+    "passos_totais": 144,
+    "passos_convergidos": 58,
+    "pct_convergencia": 40.28,
+    "media_iteracoes": 92.14,
+    "min_iteracoes": 4,
+    "max_iteracoes": 150,
+    "vmin_pu_global": 0.01,
+    "vmax_pu_global": 1.1128,
+    "cenario": "Cenário 4: Apenas PVs Corrigidos (Cargas com vminpu=0.5)",
+    "descricao": "Master + CargasBT (vminpu=0.5) + PVs corrigidos (23 monofásicos + conn=Delta) + EVs"
+  },
+  {
+    "passos_totais": 144,
+    "passos_convergidos": 144,
+    "pct_convergencia": 100.0,
+    "media_iteracoes": 3.23,
+    "min_iteracoes": 3,
+    "max_iteracoes": 4,
+    "vmin_pu_global": 0.01,
+    "vmax_pu_global": 1.1183,
+    "cenario": "Cenário 5: Rede MT + BT Completa Corrigida",
+    "descricao": "Master + CargasBT (vminpu=0.80) + PVs corrigidos (monofásicos + conn=Delta) + EVs"
+  }
+]
