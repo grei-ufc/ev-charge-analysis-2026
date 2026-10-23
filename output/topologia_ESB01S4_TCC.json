@@ -925,7 +925,7 @@
         {
             "id": "2296520tr",
             "label": "2296520tr",
-            "node_type": "load",
+            "node_type": "transformer_bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -1110,7 +1110,7 @@
         {
             "id": "4629197tr",
             "label": "4629197tr",
-            "node_type": "load",
+            "node_type": "transformer_bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -1332,7 +1332,7 @@
         {
             "id": "1051602tr",
             "label": "1051602tr",
-            "node_type": "load",
+            "node_type": "transformer_bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -11158,7 +11158,7 @@
         {
             "id": "3880495438456951",
             "label": "3880495438456951",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -11215,7 +11215,7 @@
         {
             "id": "3881659938455332",
             "label": "3881659938455332",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -11234,7 +11234,7 @@
         {
             "id": "3881778838457021",
             "label": "3881778838457021",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -11846,11 +11846,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": -38.46892800002712,
@@ -13740,11 +13738,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": -38.460614999782365,
@@ -15155,7 +15151,7 @@
         {
             "id": "3858264438465797",
             "label": "3858264438465797",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -15518,10 +15514,8 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
-                    1,
-                    2,
                     3,
                     4
                 ],
@@ -16652,7 +16646,7 @@
         {
             "id": "3880705238455787",
             "label": "3880705238455787",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -16937,10 +16931,8 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
-                    1,
-                    2,
                     3,
                     4
                 ],
@@ -17501,7 +17493,7 @@
         {
             "id": "3881461038456294",
             "label": "3881461038456294",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -17745,11 +17737,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": -38.46442700020583,
@@ -18233,7 +18223,7 @@
         {
             "id": "3860242838475962",
             "label": "3860242838475962",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -19654,7 +19644,7 @@
         {
             "id": "3866454438468367",
             "label": "3866454438468367",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -20528,7 +20518,7 @@
         {
             "id": "3871230038466379",
             "label": "3871230038466379",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -20737,7 +20727,7 @@
         {
             "id": "3857423338467596",
             "label": "3857423338467596",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -20756,7 +20746,7 @@
         {
             "id": "3882128338456673",
             "label": "3882128338456673",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -20965,7 +20955,7 @@
         {
             "id": "3881535238455635",
             "label": "3881535238455635",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21022,7 +21012,7 @@
         {
             "id": "3881680038455108",
             "label": "3881680038455108",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21041,7 +21031,7 @@
         {
             "id": "3871596638465688",
             "label": "3871596638465688",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21060,7 +21050,7 @@
         {
             "id": "3871166238465595",
             "label": "3871166238465595",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21155,7 +21145,7 @@
         {
             "id": "3881216638454811",
             "label": "3881216638454811",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21231,7 +21221,7 @@
         {
             "id": "3881563338455580",
             "label": "3881563338455580",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21269,7 +21259,7 @@
         {
             "id": "3881585938455680",
             "label": "3881585938455680",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21533,7 +21523,7 @@
         {
             "id": "3881594138454878",
             "label": "3881594138454878",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21569,7 +21559,7 @@
         {
             "id": "3869277138467823",
             "label": "3869277138467823",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21607,7 +21597,7 @@
         {
             "id": "3857382938467243",
             "label": "3857382938467243",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21681,7 +21671,7 @@
         {
             "id": "3857326338467995",
             "label": "3857326338467995",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21738,7 +21728,7 @@
         {
             "id": "3881969838454546",
             "label": "3881969838454546",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21757,7 +21747,7 @@
         {
             "id": "3857224038467895",
             "label": "3857224038467895",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21795,7 +21785,7 @@
         {
             "id": "3871809038466298",
             "label": "3871809038466298",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21852,7 +21842,7 @@
         {
             "id": "3857859638466946",
             "label": "3857859638466946",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21871,7 +21861,7 @@
         {
             "id": "3871438238466532",
             "label": "3871438238466532",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21909,7 +21899,7 @@
         {
             "id": "3881518438456096",
             "label": "3881518438456096",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21964,7 +21954,7 @@
         {
             "id": "3857109438467955",
             "label": "3857109438467955",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -21983,7 +21973,7 @@
         {
             "id": "208976962",
             "label": "208976962",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22002,7 +21992,7 @@
         {
             "id": "208976970",
             "label": "208976970",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22116,7 +22106,7 @@
         {
             "id": "208989820",
             "label": "208989820",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22230,7 +22220,7 @@
         {
             "id": "3881446238456384",
             "label": "3881446238456384",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22249,7 +22239,7 @@
         {
             "id": "3856982638467793",
             "label": "3856982638467793",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22268,7 +22258,7 @@
         {
             "id": "3857136538467910",
             "label": "3857136538467910",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22325,7 +22315,7 @@
         {
             "id": "3872134538466117",
             "label": "3872134538466117",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22363,7 +22353,7 @@
         {
             "id": "3872125538466108",
             "label": "3872125538466108",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22401,7 +22391,7 @@
         {
             "id": "3872152638466054",
             "label": "3872152638466054",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22458,7 +22448,7 @@
         {
             "id": "3872080238465982",
             "label": "3872080238465982",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22477,7 +22467,7 @@
         {
             "id": "3872071138465973",
             "label": "3872071138465973",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22515,7 +22505,7 @@
         {
             "id": "3881437038456123",
             "label": "3881437038456123",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22591,7 +22581,7 @@
         {
             "id": "3858257838467108",
             "label": "3858257838467108",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22648,7 +22638,7 @@
         {
             "id": "3868851738467831",
             "label": "3868851738467831",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22686,7 +22676,7 @@
         {
             "id": "3881925538455996",
             "label": "3881925538455996",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22743,7 +22733,7 @@
         {
             "id": "3881543138452223",
             "label": "3881543138452223",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22762,7 +22752,7 @@
         {
             "id": "3871944538466090",
             "label": "3871944538466090",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22800,7 +22790,7 @@
         {
             "id": "3857570138466865",
             "label": "3857570138466865",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22819,7 +22809,7 @@
         {
             "id": "3862692438469987",
             "label": "3862692438469987",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22838,7 +22828,7 @@
         {
             "id": "3870275538466114",
             "label": "3870275538466114",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -22857,7 +22847,7 @@
         {
             "id": "3881251638455853",
             "label": "3881251638455853",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23009,7 +22999,7 @@
         {
             "id": "3880623738457456",
             "label": "3880623738457456",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23047,7 +23037,7 @@
         {
             "id": "3872016838465919",
             "label": "3872016838465919",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23066,7 +23056,7 @@
         {
             "id": "3871998738465901",
             "label": "3871998738465901",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23085,7 +23075,7 @@
         {
             "id": "3871989638465892",
             "label": "3871989638465892",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23104,7 +23094,7 @@
         {
             "id": "3871980638465883",
             "label": "3871980638465883",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23123,7 +23113,7 @@
         {
             "id": "3871962538465865",
             "label": "3871962538465865",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23161,7 +23151,7 @@
         {
             "id": "3871917238465820",
             "label": "3871917238465820",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23180,7 +23170,7 @@
         {
             "id": "3871899138465802",
             "label": "3871899138465802",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23199,7 +23189,7 @@
         {
             "id": "3871890138465793",
             "label": "3871890138465793",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23218,7 +23208,7 @@
         {
             "id": "3871881038465784",
             "label": "3871881038465784",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23237,7 +23227,7 @@
         {
             "id": "3871853938465757",
             "label": "3871853938465757",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23256,7 +23246,7 @@
         {
             "id": "3871844838465748",
             "label": "3871844838465748",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23275,7 +23265,7 @@
         {
             "id": "3871835838465739",
             "label": "3871835838465739",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23294,7 +23284,7 @@
         {
             "id": "3871808638465712",
             "label": "3871808638465712",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23313,7 +23303,7 @@
         {
             "id": "3871772438465676",
             "label": "3871772438465676",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23332,7 +23322,7 @@
         {
             "id": "3871763338465667",
             "label": "3871763338465667",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23351,7 +23341,7 @@
         {
             "id": "3871736238465640",
             "label": "3871736238465640",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23370,7 +23360,7 @@
         {
             "id": "3871718138465622",
             "label": "3871718138465622",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23389,7 +23379,7 @@
         {
             "id": "3871700038465604",
             "label": "3871700038465604",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23408,7 +23398,7 @@
         {
             "id": "3871690938465595",
             "label": "3871690938465595",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23427,7 +23417,7 @@
         {
             "id": "3871654738465559",
             "label": "3871654738465559",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23446,7 +23436,7 @@
         {
             "id": "3871645738465550",
             "label": "3871645738465550",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23465,7 +23455,7 @@
         {
             "id": "3871636638465541",
             "label": "3871636638465541",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23484,7 +23474,7 @@
         {
             "id": "3864745538469328",
             "label": "3864745538469328",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -23503,7 +23493,7 @@
         {
             "id": "3864881038469004",
             "label": "3864881038469004",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24301,7 +24291,7 @@
         {
             "id": "3881934438455870",
             "label": "3881934438455870",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24320,7 +24310,7 @@
         {
             "id": "3871284038465811",
             "label": "3871284038465811",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24339,7 +24329,7 @@
         {
             "id": "3881002338455411",
             "label": "3881002338455411",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24415,7 +24405,7 @@
         {
             "id": "3871447738467243",
             "label": "3871447738467243",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24548,7 +24538,7 @@
         {
             "id": "3864194238470148",
             "label": "3864194238470148",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24700,7 +24690,7 @@
         {
             "id": "3856060038467965",
             "label": "3856060038467965",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24869,7 +24859,7 @@
         {
             "id": "3883669938453617",
             "label": "3883669938453617",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24926,7 +24916,7 @@
         {
             "id": "3881554638456141",
             "label": "3881554638456141",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -24945,7 +24935,7 @@
         {
             "id": "3881699838456744",
             "label": "3881699838456744",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25230,7 +25220,7 @@
         {
             "id": "3871921938466068",
             "label": "3871921938466068",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25268,7 +25258,7 @@
         {
             "id": "3881563738456123",
             "label": "3881563738456123",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25287,7 +25277,7 @@
         {
             "id": "3871962638466009",
             "label": "3871962638466009",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25401,7 +25391,7 @@
         {
             "id": "3857735038467945",
             "label": "3857735038467945",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25420,7 +25410,7 @@
         {
             "id": "3857305038467962",
             "label": "3857305038467962",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25513,7 +25503,7 @@
         {
             "id": "3873137338463955",
             "label": "3873137338463955",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25564,7 +25554,7 @@
         {
             "id": "3873257638463948",
             "label": "3873257638463948",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25602,7 +25592,7 @@
         {
             "id": "3872910638464138",
             "label": "3872910638464138",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25638,7 +25628,7 @@
         {
             "id": "3858717638464675",
             "label": "3858717638464675",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25803,7 +25793,7 @@
         {
             "id": "3860562538465177",
             "label": "3860562538465177",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25894,7 +25884,7 @@
         {
             "id": "3859892438460768",
             "label": "3859892438460768",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25913,7 +25903,7 @@
         {
             "id": "3873269138464014",
             "label": "3873269138464014",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25951,7 +25941,7 @@
         {
             "id": "3860793838465052",
             "label": "3860793838465052",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -25991,11 +25981,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -26006,7 +25994,7 @@
         {
             "id": "3873368838464446",
             "label": "3873368838464446",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26029,11 +26017,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -26061,7 +26047,7 @@
         {
             "id": "3872698438464494",
             "label": "3872698438464494",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26152,7 +26138,7 @@
         {
             "id": "3873191638463901",
             "label": "3873191638463901",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26298,7 +26284,7 @@
         {
             "id": "3860000038461207",
             "label": "3860000038461207",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26393,7 +26379,7 @@
         {
             "id": "3864962238468644",
             "label": "3864962238468644",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26412,7 +26398,7 @@
         {
             "id": "3864953238468635",
             "label": "3864953238468635",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26469,7 +26455,7 @@
         {
             "id": "3865251338467986",
             "label": "3865251338467986",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26488,7 +26474,7 @@
         {
             "id": "3865242338468031",
             "label": "3865242338468031",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26507,7 +26493,7 @@
         {
             "id": "3865224238468049",
             "label": "3865224238468049",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26526,7 +26512,7 @@
         {
             "id": "3865215138468040",
             "label": "3865215138468040",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26545,7 +26531,7 @@
         {
             "id": "3865226938468042",
             "label": "3865226938468042",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26564,7 +26550,7 @@
         {
             "id": "3865233238468022",
             "label": "3865233238468022",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26583,7 +26569,7 @@
         {
             "id": "3865287538468031",
             "label": "3865287538468031",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26602,7 +26588,7 @@
         {
             "id": "3865264938467968",
             "label": "3865264938467968",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26659,7 +26645,7 @@
         {
             "id": "3865199738467997",
             "label": "3865199738467997",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26697,7 +26683,7 @@
         {
             "id": "3865222338467970",
             "label": "3865222338467970",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26811,7 +26797,7 @@
         {
             "id": "3872567738464442",
             "label": "3872567738464442",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26940,7 +26926,7 @@
         {
             "id": "3860897738464476",
             "label": "3860897738464476",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26959,7 +26945,7 @@
         {
             "id": "3858880538464693",
             "label": "3858880538464693",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -26995,7 +26981,7 @@
         {
             "id": "3860841038465181",
             "label": "3860841038465181",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27014,7 +27000,7 @@
         {
             "id": "3873285138464020",
             "label": "3873285138464020",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27344,7 +27330,7 @@
         {
             "id": "3862727938458550",
             "label": "3862727938458550",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27551,7 +27537,7 @@
         {
             "id": "3861810938460739",
             "label": "3861810938460739",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27608,7 +27594,7 @@
         {
             "id": "3862905038458451",
             "label": "3862905038458451",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27720,7 +27706,7 @@
         {
             "id": "3859109938471550",
             "label": "3859109938471550",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27739,7 +27725,7 @@
         {
             "id": "3859600038471396",
             "label": "3859600038471396",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27796,7 +27782,7 @@
         {
             "id": "3867020038468733",
             "label": "3867020038468733",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27834,7 +27820,7 @@
         {
             "id": "3863570038457518",
             "label": "3863570038457518",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -27853,7 +27839,7 @@
         {
             "id": "3859128338471553",
             "label": "3859128338471553",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28062,7 +28048,7 @@
         {
             "id": "3864584938456621",
             "label": "3864584938456621",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28119,7 +28105,7 @@
         {
             "id": "3861579938461368",
             "label": "3861579938461368",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28157,7 +28143,7 @@
         {
             "id": "3863149838459210",
             "label": "3863149838459210",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28269,7 +28255,7 @@
         {
             "id": "3863071938456640",
             "label": "3863071938456640",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28288,7 +28274,7 @@
         {
             "id": "3863527138457578",
             "label": "3863527138457578",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28362,7 +28348,7 @@
         {
             "id": "3864374938456703",
             "label": "3864374938456703",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28559,7 +28545,7 @@
         {
             "id": "3861991038459884",
             "label": "3861991038459884",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28629,7 +28615,7 @@
         {
             "id": "3863324038458164",
             "label": "3863324038458164",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28769,7 +28755,7 @@
         {
             "id": "3863954838458042",
             "label": "3863954838458042",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28875,7 +28861,7 @@
         {
             "id": "3862258038458184",
             "label": "3862258038458184",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28911,7 +28897,7 @@
         {
             "id": "3862558738458801",
             "label": "3862558738458801",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28928,7 +28914,7 @@
         {
             "id": "3863527638460349",
             "label": "3863527638460349",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -28947,7 +28933,7 @@
         {
             "id": "3863274438458552",
             "label": "3863274438458552",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29059,7 +29045,7 @@
         {
             "id": "3862567738458810",
             "label": "3862567738458810",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29076,7 +29062,7 @@
         {
             "id": "3862621938458675",
             "label": "3862621938458675",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29093,7 +29079,7 @@
         {
             "id": "3879794138459639",
             "label": "3879794138459639",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29112,7 +29098,7 @@
         {
             "id": "3862930038459289",
             "label": "3862930038459289",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29148,7 +29134,7 @@
         {
             "id": "3859850238467512",
             "label": "3859850238467512",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29220,7 +29206,7 @@
         {
             "id": "3862133538458855",
             "label": "3862133538458855",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29237,7 +29223,7 @@
         {
             "id": "3862124538458846",
             "label": "3862124538458846",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29256,7 +29242,7 @@
         {
             "id": "3862169738458846",
             "label": "3862169738458846",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29343,7 +29329,7 @@
         {
             "id": "3858487038472007",
             "label": "3858487038472007",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29398,7 +29384,7 @@
         {
             "id": "3859554338471745",
             "label": "3859554338471745",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29472,7 +29458,7 @@
         {
             "id": "3863327638458746",
             "label": "3863327638458746",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29491,7 +29477,7 @@
         {
             "id": "3863472438458935",
             "label": "3863472438458935",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29643,7 +29629,7 @@
         {
             "id": "3863518538460196",
             "label": "3863518538460196",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29698,7 +29684,7 @@
         {
             "id": "3860554638465575",
             "label": "3860554638465575",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29736,7 +29722,7 @@
         {
             "id": "3862643338460035",
             "label": "3862643338460035",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29825,7 +29811,7 @@
         {
             "id": "271235556",
             "label": "271235556",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29844,7 +29830,7 @@
         {
             "id": "3856377338469081",
             "label": "3856377338469081",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29882,7 +29868,7 @@
         {
             "id": "3856422538469009",
             "label": "3856422538469009",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -29996,7 +29982,7 @@
         {
             "id": "3863363838458791",
             "label": "3863363838458791",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30015,7 +30001,7 @@
         {
             "id": "3863215538467465",
             "label": "3863215538467465",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30034,7 +30020,7 @@
         {
             "id": "3863206438467456",
             "label": "3863206438467456",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30072,7 +30058,7 @@
         {
             "id": "3863580238457638",
             "label": "3863580238457638",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30091,7 +30077,7 @@
         {
             "id": "3864331038457629",
             "label": "3864331038457629",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30201,7 +30187,7 @@
         {
             "id": "3857698738470008",
             "label": "3857698738470008",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30220,7 +30206,7 @@
         {
             "id": "3861279038466529",
             "label": "3861279038466529",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30457,7 +30443,7 @@
         {
             "id": "3856294038463556",
             "label": "3856294038463556",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30476,7 +30462,7 @@
         {
             "id": "3877313138461281",
             "label": "3877313138461281",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30493,7 +30479,7 @@
         {
             "id": "3876820638462121",
             "label": "3876820638462121",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30620,7 +30606,7 @@
         {
             "id": "3856282438461921",
             "label": "3856282438461921",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -30936,7 +30922,7 @@
         {
             "id": "3859338238459046",
             "label": "3859338238459046",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31012,7 +30998,7 @@
         {
             "id": "3857846238460110",
             "label": "3857846238460110",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31111,11 +31097,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -31225,10 +31209,8 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
-                    1,
-                    2,
                     3,
                     4
                 ],
@@ -31259,7 +31241,7 @@
         {
             "id": "3858942938463234",
             "label": "3858942938463234",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31335,7 +31317,7 @@
         {
             "id": "3876438338462903",
             "label": "3876438338462903",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31373,7 +31355,7 @@
         {
             "id": "3858633038459563",
             "label": "3858633038459563",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31430,7 +31412,7 @@
         {
             "id": "3858850938460450",
             "label": "3858850938460450",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31453,11 +31435,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -31472,11 +31452,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -31548,11 +31526,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -31601,7 +31577,7 @@
         {
             "id": "3858855038462723",
             "label": "3858855038462723",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31658,7 +31634,7 @@
         {
             "id": "3858461038458536",
             "label": "3858461038458536",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31698,11 +31674,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -31732,7 +31706,7 @@
         {
             "id": "3859080038462171",
             "label": "3859080038462171",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -31751,7 +31725,7 @@
         {
             "id": "3858519038462947",
             "label": "3858519038462947",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -32249,11 +32223,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -32264,7 +32236,7 @@
         {
             "id": "3858377338474384",
             "label": "3858377338474384",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -32357,7 +32329,7 @@
         {
             "id": "3860316038473306",
             "label": "3860316038473306",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -32583,7 +32555,7 @@
         {
             "id": "3860652638472420",
             "label": "3860652638472420",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -32862,7 +32834,7 @@
         {
             "id": "3857655738459209",
             "label": "3857655738459209",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -32957,7 +32929,7 @@
         {
             "id": "3860107238473411",
             "label": "3860107238473411",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33033,7 +33005,7 @@
         {
             "id": "3862241738472671",
             "label": "3862241738472671",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33147,7 +33119,7 @@
         {
             "id": "3860153638460874",
             "label": "3860153638460874",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33259,7 +33231,7 @@
         {
             "id": "3858479238459587",
             "label": "3858479238459587",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33314,7 +33286,7 @@
         {
             "id": "3861192738473338",
             "label": "3861192738473338",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33369,7 +33341,7 @@
         {
             "id": "3860667238472051",
             "label": "3860667238472051",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33519,7 +33491,7 @@
         {
             "id": "3857004738459696",
             "label": "3857004738459696",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33595,7 +33567,7 @@
         {
             "id": "3859336738461768",
             "label": "3859336738461768",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33785,7 +33757,7 @@
         {
             "id": "3857229938458210",
             "label": "3857229938458210",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33821,7 +33793,7 @@
         {
             "id": "3870805538467415",
             "label": "3870805538467415",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -33858,7 +33830,7 @@
         {
             "id": "3877306738462232",
             "label": "3877306738462232",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -34065,7 +34037,7 @@
         {
             "id": "3856977538459687",
             "label": "3856977538459687",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -34103,7 +34075,7 @@
         {
             "id": "3857004638459678",
             "label": "3857004638459678",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -34291,7 +34263,7 @@
         {
             "id": "3855578038463939",
             "label": "3855578038463939",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -34511,7 +34483,7 @@
         {
             "id": "3857448138460020",
             "label": "3857448138460020",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -34701,7 +34673,7 @@
         {
             "id": "3882024738455537",
             "label": "3882024738455537",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -34836,11 +34808,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -34851,7 +34821,7 @@
         {
             "id": "3862387838460413",
             "label": "3862387838460413",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35037,7 +35007,7 @@
         {
             "id": "3859685938470453",
             "label": "3859685938470453",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35092,7 +35062,7 @@
         {
             "id": "3863058338456901",
             "label": "3863058338456901",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35149,7 +35119,7 @@
         {
             "id": "3861182438463047",
             "label": "3861182438463047",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35168,7 +35138,7 @@
         {
             "id": "3881588338455241",
             "label": "3881588338455241",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35244,7 +35214,7 @@
         {
             "id": "3880845038455173",
             "label": "3880845038455173",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35358,7 +35328,7 @@
         {
             "id": "3862490038459258",
             "label": "3862490038459258",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35468,7 +35438,7 @@
         {
             "id": "3859059338461451",
             "label": "3859059338461451",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35611,7 +35581,7 @@
         {
             "id": "3880861038455070",
             "label": "3880861038455070",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35685,7 +35655,7 @@
         {
             "id": "3859613038463787",
             "label": "3859613038463787",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35759,7 +35729,7 @@
         {
             "id": "3860509838466260",
             "label": "3860509838466260",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35905,7 +35875,7 @@
         {
             "id": "3857255038467909",
             "label": "3857255038467909",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -35924,7 +35894,7 @@
         {
             "id": "3873369138464009",
             "label": "3873369138464009",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36055,7 +36025,7 @@
         {
             "id": "3857046038467802",
             "label": "3857046038467802",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36150,7 +36120,7 @@
         {
             "id": "3875236038463782",
             "label": "3875236038463782",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36222,7 +36192,7 @@
         {
             "id": "3872197938466099",
             "label": "3872197938466099",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36260,7 +36230,7 @@
         {
             "id": "3872044038465946",
             "label": "3872044038465946",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36317,7 +36287,7 @@
         {
             "id": "3860898838466268",
             "label": "3860898838466268",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36389,7 +36359,7 @@
         {
             "id": "3871096838467472",
             "label": "3871096838467472",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36408,7 +36378,7 @@
         {
             "id": "3857886638466748",
             "label": "3857886638466748",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36446,7 +36416,7 @@
         {
             "id": "3858242938472205",
             "label": "3858242938472205",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36558,7 +36528,7 @@
         {
             "id": "3881548338455273",
             "label": "3881548338455273",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36632,7 +36602,7 @@
         {
             "id": "3881273238454619",
             "label": "3881273238454619",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36651,7 +36621,7 @@
         {
             "id": "3861015438464566",
             "label": "3861015438464566",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36670,7 +36640,7 @@
         {
             "id": "272987605",
             "label": "272987605",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36689,7 +36659,7 @@
         {
             "id": "3871971538465874",
             "label": "3871971538465874",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36708,7 +36678,7 @@
         {
             "id": "3871926338465829",
             "label": "3871926338465829",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36727,7 +36697,7 @@
         {
             "id": "3871872038465775",
             "label": "3871872038465775",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36746,7 +36716,7 @@
         {
             "id": "3871817738465721",
             "label": "3871817738465721",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36765,7 +36735,7 @@
         {
             "id": "3871754338465658",
             "label": "3871754338465658",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36784,7 +36754,7 @@
         {
             "id": "3871672838465577",
             "label": "3871672838465577",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36803,7 +36773,7 @@
         {
             "id": "3864935138468617",
             "label": "3864935138468617",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36822,7 +36792,7 @@
         {
             "id": "270820859",
             "label": "270820859",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36841,7 +36811,7 @@
         {
             "id": "3864051338468727",
             "label": "3864051338468727",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36879,7 +36849,7 @@
         {
             "id": "3865314638468013",
             "label": "3865314638468013",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -36936,7 +36906,7 @@
         {
             "id": "3856422538469018",
             "label": "3856422538469018",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37221,7 +37191,7 @@
         {
             "id": "3869963538466317",
             "label": "3869963538466317",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37333,7 +37303,7 @@
         {
             "id": "3864312938457620",
             "label": "3864312938457620",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37428,7 +37398,7 @@
         {
             "id": "3881835238456366",
             "label": "3881835238456366",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37542,7 +37512,7 @@
         {
             "id": "3882929238455320",
             "label": "3882929238455320",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37616,7 +37586,7 @@
         {
             "id": "3857925438467558",
             "label": "3857925438467558",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37804,7 +37774,7 @@
         {
             "id": "3859027538460939",
             "label": "3859027538460939",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37899,7 +37869,7 @@
         {
             "id": "3856264238461903",
             "label": "3856264238461903",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -37936,7 +37906,7 @@
         {
             "id": "3877170938462034",
             "label": "3877170938462034",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38031,7 +38001,7 @@
         {
             "id": "3861671838458414",
             "label": "3861671838458414",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38107,7 +38077,7 @@
         {
             "id": "3858299938459404",
             "label": "3858299938459404",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38145,7 +38115,7 @@
         {
             "id": "3857396338463875",
             "label": "3857396338463875",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38164,7 +38134,7 @@
         {
             "id": "3857285138459732",
             "label": "3857285138459732",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38536,7 +38506,7 @@
         {
             "id": "3872308138464673",
             "label": "3872308138464673",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38572,7 +38542,7 @@
         {
             "id": "3877313138462092",
             "label": "3877313138462092",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38610,7 +38580,7 @@
         {
             "id": "3860097038460770",
             "label": "3860097038460770",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38739,7 +38709,7 @@
         {
             "id": "3857238038467834",
             "label": "3857238038467834",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38811,7 +38781,7 @@
         {
             "id": "3873397138464031",
             "label": "3873397138464031",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -38830,7 +38800,7 @@
         {
             "id": "3882538238455281",
             "label": "3882538238455281",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39037,7 +39007,7 @@
         {
             "id": "3872116438466018",
             "label": "3872116438466018",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39111,7 +39081,7 @@
         {
             "id": "3863689438458746",
             "label": "3863689438458746",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39168,7 +39138,7 @@
         {
             "id": "3858209138461686",
             "label": "3858209138461686",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39187,7 +39157,7 @@
         {
             "id": "3859618438472898",
             "label": "3859618438472898",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39210,11 +39180,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -39225,7 +39193,7 @@
         {
             "id": "3855813338464056",
             "label": "3855813338464056",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39354,7 +39322,7 @@
         {
             "id": "3858143538472485",
             "label": "3858143538472485",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39390,7 +39358,7 @@
         {
             "id": "3871944438465847",
             "label": "3871944438465847",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39409,7 +39377,7 @@
         {
             "id": "3871790538465694",
             "label": "3871790538465694",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39428,7 +39396,7 @@
         {
             "id": "3871663838465568",
             "label": "3871663838465568",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39466,7 +39434,7 @@
         {
             "id": "3856404538469162",
             "label": "3856404538469162",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39694,7 +39662,7 @@
         {
             "id": "3857244438466856",
             "label": "3857244438466856",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39787,7 +39755,7 @@
         {
             "id": "3861083638472447",
             "label": "3861083638472447",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39863,7 +39831,7 @@
         {
             "id": "3856415138471630",
             "label": "3856415138471630",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -39920,7 +39888,7 @@
         {
             "id": "3877180038462133",
             "label": "3877180038462133",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -40205,7 +40173,7 @@
         {
             "id": "3859050638460928",
             "label": "3859050638460928",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -40262,7 +40230,7 @@
         {
             "id": "3869836938466335",
             "label": "3869836938466335",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -40319,7 +40287,7 @@
         {
             "id": "3862494938458726",
             "label": "3862494938458726",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -40697,7 +40665,7 @@
         {
             "id": "3858669338459857",
             "label": "3858669338459857",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -40773,7 +40741,7 @@
         {
             "id": "3877482938462144",
             "label": "3877482938462144",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -40866,7 +40834,7 @@
         {
             "id": "3881475038455884",
             "label": "3881475038455884",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -40923,7 +40891,7 @@
         {
             "id": "3862871838467600",
             "label": "3862871838467600",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41075,7 +41043,7 @@
         {
             "id": "3872225238466387",
             "label": "3872225238466387",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41170,7 +41138,7 @@
         {
             "id": "3859285038475481",
             "label": "3859285038475481",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41189,7 +41157,7 @@
         {
             "id": "3862102038458820",
             "label": "3862102038458820",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41301,7 +41269,7 @@
         {
             "id": "3860089738474384",
             "label": "3860089738474384",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41320,7 +41288,7 @@
         {
             "id": "3882476838455293",
             "label": "3882476838455293",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41377,7 +41345,7 @@
         {
             "id": "3876638138462323",
             "label": "3876638138462323",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41415,7 +41383,7 @@
         {
             "id": "3860500438465674",
             "label": "3860500438465674",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41438,11 +41406,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -41453,7 +41419,7 @@
         {
             "id": "3873044638463766",
             "label": "3873044638463766",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41508,7 +41474,7 @@
         {
             "id": "3857291038468100",
             "label": "3857291038468100",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41641,7 +41607,7 @@
         {
             "id": "3862142638458873",
             "label": "3862142638458873",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41679,7 +41645,7 @@
         {
             "id": "3863363338458008",
             "label": "3863363338458008",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41717,7 +41683,7 @@
         {
             "id": "3872170738466072",
             "label": "3872170738466072",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41736,7 +41702,7 @@
         {
             "id": "3872143538466045",
             "label": "3872143538466045",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41755,7 +41721,7 @@
         {
             "id": "3872062138465964",
             "label": "3872062138465964",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41882,7 +41848,7 @@
         {
             "id": "3863481338458719",
             "label": "3863481338458719",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41901,7 +41867,7 @@
         {
             "id": "3863472238458566",
             "label": "3863472238458566",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -41939,7 +41905,7 @@
         {
             "id": "3862692538470185",
             "label": "3862692538470185",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42201,7 +42167,7 @@
         {
             "id": "3871953438465856",
             "label": "3871953438465856",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42220,7 +42186,7 @@
         {
             "id": "3871862938465766",
             "label": "3871862938465766",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42258,7 +42224,7 @@
         {
             "id": "3871681938465586",
             "label": "3871681938465586",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42277,7 +42243,7 @@
         {
             "id": "3871627638465532",
             "label": "3871627638465532",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42296,7 +42262,7 @@
         {
             "id": "3866807838468841",
             "label": "3866807838468841",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42313,7 +42279,7 @@
         {
             "id": "3864718138468842",
             "label": "3864718138468842",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42351,7 +42317,7 @@
         {
             "id": "3864075738468752",
             "label": "3864075738468752",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42427,7 +42393,7 @@
         {
             "id": "3865169938468031",
             "label": "3865169938468031",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42446,7 +42412,7 @@
         {
             "id": "3865251338468040",
             "label": "3865251338468040",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42541,7 +42507,7 @@
         {
             "id": "3856377338469009",
             "label": "3856377338469009",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42636,7 +42602,7 @@
         {
             "id": "3858339238467071",
             "label": "3858339238467071",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42710,7 +42676,7 @@
         {
             "id": "3857007438459671",
             "label": "3857007438459671",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42843,7 +42809,7 @@
         {
             "id": "3870525338467811",
             "label": "3870525338467811",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -42917,7 +42883,7 @@
         {
             "id": "3860208338475960",
             "label": "3860208338475960",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -43124,7 +43090,7 @@
         {
             "id": "3881572738456132",
             "label": "3881572738456132",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -43200,7 +43166,7 @@
         {
             "id": "3859231938463414",
             "label": "3859231938463414",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -43299,11 +43265,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -43314,7 +43278,7 @@
         {
             "id": "3883894238450012",
             "label": "3883894238450012",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -43595,7 +43559,7 @@
         {
             "id": "3880457938456959",
             "label": "3880457938456959",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -43669,7 +43633,7 @@
         {
             "id": "3857415238467593",
             "label": "3857415238467593",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -43840,7 +43804,7 @@
         {
             "id": "3872488338465241",
             "label": "3872488338465241",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44028,7 +43992,7 @@
         {
             "id": "3857116038464073",
             "label": "3857116038464073",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44142,7 +44106,7 @@
         {
             "id": "3863917138458016",
             "label": "3863917138458016",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44180,7 +44144,7 @@
         {
             "id": "3863680338458584",
             "label": "3863680338458584",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44216,7 +44180,7 @@
         {
             "id": "3859900938461865",
             "label": "3859900938461865",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44235,7 +44199,7 @@
         {
             "id": "3857134838467306",
             "label": "3857134838467306",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44311,7 +44275,7 @@
         {
             "id": "3861149038474342",
             "label": "3861149038474342",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44385,7 +44349,7 @@
         {
             "id": "3860605738474978",
             "label": "3860605738474978",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44446,11 +44410,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -44461,7 +44423,7 @@
         {
             "id": "3883933238450037",
             "label": "3883933238450037",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44518,7 +44480,7 @@
         {
             "id": "3871627438465325",
             "label": "3871627438465325",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44592,7 +44554,7 @@
         {
             "id": "3858738738469377",
             "label": "3858738738469377",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44609,7 +44571,7 @@
         {
             "id": "3872161638466063",
             "label": "3872161638466063",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44683,7 +44645,7 @@
         {
             "id": "3860074738464873",
             "label": "3860074738464873",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44782,11 +44744,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -44816,7 +44776,7 @@
         {
             "id": "3871628038466253",
             "label": "3871628038466253",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -44911,7 +44871,7 @@
         {
             "id": "3858696338459614",
             "label": "3858696338459614",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45006,7 +44966,7 @@
         {
             "id": "3871908238465811",
             "label": "3871908238465811",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45025,7 +44985,7 @@
         {
             "id": "3871799638465703",
             "label": "3871799638465703",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45044,7 +45004,7 @@
         {
             "id": "3871781438465685",
             "label": "3871781438465685",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45063,7 +45023,7 @@
         {
             "id": "3871727138465631",
             "label": "3871727138465631",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45082,7 +45042,7 @@
         {
             "id": "3871709038465613",
             "label": "3871709038465613",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45101,7 +45061,7 @@
         {
             "id": "3864917038468599",
             "label": "3864917038468599",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45139,7 +45099,7 @@
         {
             "id": "3865151838468076",
             "label": "3865151838468076",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45158,7 +45118,7 @@
         {
             "id": "3865206138468031",
             "label": "3865206138468031",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45177,7 +45137,7 @@
         {
             "id": "271134053",
             "label": "271134053",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45310,7 +45270,7 @@
         {
             "id": "3869367338467785",
             "label": "3869367338467785",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45329,7 +45289,7 @@
         {
             "id": "3857555738458444",
             "label": "3857555738458444",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45386,7 +45346,7 @@
         {
             "id": "3862551138461106",
             "label": "3862551138461106",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45570,7 +45530,7 @@
         {
             "id": "3861125338466782",
             "label": "3861125338466782",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45684,7 +45644,7 @@
         {
             "id": "3861566338463170",
             "label": "3861566338463170",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45779,7 +45739,7 @@
         {
             "id": "3871276038467442",
             "label": "3871276038467442",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45817,7 +45777,7 @@
         {
             "id": "3877330038462728",
             "label": "3877330038462728",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -45836,7 +45796,7 @@
         {
             "id": "3872923338464574",
             "label": "3872923338464574",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46178,7 +46138,7 @@
         {
             "id": "3860916238465106",
             "label": "3860916238465106",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46216,7 +46176,7 @@
         {
             "id": "3876555838462115",
             "label": "3876555838462115",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46404,7 +46364,7 @@
         {
             "id": "3882485938455284",
             "label": "3882485938455284",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46423,7 +46383,7 @@
         {
             "id": "3856959438459588",
             "label": "3856959438459588",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46480,7 +46440,7 @@
         {
             "id": "3863906638457001",
             "label": "3863906638457001",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46609,7 +46569,7 @@
         {
             "id": "3863458038458362",
             "label": "3863458038458362",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46647,7 +46607,7 @@
         {
             "id": "3857866038458361",
             "label": "3857866038458361",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46742,7 +46702,7 @@
         {
             "id": "3863758038458020",
             "label": "3863758038458020",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46761,7 +46721,7 @@
         {
             "id": "3858338038463789",
             "label": "3858338038463789",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46818,7 +46778,7 @@
         {
             "id": "3859891038462195",
             "label": "3859891038462195",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46875,7 +46835,7 @@
         {
             "id": "3859249038461250",
             "label": "3859249038461250",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -46913,7 +46873,7 @@
         {
             "id": "3877063138461253",
             "label": "3877063138461253",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47027,7 +46987,7 @@
         {
             "id": "3858547238467080",
             "label": "3858547238467080",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47063,7 +47023,7 @@
         {
             "id": "3857886738466847",
             "label": "3857886738466847",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47082,7 +47042,7 @@
         {
             "id": "3857715138467225",
             "label": "3857715138467225",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47213,7 +47173,7 @@
         {
             "id": "3872179738466081",
             "label": "3872179738466081",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47308,7 +47268,7 @@
         {
             "id": "3883280938453654",
             "label": "3883280938453654",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47346,7 +47306,7 @@
         {
             "id": "3863481338458575",
             "label": "3863481338458575",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47365,7 +47325,7 @@
         {
             "id": "3863445238458719",
             "label": "3863445238458719",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47384,7 +47344,7 @@
         {
             "id": "3869746738466803",
             "label": "3869746738466803",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47479,7 +47439,7 @@
         {
             "id": "3860002338464846",
             "label": "3860002338464846",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47498,7 +47458,7 @@
         {
             "id": "3863552438456711",
             "label": "3863552438456711",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47593,7 +47553,7 @@
         {
             "id": "3864736538469328",
             "label": "3864736538469328",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47612,7 +47572,7 @@
         {
             "id": "3864944138468626",
             "label": "3864944138468626",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47631,7 +47591,7 @@
         {
             "id": "3865232338467991",
             "label": "3865232338467991",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47650,7 +47610,7 @@
         {
             "id": "3864889838468572",
             "label": "3864889838468572",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47688,7 +47648,7 @@
         {
             "id": "3856359238468946",
             "label": "3856359238468946",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47707,7 +47667,7 @@
         {
             "id": "3856368338469135",
             "label": "3856368338469135",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47838,7 +47798,7 @@
         {
             "id": "3881871638456573",
             "label": "3881871638456573",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47857,7 +47817,7 @@
         {
             "id": "3872558738464433",
             "label": "3872558738464433",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -47874,7 +47834,7 @@
         {
             "id": "3857025438459662",
             "label": "3857025438459662",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -48049,11 +48009,9 @@
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
-                "num_nodes": 4,
+                "num_nodes": 2,
                 "nodes": [
                     1,
-                    2,
-                    3,
                     4
                 ],
                 "x": 0.0,
@@ -48254,7 +48212,7 @@
         {
             "id": "3861177838463962",
             "label": "3861177838463962",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
@@ -48330,7 +48288,7 @@
         {
             "id": "3859216038463437",
             "label": "3859216038463437",
-            "node_type": "load",
+            "node_type": "bus",
             "voltage_pu": null,
             "metadata": {
                 "kv_base": 0.2193931022920578,
