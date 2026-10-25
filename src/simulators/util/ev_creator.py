@@ -185,21 +185,52 @@ def alocar_evs(
     else:
         raise FileNotFoundError(f"Arquivo de perfis de VEs não encontrado em: {ev_sessions_csv} ou {EV_CSV}")
 
-    # 3. Seleção Estocástica de Locais (Domicílios)
-    lista_consumidores = list(consumidores_bt.values())
-    if qtd_evs <= len(lista_consumidores):
-        # Amostragem sem reposição: no máximo 1 VE por domicílio
-        locais_sorteados = random.sample(lista_consumidores, qtd_evs)
-    else:
-        # Se a quantidade superar os domicílios, amostra com reposição
-        locais_sorteados = random.choices(lista_consumidores, k=qtd_evs)
+    # 3. Seleção Estocástica de Locais (Domicílios) - LÓGICA INCREMENTAL ANINHADA (NESTED ADOPTION)
+    # Utiliza uma instância isolada de Random para garantir determinismo e reprodutibilidade estrita
+    rng = random.Random(seed)
 
-    logger.info(f"Iniciando geração de {qtd_evs} VEs Monofásicos BT (220V) [{metrica_str}]...")
+    # Ordena os domicílios de forma canônica antes do embaralhamento para garantir consistência entre sistemas
+    lista_consumidores = sorted(
+        list(consumidores_bt.values()),
+        key=lambda c: (str(c.get('bus', '')), str(c.get('name', '')))
+    )
+    # Embaralha a lista completa de domicílios uma única vez baseada na seed
+    rng.shuffle(lista_consumidores)
+
+    # Pré-gera a fila de adoção contínua (Rogers / Bass Diffusion Model):
+    # Cada domicílio sorteia sua curva de recarga e fase uma única vez na fila.
+    # Assim, qualquer cenário com N VEs conterá EXATAMENTE os mesmos VEs dos cenários anteriores,
+    # apenas adicionando novos veículos (crescimento cumulativo estrito).
+    fila_adocao_ves = []
+    for idx, local in enumerate(lista_consumidores, start=1):
+        curva_sorteada = rng.choice(curvas_disponiveis)
+        no_fase = rng.choice(local['phases'])
+        fila_adocao_ves.append({
+            "idx": idx,
+            "local": local,
+            "curva": curva_sorteada,
+            "fase": no_fase,
+        })
+
+    # Seleciona os primeiros qtd_evs da fila de adoção
+    if qtd_evs <= len(fila_adocao_ves):
+        veiculos_alocados = fila_adocao_ves[:qtd_evs]
+    else:
+        veiculos_alocados = fila_adocao_ves[:]
+        adicionais = qtd_evs - len(veiculos_alocados)
+        veiculos_alocados.extend(fila_adocao_ves[:adicionais])
+
+    logger.info(
+        f"Iniciando geração de {qtd_evs} VEs Monofásicos BT (220V) "
+        f"[Lógica Incremental Aninhada - {metrica_str}]..."
+    )
 
     ev_commands: List[str] = []
-    for i, local in enumerate(locais_sorteados, start=1):
-        curva_sorteada = random.choice(curvas_disponiveis)
-        no_fase = random.choice(local['phases'])
+    for item in veiculos_alocados:
+        i = item["idx"]
+        local = item["local"]
+        curva_sorteada = item["curva"]
+        no_fase = item["fase"]
 
         # Conexão monofásica fase-neutro (.fase.4) com a ddp de 220V
         bus_monofasico = f"{local['bus']}.{no_fase}.4"

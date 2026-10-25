@@ -127,9 +127,14 @@ flowchart TB
     classDef data fill:#f1f3f5,stroke:#495057,stroke-width:2px,color:#111,rx:8,ry:8;
     classDef cache fill:#e8590c,stroke:#d9480f,stroke-width:2px,color:#fff,rx:8,ry:8;
 
-    subgraph Caldera["⚙️ Motor Fisico Caldera ICM (C++ em Lote)"]
+    subgraph Dados["📁 Dados e Parametros de Entrada (CSVs)"]
         direction TB
         CSV_INV[("Inventarios Fisicos<br>EV e EVSE (CSVs)")]
+        SESS[("ev_sessions_caldera.csv<br>(Sessoes Estocasticas)")]
+    end
+
+    subgraph Caldera["⚙️ Motor Fisico Caldera ICM (C++ em Lote)"]
+        direction TB
         WRAP["caldera_wrapper.py<br>(Camada Fisica)"]
         
         EVSE["EVSE (Wallbox AC)"]
@@ -139,7 +144,6 @@ flowchart TB
         
         LIB[("Biblioteca de Perfis em RAM<br>(Pre-calculo CC-CV)")]
         
-        CSV_INV --> WRAP
         WRAP --> EVSE
         EVSE -- "P_max (AC)" --> BMS
         BAT -. "SoC e V_oc" .-> BMS
@@ -151,12 +155,10 @@ flowchart TB
 
     subgraph Mosaik["🐍 Orquestrador Mosaik (Python)"]
         direction TB
-        SESS[("ev_sessions_caldera.csv<br>(Sessoes Estocasticas)")]
         SIM(["caldera_ev_sim.py<br>(Simulador Mosaik)"])
         DECISOR{"EV conectado<br>no minuto t?"}
         CALC["Calculo P(t) e Q(t)<br>com FP IEC 61000"]
         
-        SESS -- "Agenda (Start, End)" --> SIM
         SIM -- "step(t)" --> DECISOR
         DECISOR -- "Sim" --> CALC
     end
@@ -166,7 +168,9 @@ flowchart TB
     end
 
     %% Conexoes cruzadas
+    CSV_INV --> WRAP
     SESS -- "Vetor SoC_0 e Alvo" --> WRAP
+    SESS -- "Agenda (Start, End)" --> SIM
     LIB -- "Curva P Fisica Tapering" --> SIM
     CALC -- "Injeta P (kW) e Q (kVAr)" --> DSS
 
