@@ -252,3 +252,42 @@ UNIVERSIDADE FEDERAL DO CEARÁ (UFC). Grupo de Redes Elétricas Inteligentes (GR
 * *Chamada no texto:* GREI-UFC (2024) ou (GREI-UFC, 2024).
 * *Aplicação no projeto:* Arquitetura modular de microsserviços base deste Trabalho de Conclusão de Curso.
 
+
+
+---
+
+## 8. Estatística de Simulação, Teoria Amostral e Método de Monte Carlo
+
+ALEXOPOULOS, Christos. Statistical analysis of simulation output: state of the art. In: WINTER SIMULATION CONFERENCE (WSC), 38., 2006, Monterey, CA. **Proceedings** [...]. Monterey, CA: IEEE, 2006. p. 150–161. DOI: 10.1109/WSC.2006.323049. Disponível em: https://informs-sim.org/wsc06papers/018.pdf. Acesso em: 25 out. 2026.
+* *Chamada no texto:* Alexopoulos (2006) ou (ALEXOPOULOS, 2006).
+* *Aplicação no projeto:* Tutorial de referência sobre o Método das Replicações Independentes (*Method of Independent Replications*), independência mútua de fluxos estocásticos e estimação intervalar via distribuição $t$ de Student.
+
+BANKS, Jerry; CARSON II, John S.; NELSON, Barry L.; NICOL, David M. **Discrete-event system simulation**. 5. ed. Upper Saddle River, NJ: Pearson Prentice Hall, 2010. 622 p. ISBN 978-0136062127.
+* *Chamada no texto:* Banks et al. (2010) ou (BANKS et al., 2010).
+* *Aplicação no projeto:* Obra clássica de simulação que fundamenta o dimensionamento do número de replicações estatísticas ($M$), a eliminação de viés gerado por autocorrelação serial intra-rodada e a determinação de intervalos de confiança em experimentos computacionais.
+
+CHOW, Yuan Shih; ROBBINS, Herbert. On the asymptotic theory of fixed-width sequential confidence intervals for the mean. **The Annals of Mathematical Statistics**, Beachwood, OH, v. 36, n. 2, p. 457–462, abr. 1965. DOI: 10.1214/aoms/1177700156. Disponível em: https://projecteuclid.org/journals/annals-of-mathematical-statistics/volume-36/issue-2/On-the-Asymptotic-Theory-of-Fixed-Width-Sequential-Confidence-Intervals/10.1214/aoms/1177700156.full. Acesso em: 25 out. 2026.
+* *Chamada no texto:* Chow e Robbins (1965) ou (CHOW; ROBBINS, 1965).
+* *Aplicação no projeto:* Artigo seminal que estabelece a teoria assintótica e os teoremas de consistência e eficiência para Regras de Parada Sequencial (*Sequential Stopping Rules*), fundamentando a convergência estocástica quando a variância populacional é desconhecida.
+
+DRIELS, Morris R.; SHIN, Young S. **Determining the number of iterations for Monte Carlo simulations of weapon effectiveness**. Monterey, CA: Naval Postgraduate School (NPS), 2004. Relatório Técnico NPS-MAE-04-005. 24 p. Disponível em: https://apps.dtic.mil/sti/pdfs/ADA423541.pdf. Acesso em: 25 out. 2026.
+* *Chamada no texto:* Driels e Shin (2004) ou (DRIELS; SHIN, 2004).
+* *Aplicação no projeto:* Formalização de engenharia para o cálculo analítico fechado do número de iterações em simulações de Monte Carlo com base no Coeficiente de Variação ($\widehat{CV}$), no erro relativo máximo admissível ($\epsilon$) e na distribuição $t$ de Student em procedimentos em dois estágios.
+
+LAW, Averill M. Statistical analysis of simulation output data: the practical state of the art. In: WINTER SIMULATION CONFERENCE (WSC), 39., 2007, Washington, DC. **Proceedings** [...]. Washington, DC: IEEE, 2007. p. 77–83. DOI: 10.1109/WSC.2007.4419592. Disponível em: https://informs-sim.org/wsc07papers/009.pdf. Acesso em: 25 out. 2026.
+* *Chamada no texto:* Law (2007) ou (LAW, 2007).
+* *Aplicação no projeto:* Guia prático de engenharia que sistematiza o algoritmo de parada sequencial baseado em erro relativo ajustado ($\epsilon' = \epsilon / (1+\epsilon)$) e a robustez da distribuição $t$ de Student para amostras pequenas ($M \le 10$).
+
+LAW, Averill M. **Simulation modeling and analysis**. 5. ed. New York: McGraw-Hill Education, 2015. 804 p. ISBN 978-0073401324.
+* *Chamada no texto:* Law (2015) ou (LAW, 2015).
+* *Aplicação no projeto:* Tratado fundamental de modelagem e análise de simulação estocástica (Capítulo 9: *Output Data Analysis for a Single System*), fornecendo os critérios formais para estimação de média, variância inter-replicações, geradores de números pseudoaleatórios e intervalos de confiança.
+
+MONTGOMERY, Douglas C.; RUNGER, George C. **Estatística aplicada e probabilidade para engenheiros**. 7. ed. Rio de Janeiro: LTC, 2021. 416 p. ISBN 978-8521637332.
+* *Chamada no texto:* Montgomery e Runger (2021) ou (MONTGOMERY; RUNGER, 2021).
+* *Aplicação no projeto:* Referência básica para inferência estatística, formulação do Teorema Central do Limite (TCL), distribuição $t$ de Student com $\nu = M - 1$ graus de liberdade e cálculo do tamanho amostral baseado em margem de erro.
+
+RUBINSTEIN, Reuven Y.; KROESE, Dirk P. **Simulation and the Monte Carlo method**. 3. ed. Hoboken, NJ: John Wiley & Sons, 2016. 432 p. (Wiley Series in Probability and Statistics). ISBN 978-1118632161.
+* *Chamada no texto:* Rubinstein e Kroese (2016) ou (RUBINSTEIN; KROESE, 2016).
+* *Aplicação no projeto:* Embasamento teórico sobre convergência estocástica, propriedades de amostragem em Monte Carlo e taxas de convergência de erro de ordem $\mathcal{O}(1/\sqrt{M})$.
+
+

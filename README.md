@@ -57,6 +57,19 @@ Para assegurar consistência física e eliminar artefatos estatísticos de reamo
 
 ---
 
+## 🎲 Validação Estatística de Monte Carlo (Law, 2015 / Chow & Robbins, 1965)
+
+Para garantir a validade estatística das conclusões estocásticas sem incorrer em esforço computacional redundante, o tamanho amostral do estudo foi determinado via **Procedimento Sequencial de Parada** com erro relativo especificado (CHOW; ROBBINS, 1965; LAW, 2015):
+
+* **Abordagem A (Variável Governante):** Eleição da **Tensão Mínima Global ($V_{\min}$)** como grandeza primária governante da conformidade e da capacidade de hospedagem sob o PRODIST Módulo 8 (ANEEL, 2021).
+* **Parâmetros de Rigor:** $95\%$ de confiança estatística ($\alpha = 0,05$) e tolerância de erro de $\epsilon = 5\%$ ($0,05$, equivalente a $\pm 4,9\text{ V}$ em 127 V).
+* **Convergência Atingida:** No cenário mais severamente carregado (50% de penetração), o critério ótimo de parada encerrou exatamente em **$M = 6$ replicações independentes** (`seed = [8, 25, 2026, 42, 100, 777]`), obtendo $\bar{V}_{\min} = 0,7729\text{ pu}$, $\widehat{CV} = 4,242\%$ e erro observado de $\pm 4,45\% \le 5,0\%$.
+* **Estabilidade Sistêmica:** Todas as grandezas agregadas da rede (tensão média, demanda de pico no tronco e energia de recarga) alcançaram erro relativo observado inferior a 1% ($M^* = 1$).
+
+> 📄 **Documentação Completa:** [`docs/metodologia_calculo_tamanho_amostral.md`](docs/metodologia_calculo_tamanho_amostral.md) | [`docs/fundamentacao_estatistica_monte_carlo.md`](docs/fundamentacao_estatistica_monte_carlo.md) | Relatório Executivo: [`output/relatorio_tamanho_amostral_monte_carlo.md`](output/relatorio_tamanho_amostral_monte_carlo.md)
+
+---
+
 ## 📊 Síntese dos Resultados e Limiares de Hosting Capacity
 
 Simulação semanal (1.008 passos de 10 min) executada sobre toda a grade paramétrica:
@@ -111,6 +124,7 @@ ev-analysis-2026/
 └── docs/                      # Documentação técnica e metodológica
     ├── metodologia_alocacao_incremental_aninhada.md
     ├── metodologia_analise_comparativa_relativa.md
+    ├── fundamentacao_estatistica_monte_carlo.md
     ├── fundamentacao_cenarios_penetracao_ve.md
     └── modelagem_veiculos_eletricos.md
 ```
@@ -173,6 +187,7 @@ uv run jupyter lab notebooks/analise_tcc_principal.ipynb
 
 * **Metodologia de Alocação Incremental Aninhada:** [`docs/metodologia_alocacao_incremental_aninhada.md`](docs/metodologia_alocacao_incremental_aninhada.md)
 * **Metodologia de Análise Comparativa Diferencial:** [`docs/metodologia_analise_comparativa_relativa.md`](docs/metodologia_analise_comparativa_relativa.md)
+* **Fundamentação Estatística e Replicações de Monte Carlo:** [`docs/fundamentacao_estatistica_monte_carlo.md`](docs/fundamentacao_estatistica_monte_carlo.md)
 * **Catálogo Geral de Referências Bibliográficas (ABNT NBR 6023/10520):** [`REFERENCIAS.md`](REFERENCIAS.md)
 
 ---

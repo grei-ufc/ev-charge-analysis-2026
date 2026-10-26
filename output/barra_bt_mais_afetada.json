@@ -1,0 +1,7 @@
+{
+  "bus": "3864601538458035",
+  "distancia_km": 7.33124,
+  "v_min_pu": 0.7857201017598556,
+  "coluna_critica": "DSS-0.Bus-3864601538458035-V2_pu",
+  "criterio": "menor_tensao_minima_p50"
+}
