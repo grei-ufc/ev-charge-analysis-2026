@@ -53,7 +53,7 @@ Para assegurar consistência física e eliminar artefatos estatísticos de reamo
   Cada cenário superior mantém **100% dos veículos e conexões dos cenários anteriores**, apenas acrescentando novos consumidores na rede.
 * **Garantia Eletrotécnica:** Assegura monotonicidade estrita nas curvas de demanda acumulada ($\sum E_{\text{VE}}$) e afundamento nodal de tensão ($V_{\min}$), eliminando anomalias causadas por troca aleatória de vizinhança.
 
-> 📄 **Documento Completo da Metodologia:** [`docs/metodologia_alocacao_incremental_aninhada.md`](docs/metodologia_alocacao_incremental_aninhada.md)
+> 📄 **Documento Completo da Metodologia:** [`docs/metodologia/metodologia_alocacao_incremental_aninhada.md`](docs/metodologia/metodologia_alocacao_incremental_aninhada.md)
 
 ---
 
@@ -66,7 +66,7 @@ Para garantir a validade estatística das conclusões estocásticas sem incorrer
 * **Convergência Atingida:** No cenário mais severamente carregado (50% de penetração), o critério ótimo de parada encerrou exatamente em **$M = 6$ replicações independentes** (`seed = [8, 25, 2026, 42, 100, 777]`), obtendo $\bar{V}_{\min} = 0,7729\text{ pu}$, $\widehat{CV} = 4,242\%$ e erro observado de $\pm 4,45\% \le 5,0\%$.
 * **Estabilidade Sistêmica:** Todas as grandezas agregadas da rede (tensão média, demanda de pico no tronco e energia de recarga) alcançaram erro relativo observado inferior a 1% ($M^* = 1$).
 
-> 📄 **Documentação Completa:** [`docs/metodologia_calculo_tamanho_amostral.md`](docs/metodologia_calculo_tamanho_amostral.md) | [`docs/fundamentacao_estatistica_monte_carlo.md`](docs/fundamentacao_estatistica_monte_carlo.md) | Relatório Executivo: [`output/relatorios/relatorio_tamanho_amostral_monte_carlo.md`](output/relatorios/relatorio_tamanho_amostral_monte_carlo.md)
+> 📄 **Documentação Completa:** [`docs/metodologia/metodologia_calculo_tamanho_amostral.md`](docs/metodologia/metodologia_calculo_tamanho_amostral.md) | [`docs/metodologia/fundamentacao_estatistica_monte_carlo.md`](docs/metodologia/fundamentacao_estatistica_monte_carlo.md) | Relatório Executivo: [`docs/relatorios_validacao/relatorio_tamanho_amostral_monte_carlo.md`](docs/relatorios_validacao/relatorio_tamanho_amostral_monte_carlo.md)
 
 ---
 
@@ -100,7 +100,6 @@ Simulação semanal (1.008 passos de 10 min) executada sobre toda a grade param�
 ```text
 ev-analysis-2026/
 ├── pyproject.toml                   # Gerenciamento de dependências via uv
-├── REFERENCIAS.md                   # Catálogo mestre de referências bibliográficas (ABNT NBR 6023/10520)
 ├── scenarios/                       # Scripts executáveis de co-simulação
 │   ├── executar_grade_cenarios.py   # Orquestrador multissemente em lote da grade (0% a 50%)
 │   └── scenario_ESB01S4_TCC.py      # Cenário principal integrado no Mosaik (OpenDSS + Caldera)
@@ -123,17 +122,24 @@ ev-analysis-2026/
 │   │   ├── figuras_topologia/       # Mapas da rede, satélite e alocação de VEs (PNG 600 DPI e PDF)
 │   │   └── figuras_comparativas/    # 14 figuras comparativas dos cenários (PNG 600 DPI e PDF)
 │   ├── tabelas/                     # Tabelas consolidadas CSV/JSON (multissemente e transformadores)
-│   ├── relatorios/                  # Relatórios estatísticos de Monte Carlo e resumos de execução
+│   ├── relatorios/                  # Relatórios JSON de Monte Carlo e resumos de execução
 │   └── topologia/                   # Metadados topológicos, mapeamento de trafos e barra crítica
 └── docs/                            # Documentação técnica, metodológica e relatórios de validação
-    ├── metodologia_alocacao_incremental_aninhada.md
-    ├── metodologia_analise_comparativa_relativa.md
-    ├── metodologia_calculo_tamanho_amostral.md
-    ├── fundamentacao_estatistica_monte_carlo.md
-    ├── fundamentacao_cenarios_penetracao_ve.md
-    ├── modelagem_veiculos_eletricos.md
-    ├── manual_novo_cenario.md
-    └── relatorios_validacao/        # Relatórios técnicos de auditoria BDGD e convergência OpenDSS
+    ├── metodologia/                 # Fundamentação teórica, estatística e analítica do TCC
+    │   ├── metodologia_alocacao_incremental_aninhada.md
+    │   ├── metodologia_analise_comparativa_relativa.md
+    │   ├── metodologia_calculo_tamanho_amostral.md
+    │   ├── fundamentacao_estatistica_monte_carlo.md
+    │   └── fundamentacao_cenarios_penetracao_ve.md
+    ├── modelagem/                   # Modelagem elétrica de VEs, GD fotovoltaica e curvas de carga
+    │   ├── modelagem_veiculos_eletricos.md
+    │   ├── conversao_pvsystem_documentacao.md
+    │   └── pipeline_cargas_documentacao.md
+    ├── manuais/                     # Guias práticos de configuração e uso
+    │   └── manual_novo_cenario.md
+    ├── referencias/                 # Catálogo mestre de referências bibliográficas (ABNT NBR 6023/10520)
+    │   └── REFERENCIAS.md
+    └── relatorios_validacao/        # Relatórios técnicos de auditoria BDGD, convergência e Monte Carlo
 ```
 
 ---
@@ -194,10 +200,10 @@ uv run jupyter lab notebooks/analise_grade_tcc.ipynb
 
 ## 📚 Documentação Técnica e Referências Normativas
 
-* **Metodologia de Alocação Incremental Aninhada:** [`docs/metodologia_alocacao_incremental_aninhada.md`](docs/metodologia_alocacao_incremental_aninhada.md)
-* **Metodologia de Análise Comparativa Diferencial:** [`docs/metodologia_analise_comparativa_relativa.md`](docs/metodologia_analise_comparativa_relativa.md)
-* **Fundamentação Estatística e Replicações de Monte Carlo:** [`docs/fundamentacao_estatistica_monte_carlo.md`](docs/fundamentacao_estatistica_monte_carlo.md)
-* **Catálogo Geral de Referências Bibliográficas (ABNT NBR 6023/10520):** [`REFERENCIAS.md`](REFERENCIAS.md)
+* **Metodologia de Alocação Incremental Aninhada:** [`docs/metodologia/metodologia_alocacao_incremental_aninhada.md`](docs/metodologia/metodologia_alocacao_incremental_aninhada.md)
+* **Metodologia de Análise Comparativa Diferencial:** [`docs/metodologia/metodologia_analise_comparativa_relativa.md`](docs/metodologia/metodologia_analise_comparativa_relativa.md)
+* **Fundamentação Estatística e Replicações de Monte Carlo:** [`docs/metodologia/fundamentacao_estatistica_monte_carlo.md`](docs/metodologia/fundamentacao_estatistica_monte_carlo.md)
+* **Catálogo Geral de Referências Bibliográficas (ABNT NBR 6023/10520):** [`docs/referencias/REFERENCIAS.md`](docs/referencias/REFERENCIAS.md)
 
 ---
 

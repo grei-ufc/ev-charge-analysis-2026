@@ -576,16 +576,18 @@ def main():
     print(f"{'CRITÉRIO GOVERNANTE (ABORD. A)':<26} | {'—':<11} | {'—':<10} | {'—':<8} | {m_vmin_cols} | {stat_vmin}")
     print("=" * largura_tabela)
 
-    # 5. Exportação dos Relatórios na subpasta relatorios/
+    # 5. Exportação dos Relatórios (JSON em output/relatorios/ e Markdown em docs/relatorios_validacao/)
     pasta_relatorios = OUTPUT_DIR / "relatorios"
     pasta_relatorios.mkdir(parents=True, exist_ok=True)
+    pasta_docs_relatorios = PROJECT_ROOT / "docs" / "relatorios_validacao"
+    pasta_docs_relatorios.mkdir(parents=True, exist_ok=True)
 
     json_path = pasta_relatorios / "relatorio_tamanho_amostral_monte_carlo.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(resultados_finais, f, indent=2, ensure_ascii=False)
     print(f"\n[OK] Relatório JSON estruturado salvo em: {json_path}")
 
-    md_path = pasta_relatorios / "relatorio_tamanho_amostral_monte_carlo.md"
+    md_path = pasta_docs_relatorios / "relatorio_tamanho_amostral_monte_carlo.md"
     conteudo_md = gerar_relatorio_md(resultados_finais, sementes_executadas, penetracao, passos_sequenciais)
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(conteudo_md)
