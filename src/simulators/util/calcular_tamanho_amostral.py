@@ -58,20 +58,34 @@ def obter_ou_executar_simulacao(
 ) -> Path:
     """
     Verifica se o arquivo de simulação para a semente já existe.
+    Busca na subpasta da semente (output/monte_carlo/seed_{seed}/) ou na raiz de output/.
     Se não existir (e não for somente_analisar), executa a simulação chamando o cenário Mosaik.
     """
+    pasta_seed = OUTPUT_DIR / "cenarios" / f"seed_{seed}"
+    pasta_seed.mkdir(parents=True, exist_ok=True)
     tag = f"ev_p{int(penetracao_pct)}_{base_calculo}_seed{seed}"
-    arquivo_esperado = OUTPUT_DIR / f"result_TCC_{tag}.csv"
+    tag_padrao = f"ev_p{int(penetracao_pct)}_{base_calculo}"
 
-    # Se a semente for 42 e já existir o arquivo padrão da grade sem sufixo de seed, permite reaproveitá-lo
-    arquivo_padrao_grade = OUTPUT_DIR / f"result_TCC_ev_p{int(penetracao_pct)}_{base_calculo}.csv"
-    if not forcar and not arquivo_esperado.exists() and seed == 42 and arquivo_padrao_grade.exists():
-        print(f"  [Reaproveitamento] Utilizando resultado padrão existente para Seed 42: {arquivo_padrao_grade.name}")
-        return arquivo_padrao_grade
+    arquivo_esperado = pasta_seed / f"result_TCC_{tag}.csv"
 
-    if arquivo_esperado.exists() and not forcar:
-        print(f"  [OK] Simulação já existente para Seed {seed}: {arquivo_esperado.name}")
-        return arquivo_esperado
+    # Lista de caminhos candidatos onde o arquivo pode já existir
+    candidatos = [
+        arquivo_esperado,
+        pasta_seed / f"result_TCC_{tag_padrao}.csv" if seed == 42 else None,
+        OUTPUT_DIR / "monte_carlo" / f"seed_{seed}" / f"result_TCC_{tag}.csv",
+        OUTPUT_DIR / f"result_TCC_{tag}.csv",
+        OUTPUT_DIR / f"result_TCC_{tag_padrao}.csv" if seed == 42 else None,
+    ]
+    candidatos_validos = [c for c in candidatos if c is not None and c.exists()]
+
+    if not forcar and candidatos_validos:
+        arq = candidatos_validos[0]
+        try:
+            rel = arq.relative_to(PROJECT_ROOT)
+        except ValueError:
+            rel = arq
+        print(f"  [OK] Simulação já existente para Seed {seed}: {rel}")
+        return arq
 
     if somente_analisar:
         raise FileNotFoundError(
@@ -91,9 +105,12 @@ def obter_ou_executar_simulacao(
         nome_cenario=f"result_TCC_{tag}",
         reexecutar_alocacao=True,
         mostrar_progresso=False,
+        pasta_saida=pasta_seed,
     )
 
     if not arquivo_esperado.exists():
+        if (pasta_seed / f"result_TCC_{tag_padrao}.csv").exists():
+            return pasta_seed / f"result_TCC_{tag_padrao}.csv"
         raise RuntimeError(f"Falha na geração do arquivo esperado de simulação: {arquivo_esperado}")
 
     return arquivo_esperado
@@ -559,13 +576,16 @@ def main():
     print(f"{'CRITÉRIO GOVERNANTE (ABORD. A)':<26} | {'—':<11} | {'—':<10} | {'—':<8} | {m_vmin_cols} | {stat_vmin}")
     print("=" * largura_tabela)
 
-    # 5. Exportação dos Relatórios
-    json_path = OUTPUT_DIR / "relatorio_tamanho_amostral_monte_carlo.json"
+    # 5. Exportação dos Relatórios na subpasta relatorios/
+    pasta_relatorios = OUTPUT_DIR / "relatorios"
+    pasta_relatorios.mkdir(parents=True, exist_ok=True)
+
+    json_path = pasta_relatorios / "relatorio_tamanho_amostral_monte_carlo.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(resultados_finais, f, indent=2, ensure_ascii=False)
     print(f"\n[OK] Relatório JSON estruturado salvo em: {json_path}")
 
-    md_path = OUTPUT_DIR / "relatorio_tamanho_amostral_monte_carlo.md"
+    md_path = pasta_relatorios / "relatorio_tamanho_amostral_monte_carlo.md"
     conteudo_md = gerar_relatorio_md(resultados_finais, sementes_executadas, penetracao, passos_sequenciais)
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(conteudo_md)

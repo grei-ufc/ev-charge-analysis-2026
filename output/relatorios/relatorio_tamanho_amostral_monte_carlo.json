@@ -1,0 +1,378 @@
+{
+  "configuracao": {
+    "estrategia": "Abordagem A Sequencial (Law, 2015 / Chow-Robbins 1965) - Modo: sequencial",
+    "penetracao_pct": 50.0,
+    "base_calculo": "residencial_bt",
+    "sementes": [
+      8,
+      25,
+      2026,
+      42
+    ],
+    "confianca": 0.95,
+    "erros_admissiveis": [
+      0.05,
+      0.02,
+      0.01
+    ],
+    "convergencia_atingida": true,
+    "barra_mais_afetada_id": "3864601538458035",
+    "barra_mais_afetada_km": 7.33124
+  },
+  "passos_sequenciais_vmin": [
+    {
+      "passo_k": 2,
+      "semente": 25,
+      "valor_individual": 0.6854098429550441,
+      "media_acumulada": 0.6957942459947017,
+      "desvio_padrao": 0.014685763615832246,
+      "coeficiente_variacao": 0.02110647465162291,
+      "coeficiente_variacao_pct": 2.110647465162291,
+      "graus_liberdade": 1,
+      "t_critico": 12.706204736432095,
+      "semi_comprimento_h": 0.1319463510875179,
+      "erro_relativo_observado_pct": 18.96341509678461,
+      "epsilon_admissivel_pct": 5.0,
+      "M_requerido": 29,
+      "condicao_parada_satisfeita": false
+    },
+    {
+      "passo_k": 3,
+      "semente": 2026,
+      "valor_individual": 0.7307838119964903,
+      "media_acumulada": 0.7074574346619645,
+      "desvio_padrao": 0.022713998682630864,
+      "coeficiente_variacao": 0.032106523403042625,
+      "coeficiente_variacao_pct": 3.2106523403042626,
+      "graus_liberdade": 2,
+      "t_critico": 4.302652729696142,
+      "semi_comprimento_h": 0.05642470071147141,
+      "erro_relativo_observado_pct": 7.975702557770435,
+      "epsilon_admissivel_pct": 5.0,
+      "M_requerido": 8,
+      "condicao_parada_satisfeita": false
+    },
+    {
+      "passo_k": 4,
+      "semente": 42,
+      "valor_individual": 0.7155032397562021,
+      "media_acumulada": 0.7094688859355239,
+      "desvio_padrao": 0.018977203051907275,
+      "coeficiente_variacao": 0.026748464137202364,
+      "coeficiente_variacao_pct": 2.6748464137202363,
+      "graus_liberdade": 3,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 0.030196964868585773,
+      "erro_relativo_observado_pct": 4.256277543273413,
+      "epsilon_admissivel_pct": 5.0,
+      "M_requerido": 3,
+      "condicao_parada_satisfeita": true
+    }
+  ],
+  "metricas": {
+    "v_min_global": {
+      "amostras": [
+        0.7061786490343595,
+        0.6854098429550441,
+        0.7307838119964903,
+        0.7155032397562021
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 0.7094688859355239,
+      "desvio_padrao": 0.018977203051907275,
+      "coeficiente_variacao": 0.026748464137202364,
+      "coeficiente_variacao_pct": 2.6748464137202363,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 0.030196964868585773,
+      "ic_95": [
+        0.6792719210669381,
+        0.7396658508041097
+      ],
+      "erro_relativo_observado_pct": 4.256277543273413,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 3,
+          "suficiente": true
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 19,
+          "suficiente": false
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 73,
+          "suficiente": false
+        }
+      }
+    },
+    "v_med_global": {
+      "amostras": [
+        1.0059550424116712,
+        1.0057978705265604,
+        1.0056539021521986,
+        1.0063841412478334
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 1.005947739084566,
+      "desvio_padrao": 0.00031585910054589245,
+      "coeficiente_variacao": 0.0003139915606682819,
+      "coeficiente_variacao_pct": 0.031399156066828186,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 0.000502602313761343,
+      "ic_95": [
+        1.0054451367708046,
+        1.0064503413983272
+      ],
+      "erro_relativo_observado_pct": 0.04996306410696065,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 1,
+          "suficiente": true
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 1,
+          "suficiente": true
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 1,
+          "suficiente": true
+        }
+      }
+    },
+    "v_afetada_min": {
+      "amostras": [
+        0.7556497710804878,
+        0.776054935741029,
+        0.7780724186381618,
+        0.7475922246124788
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 0.7643423375180394,
+      "desvio_padrao": 0.015075665583080107,
+      "coeficiente_variacao": 0.01972370866179358,
+      "coeficiente_variacao_pct": 1.9723708661793582,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 0.023988748117287205,
+      "ic_95": [
+        0.7403535894007521,
+        0.7883310856353266
+      ],
+      "erro_relativo_observado_pct": 3.1384821878614098,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 2,
+          "suficiente": true
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 10,
+          "suficiente": false
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 40,
+          "suficiente": false
+        }
+      }
+    },
+    "v_afetada_med": {
+      "amostras": [
+        0.9654958457108033,
+        0.9631747400516766,
+        0.9611038376208951,
+        0.9646097251829284
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 0.9635960371415757,
+      "desvio_padrao": 0.0019170624866993733,
+      "coeficiente_variacao": 0.001989487723907804,
+      "coeficiente_variacao_pct": 0.19894877239078043,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 0.0030504742138977407,
+      "ic_95": [
+        0.960545562927678,
+        0.9666465113554734
+      ],
+      "erro_relativo_observado_pct": 0.3165718928179394,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 1,
+          "suficiente": true
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 1,
+          "suficiente": true
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 1,
+          "suficiente": true
+        }
+      }
+    },
+    "energia_ves_kwh": {
+      "amostras": [
+        23104.3456818584,
+        22859.54112421443,
+        22655.466436707175,
+        21400.847873200426
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 22505.050278995106,
+      "desvio_padrao": 758.6625760070616,
+      "coeficiente_variacao": 0.03371077009835222,
+      "coeficiente_variacao_pct": 3.3710770098352225,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 1207.2014559855572,
+      "ic_95": [
+        21297.84882300955,
+        23712.251734980662
+      ],
+      "erro_relativo_observado_pct": 5.364135787389412,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 5,
+          "suficiente": false
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 29,
+          "suficiente": false
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 116,
+          "suficiente": false
+        }
+      }
+    },
+    "p_max_kw": {
+      "amostras": [
+        1841.1488055188838,
+        1949.5552107795456,
+        1915.0489055881217,
+        1951.7648598629216
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 1914.3794454373683,
+      "desvio_padrao": 51.63389868081651,
+      "coeficiente_variacao": 0.026971611507780255,
+      "coeficiente_variacao_pct": 2.6971611507780255,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 82.16105504209324,
+      "ic_95": [
+        1832.218390395275,
+        1996.5405004794616
+      ],
+      "erro_relativo_observado_pct": 4.2917852695248895,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 3,
+          "suficiente": true
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 19,
+          "suficiente": false
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 74,
+          "suficiente": false
+        }
+      }
+    },
+    "vdi_sub_acum": {
+      "amostras": [
+        3869.543870142301,
+        4211.895964945723,
+        4189.832106268814,
+        3839.6981224789974
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 4027.742515958959,
+      "desvio_padrao": 200.47695920646197,
+      "coeficiente_variacao": 0.04977402562654399,
+      "coeficiente_variacao_pct": 4.977402562654399,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 319.0035790606144,
+      "ic_95": [
+        3708.7389368983445,
+        4346.746095019574
+      ],
+      "erro_relativo_observado_pct": 7.920158197715957,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 11,
+          "suficiente": false
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 63,
+          "suficiente": false
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 251,
+          "suficiente": false
+        }
+      }
+    },
+    "n_barras_violam_drc_sub": {
+      "amostras": [
+        477.0,
+        524.0,
+        501.0,
+        534.0
+      ],
+      "M_executado": 4,
+      "graus_liberdade": 3,
+      "media": 509.0,
+      "desvio_padrao": 25.41653005427767,
+      "coeficiente_variacao": 0.04993424372156713,
+      "coeficiente_variacao_pct": 4.993424372156713,
+      "t_critico": 3.182446305284263,
+      "semi_comprimento_h": 40.4433710821912,
+      "ic_95": [
+        468.5566289178088,
+        549.4433710821912
+      ],
+      "erro_relativo_observado_pct": 7.945652471943261,
+      "dimensionamento_por_erro": {
+        "5.0%": {
+          "epsilon": 0.05,
+          "M_requerido": 11,
+          "suficiente": false
+        },
+        "2.0%": {
+          "epsilon": 0.02,
+          "M_requerido": 64,
+          "suficiente": false
+        },
+        "1.0%": {
+          "epsilon": 0.01,
+          "M_requerido": 253,
+          "suficiente": false
+        }
+      }
+    }
+  }
+}

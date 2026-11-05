@@ -66,7 +66,7 @@ Para garantir a validade estatística das conclusões estocásticas sem incorrer
 * **Convergência Atingida:** No cenário mais severamente carregado (50% de penetração), o critério ótimo de parada encerrou exatamente em **$M = 6$ replicações independentes** (`seed = [8, 25, 2026, 42, 100, 777]`), obtendo $\bar{V}_{\min} = 0,7729\text{ pu}$, $\widehat{CV} = 4,242\%$ e erro observado de $\pm 4,45\% \le 5,0\%$.
 * **Estabilidade Sistêmica:** Todas as grandezas agregadas da rede (tensão média, demanda de pico no tronco e energia de recarga) alcançaram erro relativo observado inferior a 1% ($M^* = 1$).
 
-> 📄 **Documentação Completa:** [`docs/metodologia_calculo_tamanho_amostral.md`](docs/metodologia_calculo_tamanho_amostral.md) | [`docs/fundamentacao_estatistica_monte_carlo.md`](docs/fundamentacao_estatistica_monte_carlo.md) | Relatório Executivo: [`output/relatorio_tamanho_amostral_monte_carlo.md`](output/relatorio_tamanho_amostral_monte_carlo.md)
+> 📄 **Documentação Completa:** [`docs/metodologia_calculo_tamanho_amostral.md`](docs/metodologia_calculo_tamanho_amostral.md) | [`docs/fundamentacao_estatistica_monte_carlo.md`](docs/fundamentacao_estatistica_monte_carlo.md) | Relatório Executivo: [`output/relatorios/relatorio_tamanho_amostral_monte_carlo.md`](output/relatorios/relatorio_tamanho_amostral_monte_carlo.md)
 
 ---
 
@@ -99,34 +99,41 @@ Simulação semanal (1.008 passos de 10 min) executada sobre toda a grade param�
 
 ```text
 ev-analysis-2026/
-├── pyproject.toml             # Gerenciamento de dependências via uv
-├── REFERENCIAS.md             # Catálogo mestre de referências bibliográficas (ABNT NBR 6023/10520)
-├── scenarios/                 # Scripts executáveis de simulação
-│   ├── executar_grade_cenarios.py # Orquestrador em lote da grade (5% a 50%)
-│   ├── scenario_ESB01S4_TCC.py    # Cenário principal integrado no Mosaik
-│   ├── scenario_ESB01S4.py        # Cenário base (0 VEs)
-│   └── scenario_ESB01S4_EVs.py    # Cenário com VEs isolado
-├── src/                       # Códigos-fonte e módulos de apoio
+├── pyproject.toml                   # Gerenciamento de dependências via uv
+├── REFERENCIAS.md                   # Catálogo mestre de referências bibliográficas (ABNT NBR 6023/10520)
+├── scenarios/                       # Scripts executáveis de co-simulação
+│   ├── executar_grade_cenarios.py   # Orquestrador multissemente em lote da grade (0% a 50%)
+│   └── scenario_ESB01S4_TCC.py      # Cenário principal integrado no Mosaik (OpenDSS + Caldera)
+├── src/                             # Códigos-fonte e módulos de apoio
 │   ├── simulators/util/
-│   │   ├── ev_creator.py          # Gerador da alocação incremental aninhada (Rogers/Bass)
-│   │   ├── analisador_grade_tcc.py# Analisador diferencial relativo e gráficos 300 DPI
-│   │   └── topologia.py           # Extrator de grafos da rede do OpenDSS
-│   └── ajuste-dados/          # Tratamento de datasets solares e perfis Caldera
-├── data/rede/ESB01S4/         # Modelos OpenDSS nativos do alimentador real
-│   ├── run_ESB01S4.dss        # Master script do circuito
-│   └── ESB01S4_evs.dss        # Arquivo compilado dos VEs alocados
-├── notebooks/                 # Ambiente analítico Jupyter
-│   └── analise_tcc_principal.ipynb # Notebook executivo com Módulo 9.1 integrado
-├── output/                    # Resultados gerados
-│   ├── figuras_comparativas/  # Figuras acadêmicas em 300 DPI (Figuras 1 a 4)
-│   ├── tabela_comparativa_relativa_tcc.csv # Tabela resumo CSV
-│   └── tabela_comparativa_relativa_tcc.json# Tabela resumo JSON estruturada
-└── docs/                      # Documentação técnica e metodológica
+│   │   ├── ev_creator.py            # Gerador da alocação incremental aninhada (Rogers/Bass)
+│   │   ├── analisador_grade_tcc.py  # Analisador diferencial relativo, trafos e gráficos 600 DPI
+│   │   ├── calcular_tamanho_amostral.py # Validador estatístico sequencial de Monte Carlo
+│   │   └── topologia.py             # Extrator de grafos georreferenciados da rede OpenDSS
+│   └── ajuste-dados/                # Tratamento de datasets solares e perfis Caldera
+├── data/rede/ESB01S4/               # Modelos OpenDSS nativos do alimentador real
+│   ├── run_ESB01S4.dss              # Master script do circuito
+│   └── ESB01S4_evs.dss              # Arquivo compilado dos VEs alocados
+├── notebooks/                       # Ambiente analítico e geração de figuras em 600 DPI / PDF
+│   ├── figuras_topologia_tcc.ipynb  # Mapas georreferenciados da topologia, satélite e alocação de VEs
+│   └── analise_grade_tcc.ipynb      # Análise consolidada e geração dos 14 gráficos comparativos
+├── output/                          # Resultados organizados por categoria
+│   ├── cenarios/                    # Séries temporais brutas (caso_base/ e seed_8/ a seed_2026/)
+│   ├── figuras/
+│   │   ├── figuras_topologia/       # Mapas da rede, satélite e alocação de VEs (PNG 600 DPI e PDF)
+│   │   └── figuras_comparativas/    # 14 figuras comparativas dos cenários (PNG 600 DPI e PDF)
+│   ├── tabelas/                     # Tabelas consolidadas CSV/JSON (multissemente e transformadores)
+│   ├── relatorios/                  # Relatórios estatísticos de Monte Carlo e resumos de execução
+│   └── topologia/                   # Metadados topológicos, mapeamento de trafos e barra crítica
+└── docs/                            # Documentação técnica, metodológica e relatórios de validação
     ├── metodologia_alocacao_incremental_aninhada.md
     ├── metodologia_analise_comparativa_relativa.md
+    ├── metodologia_calculo_tamanho_amostral.md
     ├── fundamentacao_estatistica_monte_carlo.md
     ├── fundamentacao_cenarios_penetracao_ve.md
-    └── modelagem_veiculos_eletricos.md
+    ├── modelagem_veiculos_eletricos.md
+    ├── manual_novo_cenario.md
+    └── relatorios_validacao/        # Relatórios técnicos de auditoria BDGD e convergência OpenDSS
 ```
 
 ---
@@ -148,7 +155,7 @@ uv sync
 
 ### 2. Execução da Grade Paramétrica de Simulações (0% a 50%)
 
-Para executar sequencialmente todos os cenários da pesquisa (com a nova lógica aninhada e substituição automática):
+Para executar sequencialmente todos os cenários da pesquisa (com a lógica aninhada e múltiplas sementes):
 
 ```bash
 # Executa todos os 10 cenários (5% a 50%) garantindo alocação aninhada:
@@ -166,19 +173,21 @@ Após a conclusão das simulações, processe os resultados com o analisador dif
 uv run python src/simulators/util/analisador_grade_tcc.py
 ```
 
-* **Figuras Geradas:** Salvas automaticamente em `output/figuras_comparativas/` a 300 DPI:
-  * `fig1_impacto_relativo_pico_energia.png` (Sensibilidade da Demanda e Energia);
-  * `fig2_hosting_capacity_novas_barras_prodist.png` (Limiar de *Hosting Capacity* e transgressões ANEEL);
-  * `fig3_vdi_subtensao_relativo.png` (Agravamento do VDI de Subtensão - Nwobu et al., 2026);
-  * `fig4_tensao_minima_global_prodist.png` (Afundamento da Tensão Mínima Global $V_{\min}$).
-* **Tabelas Consolidadas:** Salvas em `output/tabela_comparativa_relativa_tcc.csv` e `.json`.
+* **Figuras Comparativas:** Salvas automaticamente em `output/figuras/figuras_comparativas/` em 600 DPI e PDF vetorial (`fig1` a `fig14`).
+* **Mapas de Topologia e Satélite:** Gerados em `output/figuras/figuras_topologia/` em 600 DPI e PDF vetorial (`fig1` e `fig2`).
+* **Tabelas Consolidadas:** Salvas em `output/tabelas/`.
+* **Relatórios Estatísticos:** Salvos em `output/relatorios/`.
 
-### 4. Visualização Interativa no Jupyter Notebook
+### 4. Visualização Interativa nos Jupyter Notebooks
 
-Abra o notebook principal para inspeção visual interativa e replicação de gráficos:
+Abra os notebooks para inspeção visual interativa e exportação das figuras:
 
 ```bash
-uv run jupyter lab notebooks/analise_tcc_principal.ipynb
+# Mapas da topologia, imagem de satélite e alocação de VEs:
+uv run jupyter lab notebooks/figuras_topologia_tcc.ipynb
+
+# Análise consolidada da grade e 14 gráficos comparativos:
+uv run jupyter lab notebooks/analise_grade_tcc.ipynb
 ```
 
 ---
@@ -191,10 +200,6 @@ uv run jupyter lab notebooks/analise_tcc_principal.ipynb
 * **Catálogo Geral de Referências Bibliográficas (ABNT NBR 6023/10520):** [`REFERENCIAS.md`](REFERENCIAS.md)
 
 ---
-
-## ⚖️ Licença
-
-Este repositório é parte de um Trabalho de Conclusão de Curso desenvolvido na Universidade Federal do Ceará (UFC). O código é distribuído sob a licença MIT. Consulte o arquivo `LICENSE` para mais informações.
 
 ## ⚖️ Licença
 

@@ -1,8 +1,22 @@
+"""Módulo Utilitário Universal de Alocação e Criação de Veículos Elétricos (OpenDSS)
+================================================================================
+
+Este módulo é responsável por alocar Veículos Elétricos (VEs) de forma estocástica,
+física e reproduzível em QUALQUER alimentador ou sistema elétrico modelado no OpenDSS.
+
+Funcionalidades:
+- Alocação direta por quantidade exata de VEs (ex: quantidade=10, 50, 100);
+- Alocação proporcional por taxa de penetração (residencial, barras BT ou barras totais);
+- Alocação direcionada em barras específicas (barras_especificas / whitelist);
+- Bloqueio de barras que NÃO devem receber VEs (barras_excluidas / blacklist);
+- Compatível com redes brasileiras (BDGD) e redes IEEE (IEEE 13, 34, 123, etc.).
+"""
+
 import argparse
 import logging
 from pathlib import Path
 import random
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Union
 
 import pandas as pd
 import py_dss_interface
@@ -10,21 +24,47 @@ import py_dss_interface
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%H:%M:%S')
 logger = logging.getLogger(__name__)
 
-# --- Caminhos Absolutos Baseados na Raiz do Projeto ---
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-REDE_DSS = PROJECT_ROOT / 'data' / 'rede' / 'ESB01S4' / 'run_ESB01S4.dss'
-EV_SESSIONS_CSV = PROJECT_ROOT / 'data' / 'datasets' / 'veiculos-eletricos' / 'ev_sessions_caldera.csv'
-EV_CSV = PROJECT_ROOT / 'data' / 'datasets' / 'veiculos-eletricos' / 'ev_loadshapes_normalized.csv'
-OUTPUT_DSS = PROJECT_ROOT / 'data' / 'rede' / 'ESB01S4' / 'ESB01S4_evs.dss'
+# --- Detecção Automática da Raiz do Projeto ---
+CURRENT_FILE = Path(__file__).resolve()
 
 
-def mapear_topologia_bt(caminho_dss: Path, output_dss_path: Path):
-    """
-    Compila o circuito no OpenDSS e mapeia as barras e domicílios de Baixa Tensão (BT),
-    além de computar o total de barras e unidades consumidoras residenciais.
+def _detectar_raiz_projeto() -> Path:
+    curr = CURRENT_FILE.parent
+    while curr.parent != curr:
+        if (curr / "pyproject.toml").exists() or (curr / "data").exists():
+            return curr
+        curr = curr.parent
+    return CURRENT_FILE.parents[2]
+
+
+PROJECT_ROOT = _detectar_raiz_projeto()
+DEFAULT_EV_SESSIONS = PROJECT_ROOT / 'data' / 'datasets' / 'veiculos-eletricos' / 'ev_sessions_caldera.csv'
+DEFAULT_EV_CSV = PROJECT_ROOT / 'data' / 'datasets' / 'veiculos-eletricos' / 'ev_loadshapes_normalized.csv'
+
+
+def _normalizar_lista_barras(lista_ou_str: Optional[Union[List[str], Set[str], str]]) -> Optional[Set[str]]:
+    """Converte listas, tuplas, conjuntos ou strings separadas por vírgula/espaço em conjunto canônico (lowercase)."""
+    if not lista_ou_str:
+        return None
+    if isinstance(lista_ou_str, str):
+        tokens = [t.strip().lower().split('.')[0] for t in lista_ou_str.replace(',', ' ').split() if t.strip()]
+    elif isinstance(lista_ou_str, (list, tuple, set)):
+        tokens = [str(b).strip().lower().split('.')[0] for b in lista_ou_str if str(b).strip()]
+    else:
+        tokens = [str(lista_ou_str).strip().lower().split('.')[0]]
+    return set(tokens)
+
+
+def mapear_topologia_cargas(caminho_dss: Path, output_dss_path: Path) -> Dict[str, Any]:
+    """Compila o circuito no OpenDSS e mapeia as barras e cargas da rede.
+
+    Aplica estratégia hierárquica para suportar QUALQUER alimentador:
+    1. Cargas BT com identificador residencial (prefixo 'bt_');
+    2. Cargas gerais de Baixa Tensão (kv_base <= 1.0 kV);
+    3. Cargas gerais do alimentador (caso o sistema seja puramente MT, ex: IEEE 13).
     """
     dss = py_dss_interface.DSS()
-    logger.info(f"Compilando circuito para mapeamento de BT: {caminho_dss.name}")
+    logger.info(f"Compilando circuito para mapeamento de cargas: {caminho_dss.name}")
 
     # Garante que o arquivo de EVs exista (mesmo vazio) para evitar erro de compilação
     output_dss_path.parent.mkdir(parents=True, exist_ok=True)
@@ -38,57 +78,82 @@ def mapear_topologia_bt(caminho_dss: Path, output_dss_path: Path):
     todas_barras = dss.circuit.buses_names
     total_barras_feeder = dss.circuit.num_buses or len(todas_barras)
 
-    # Dicionário de domicílios/consumidores BT: cada consumidor possui normalmente _M1 e _M2
-    consumidores_bt: Dict[str, Dict[str, Any]] = {}
-
+    todas_cargas = []
     dss.loads.first()
     while True:
         nome_carga = dss.loads.name
         if not nome_carga:
             break
 
-        # Filtra cargas residenciais de Baixa Tensão
-        if nome_carga.lower().startswith("bt_"):
-            dss.circuit.set_active_element(f"Load.{nome_carga}")
+        dss.circuit.set_active_element(f"Load.{nome_carga}")
+        bus_str = dss.cktelement.bus_names[0]
+        base_bus = bus_str.split('.')[0]
+        nos = bus_str.split('.')[1:]
+        fases = [n for n in nos if n in ['1', '2', '3']]
+        if not fases:
+            fases = ['1', '2', '3']
 
-            bus_str = dss.cktelement.bus_names[0]
-            base_bus = bus_str.split('.')[0]
-            nos = bus_str.split('.')[1:]
+        dss.circuit.set_active_bus(base_bus)
+        kv_base = dss.bus.kv_base
+        dss.loads.name = nome_carga
+        kv_load = dss.loads.kv
 
-            fases = [n for n in nos if n in ['1', '2', '3']]
-            if not fases:
-                fases = ['1', '2', '3']
-
-            dss.circuit.set_active_bus(base_bus)
-            kv_base = dss.bus.kv_base
-
-            # Filtra barras com tensão nominal <= 1 kV (Baixa Tensão)
-            if kv_base <= 1.0:
-                # Extrai o ID do domicílio (removendo sufixos _M1 / _M2 se existirem)
-                # Exemplo: BT_U52513810_M1 -> BT_U52513810
-                uc_id = nome_carga.rsplit('_', 1)[0]
-                if uc_id not in consumidores_bt:
-                    consumidores_bt[uc_id] = {
-                        'uc_id': uc_id,
-                        'bus': base_bus,
-                        'phases': fases,
-                        'kv': 0.220  # Tensão monofásica nominal fase-neutro no Ceará (220V)
-                    }
+        todas_cargas.append({
+            "nome": nome_carga,
+            "bus": base_bus,
+            "fases": fases,
+            "kv_base": kv_base,
+            "kv_load": kv_load,
+        })
 
         if not dss.loads.next():
             break
 
-    barras_bt_unicas = sorted(list({c['bus'] for c in consumidores_bt.values()}))
+    if not todas_cargas:
+        raise RuntimeError(f"Nenhuma carga (Load) encontrada no circuito OpenDSS: {caminho_dss}")
+
+    # Estratégia em cascata:
+    cargas_bt_prefix = [c for c in todas_cargas if c["nome"].lower().startswith("bt_") and c["kv_base"] <= 1.0]
+    cargas_bt_geral = [c for c in todas_cargas if c["kv_base"] <= 1.0]
+
+    if cargas_bt_prefix:
+        cargas_selecionadas = cargas_bt_prefix
+        tipo_base = "domicílios residenciais BT (prefixo bt_)"
+    elif cargas_bt_geral:
+        cargas_selecionadas = cargas_bt_geral
+        tipo_base = "cargas de Baixa Tensão (kv_base <= 1 kV)"
+    else:
+        cargas_selecionadas = todas_cargas
+        tipo_base = "cargas do alimentador (rede MT)"
+
+    consumidores_alvo: Dict[str, Dict[str, Any]] = {}
+    for c in cargas_selecionadas:
+        nome_carga = c["nome"]
+        uc_id = nome_carga.rsplit('_', 1)[0]
+        if uc_id not in consumidores_alvo:
+            if c["kv_base"] <= 1.0:
+                kv_ev = 0.220  # 220V padrão fase-neutro
+            else:
+                kv_ev = c["kv_load"] if c["kv_load"] > 0 else (c["kv_base"] / 1.732)
+            consumidores_alvo[uc_id] = {
+                'uc_id': uc_id,
+                'bus': c["bus"],
+                'phases': c["fases"],
+                'kv': kv_ev,
+            }
+
+    barras_unicas = sorted(list({c['bus'] for c in consumidores_alvo.values()}))
 
     logger.info(
-        f"Mapeamento concluído: {len(consumidores_bt)} domicílios BT identificados em "
-        f"{len(barras_bt_unicas)} barras BT (Total do alimentador: {total_barras_feeder} barras)."
+        f"Mapeamento concluído ({tipo_base}): {len(consumidores_alvo)} pontos de consumo identificados em "
+        f"{len(barras_unicas)} barras (Total da rede: {total_barras_feeder} barras)."
     )
 
     return {
-        "consumidores_bt": consumidores_bt,
-        "barras_bt_unicas": barras_bt_unicas,
+        "consumidores": consumidores_alvo,
+        "barras_unicas": barras_unicas,
         "total_barras_feeder": total_barras_feeder,
+        "tipo_base": tipo_base,
     }
 
 
@@ -100,55 +165,105 @@ def alocar_evs(
     caminho_dss: Optional[Path] = None,
     output_dss: Optional[Path] = None,
     ev_sessions_csv: Optional[Path] = None,
+    barras_especificas: Optional[Union[List[str], Set[str], str]] = None,
+    barras_excluidas: Optional[Union[List[str], Set[str], str]] = None,
 ) -> Dict[str, Any]:
-    """
-    Aloca Veículos Elétricos monofásicos (220V) de forma estocástica e reproduzível na rede.
+    """Aloca Veículos Elétricos monofásicos de forma estocástica e reproduzível na rede.
 
     Parâmetros:
     -----------
     quantidade: int, opcional
-        Número absoluto de VEs a serem alocados (ex: 10, 50, 100).
+        Número absoluto direto de VEs a serem alocados (ex: 10, 50, 100).
+        Se informado, sobrepõe o cálculo percentual de penetração.
     penetracao_pct: float, opcional
         Taxa de penetração em porcentagem (ex: 5.0 para 5%, 20.0 para 20%).
     base_calculo: str, padrão "residencial_bt"
-        Define a base para cálculo da penetração quando penetracao_pct for especificado:
-        - "residencial_bt": Taxa de Adoção Residencial/Domiciliar (% dos domicílios BT com VE). [Recomendado cientificamente]
-        - "barras_bt": % das barras de baixa tensão com VE.
-        - "total_barras": % do total de barras do alimentador (incluindo MT).
+        Define a base para cálculo quando penetracao_pct for utilizado:
+        - "residencial_bt": % dos domicílios / cargas elegíveis.
+        - "barras_bt": % das barras elegíveis.
+        - "total_barras": % do total de barras do alimentador.
     seed: int, padrão 42
-        Semente pseudoaleatória para reprodutibilidade estrita da alocação e sorteio de perfis.
+        Semente pseudoaleatória para reprodutibilidade estrita.
     caminho_dss: Path, opcional
-        Caminho do arquivo principal do circuito DSS (padrão: run_ESB01S4.dss).
+        Caminho do arquivo principal do circuito DSS.
     output_dss: Path, opcional
-        Caminho onde será salvo o arquivo de VEs (.dss) (padrão: ESB01S4_evs.dss).
+        Caminho onde será salvo o arquivo de VEs (.dss).
     ev_sessions_csv: Path, opcional
         Caminho do CSV de sessões de recarga Caldera.
+    barras_especificas: list, set ou str, opcional
+        Lista de barras onde os VEs DEVEM ser alocados (whitelist).
+        Pode ser uma lista de strings ou texto separado por vírgulas.
+    barras_excluidas: list, set ou str, opcional
+        Lista de barras que NÃO DEVEM receber VEs (blacklist).
+        Pode ser uma lista de strings ou texto separado por vírgulas.
 
     Retorno:
     --------
     dict com informações detalhadas da alocação realizada.
     """
-    caminho_dss = Path(caminho_dss).resolve() if caminho_dss else REDE_DSS
-    output_dss = Path(output_dss).resolve() if output_dss else OUTPUT_DSS
-    ev_sessions_csv = Path(ev_sessions_csv).resolve() if ev_sessions_csv else EV_SESSIONS_CSV
+    if caminho_dss is None:
+        raise ValueError("O parâmetro 'caminho_dss' com o caminho do circuito DSS é obrigatório.")
+
+    caminho_dss = Path(caminho_dss).resolve()
+    output_dss = Path(output_dss).resolve() if output_dss else caminho_dss.parent / f"{caminho_dss.stem}_evs.dss"
+    ev_sessions_csv = Path(ev_sessions_csv).resolve() if ev_sessions_csv else DEFAULT_EV_SESSIONS
 
     random.seed(seed)
 
-    dados_topologia = mapear_topologia_bt(caminho_dss, output_dss)
-    consumidores_bt = dados_topologia["consumidores_bt"]
-    barras_bt_unicas = dados_topologia["barras_bt_unicas"]
+    dados_topologia = mapear_topologia_cargas(caminho_dss, output_dss)
+    consumidores = dados_topologia["consumidores"]
     total_barras_feeder = dados_topologia["total_barras_feeder"]
 
-    total_domicilios = len(consumidores_bt)
-    total_barras_bt = len(barras_bt_unicas)
+    # 1. Aplicação dos Filtros de Barras Específicas e Barras Excluídas
+    set_especificas = _normalizar_lista_barras(barras_especificas)
+    set_excluidas = _normalizar_lista_barras(barras_excluidas)
 
-    if total_domicilios == 0:
-        raise RuntimeError("Nenhum domicílio ou carga de Baixa Tensão identificada para alocação dos VEs.")
+    candidatos_consumidores = {}
+    for uc_id, c in consumidores.items():
+        bus_norm = str(c['bus']).lower().split('.')[0]
 
-    # 1. Determinação da Quantidade de VEs
+        # Bloqueia barras excluídas
+        if set_excluidas and bus_norm in set_excluidas:
+            continue
+
+        # Restringe a barras específicas se fornecidas
+        if set_especificas is not None and bus_norm not in set_especificas:
+            continue
+
+        candidatos_consumidores[uc_id] = c
+
+    # Se barras_especificas continha barras válidas sem cargas existentes, adiciona pontos de conexão
+    if set_especificas:
+        barras_com_carga = {str(c['bus']).lower().split('.')[0] for c in candidatos_consumidores.values()}
+        barras_sem_carga = set_especificas - barras_com_carga
+        if set_excluidas:
+            barras_sem_carga = barras_sem_carga - set_excluidas
+
+        for b_nome in sorted(list(barras_sem_carga)):
+            candidatos_consumidores[f"PONTO_{b_nome}"] = {
+                'uc_id': f"PONTO_{b_nome}",
+                'bus': b_nome,
+                'phases': ['1', '2', '3'],
+                'kv': 0.220,
+            }
+
+    if not candidatos_consumidores:
+        raise ValueError(
+            "Nenhum ponto de conexão elegível encontrado na rede após aplicar os filtros: "
+            f"barras_especificas ({len(set_especificas) if set_especificas else 'N/A'}) e "
+            f"barras_excluidas ({len(set_excluidas) if set_excluidas else 'N/A'})."
+        )
+
+    total_consumidores_elegiveis = len(candidatos_consumidores)
+    barras_elegiveis_unicas = sorted(list({str(c['bus']).lower().split('.')[0] for c in candidatos_consumidores.values()}))
+    total_barras_elegiveis = len(barras_elegiveis_unicas)
+
+    # 2. Determinação da Quantidade de VEs
     if quantidade is not None:
         qtd_evs = int(quantidade)
-        metrica_str = f"Quantidade fixa ({qtd_evs} VEs)"
+        if qtd_evs < 0:
+            raise ValueError("A quantidade de VEs não pode ser negativa.")
+        metrica_str = f"Quantidade fixa direta ({qtd_evs} VEs)"
     elif penetracao_pct is not None:
         pct = float(penetracao_pct)
         if pct < 0:
@@ -156,11 +271,11 @@ def alocar_evs(
 
         base_norm = base_calculo.lower().strip()
         if base_norm in ["residencial_bt", "domiciliar", "domicilio", "domicilios", "residencial"]:
-            qtd_evs = max(1, round((pct / 100.0) * total_domicilios)) if pct > 0 else 0
-            metrica_str = f"{pct:.1f}% de Adoção Domiciliar BT ({qtd_evs} VEs sobre {total_domicilios} domicílios)"
+            qtd_evs = max(1, round((pct / 100.0) * total_consumidores_elegiveis)) if pct > 0 else 0
+            metrica_str = f"{pct:.1f}% de Adoção ({qtd_evs} VEs sobre {total_consumidores_elegiveis} pontos elegíveis)"
         elif base_norm in ["barras_bt", "barra_bt", "bus_bt"]:
-            qtd_evs = max(1, round((pct / 100.0) * total_barras_bt)) if pct > 0 else 0
-            metrica_str = f"{pct:.1f}% das Barras BT ({qtd_evs} VEs sobre {total_barras_bt} barras BT)"
+            qtd_evs = max(1, round((pct / 100.0) * total_barras_elegiveis)) if pct > 0 else 0
+            metrica_str = f"{pct:.1f}% das Barras Elegíveis ({qtd_evs} VEs sobre {total_barras_elegiveis} barras)"
         elif base_norm in ["total_barras", "barras_totais", "feeder_buses"]:
             qtd_evs = max(1, round((pct / 100.0) * total_barras_feeder)) if pct > 0 else 0
             metrica_str = f"{pct:.1f}% do Total de Barras ({qtd_evs} VEs sobre {total_barras_feeder} barras totais)"
@@ -169,40 +284,55 @@ def alocar_evs(
                 f"Base de cálculo '{base_calculo}' não suportada. "
                 f"Opções válidas: 'residencial_bt', 'barras_bt', 'total_barras'."
             )
+    elif set_especificas is not None:
+        qtd_evs = total_barras_elegiveis
+        metrica_str = f"1 VE por barra específica ({qtd_evs} VEs em {total_barras_elegiveis} barras)"
     else:
         qtd_evs = 50
         metrica_str = f"Padrão fixo ({qtd_evs} VEs)"
 
-    # 2. Carregamento dos Perfis Disponíveis
+    if set_especificas:
+        metrica_str += f" [Restrito a {len(set_especificas)} barras alvo]"
+    if set_excluidas:
+        metrica_str += f" [{len(set_excluidas)} barras excluídas]"
+
+    # 3. Caso Base sem VEs
+    if qtd_evs == 0:
+        with open(output_dss, 'w', encoding='utf-8') as f:
+            f.write("! Caso Base sem Veiculos Eletricos\n")
+        logger.info(f"Caso Base: Nenhum VE alocado ({output_dss})")
+        return {
+            "output_dss": str(output_dss),
+            "qtd_evs": 0,
+            "seed": seed,
+            "metrica": "Caso Base (0 VEs)",
+            "total_pontos": total_consumidores_elegiveis,
+            "total_barras": total_barras_elegiveis,
+            "comandos_dss": [],
+        }
+
+    # 4. Carregamento dos Perfis Disponíveis
     if ev_sessions_csv.exists():
         logger.info(f"Lendo perfis de VEs do dataset Caldera: {ev_sessions_csv.name}")
         df_sessions = pd.read_csv(ev_sessions_csv)
         curvas_disponiveis = sorted(df_sessions["Profile_Name"].unique())
-    elif EV_CSV.exists():
-        logger.info(f"Lendo perfis de VEs do dataset CSV padrão: {EV_CSV.name}")
-        df_evs = pd.read_csv(EV_CSV)
+    elif DEFAULT_EV_CSV.exists():
+        logger.info(f"Lendo perfis de VEs do dataset CSV padrão: {DEFAULT_EV_CSV.name}")
+        df_evs = pd.read_csv(DEFAULT_EV_CSV)
         curvas_disponiveis = [col for col in df_evs.columns if col.lower() not in ['date', 'time']]
     else:
-        raise FileNotFoundError(f"Arquivo de perfis de VEs não encontrado em: {ev_sessions_csv} ou {EV_CSV}")
+        raise FileNotFoundError(f"Arquivo de perfis de VEs não encontrado em: {ev_sessions_csv} ou {DEFAULT_EV_CSV}")
 
-    # 3. Seleção Estocástica de Locais (Domicílios) - LÓGICA INCREMENTAL ANINHADA (NESTED ADOPTION)
-    # Utiliza uma instância isolada de Random para garantir determinismo e reprodutibilidade estrita
+    # 5. Seleção Estocástica Incremental Aninhada (Nested Adoption)
     rng = random.Random(seed)
-
-    # Ordena os domicílios de forma canônica antes do embaralhamento para garantir consistência entre sistemas
-    lista_consumidores = sorted(
-        list(consumidores_bt.values()),
-        key=lambda c: (str(c.get('bus', '')), str(c.get('name', '')))
+    lista_candidatos = sorted(
+        list(candidatos_consumidores.values()),
+        key=lambda c: (str(c.get('bus', '')), str(c.get('uc_id', '')))
     )
-    # Embaralha a lista completa de domicílios uma única vez baseada na seed
-    rng.shuffle(lista_consumidores)
+    rng.shuffle(lista_candidatos)
 
-    # Pré-gera a fila de adoção contínua (Rogers / Bass Diffusion Model):
-    # Cada domicílio sorteia sua curva de recarga e fase uma única vez na fila.
-    # Assim, qualquer cenário com N VEs conterá EXATAMENTE os mesmos VEs dos cenários anteriores,
-    # apenas adicionando novos veículos (crescimento cumulativo estrito).
     fila_adocao_ves = []
-    for idx, local in enumerate(lista_consumidores, start=1):
+    for idx, local in enumerate(lista_candidatos, start=1):
         curva_sorteada = rng.choice(curvas_disponiveis)
         no_fase = rng.choice(local['phases'])
         fila_adocao_ves.append({
@@ -212,108 +342,93 @@ def alocar_evs(
             "fase": no_fase,
         })
 
-    # Seleciona os primeiros qtd_evs da fila de adoção
-    if qtd_evs <= len(fila_adocao_ves):
-        veiculos_alocados = fila_adocao_ves[:qtd_evs]
-    else:
-        veiculos_alocados = fila_adocao_ves[:]
-        adicionais = qtd_evs - len(veiculos_alocados)
-        veiculos_alocados.extend(fila_adocao_ves[:adicionais])
+    # Permite alocação maior que a quantidade de barras/candidatos (múltiplos VEs por barra)
+    veiculos_alocados = []
+    contador_global = 1
+    while len(veiculos_alocados) < qtd_evs:
+        restantes = qtd_evs - len(veiculos_alocados)
+        fatia = fila_adocao_ves[:restantes]
+        for item in fatia:
+            item_copia = dict(item)
+            item_copia["global_id"] = contador_global
+            contador_global += 1
+            veiculos_alocados.append(item_copia)
 
     logger.info(
-        f"Iniciando geração de {qtd_evs} VEs Monofásicos BT (220V) "
+        f"Iniciando geração de {qtd_evs} VEs Monofásicos "
         f"[Lógica Incremental Aninhada - {metrica_str}]..."
     )
 
     ev_commands: List[str] = []
     for item in veiculos_alocados:
-        i = item["idx"]
+        g_id = item["global_id"]
         local = item["local"]
         curva_sorteada = item["curva"]
         no_fase = item["fase"]
 
-        # Conexão monofásica fase-neutro (.fase.4) com a ddp de 220V
         bus_monofasico = f"{local['bus']}.{no_fase}.4"
-
-        # Reconhece 3.6kW ou 7.2kW conforme a nomenclatura do perfil
         potencia = 3.6 if ('3.6' in curva_sorteada or '3p6' in curva_sorteada) else 7.2
         kv_monofasico = local['kv']
 
-        nome_id = f"{curva_sorteada}_{i}"
+        nome_id = f"{curva_sorteada}_{g_id}"
         cmd = (
             f"New Load.EV_{nome_id} Bus1={bus_monofasico} Phases=1 Conn=Wye "
             f"kV={kv_monofasico:.3f} kW={potencia} pf=1.0 status=variable"
         )
         ev_commands.append(cmd)
 
-    # 4. Gravação do Arquivo DSS
+    # 6. Gravação do Arquivo DSS
     with open(output_dss, 'w', encoding='utf-8') as f:
         f.write("! ======================================================================\n")
-        f.write(f"! Alocação Estocástica de Veículos Elétricos (OpenDSS)\n")
-        f.write(f"! Métrica: {metrica_str}\n")
-        f.write(f"! Quantidade de VEs: {qtd_evs}\n")
-        f.write(f"! Semente (Seed): {seed}\n")
-        f.write(f"! Total de Domicílios BT: {total_domicilios}\n")
-        f.write(f"! Total de Barras BT com Cargas: {total_barras_bt}\n")
-        f.write(f"! Total de Barras do Alimentador: {total_barras_feeder}\n")
+        f.write(f"! ARQUIVO DE VEÍCULOS ELÉTRICOS GERADO AUTOMATICAMENTE ({qtd_evs} VEs)\n")
+        f.write(f"! Circuito: {caminho_dss.name} | Semente: {seed} | Métrica: {metrica_str}\n")
+        if set_especificas:
+            f.write(f"! Barras Alvo Especificadas: {sorted(list(set_especificas))}\n")
+        if set_excluidas:
+            f.write(f"! Barras Excluídas (Bloqueadas): {sorted(list(set_excluidas))}\n")
         f.write("! ======================================================================\n\n")
         for cmd in ev_commands:
-            f.write(cmd + "\n")
+            f.write(f"{cmd}\n")
 
-    logger.info(f"Arquivo DSS de VEs gerado com sucesso: {output_dss.name} ({len(ev_commands)} VEs salvos)")
+    logger.info(f"Arquivo DSS de VEs gravado com sucesso: {output_dss} ({len(ev_commands)} cargas)")
 
     return {
+        "output_dss": str(output_dss),
         "qtd_evs": qtd_evs,
-        "penetracao_pct": penetracao_pct,
-        "base_calculo": base_calculo,
-        "metrica": metrica_str,
         "seed": seed,
-        "total_domicilios_bt": total_domicilios,
-        "total_barras_bt": total_barras_bt,
-        "total_barras_feeder": total_barras_feeder,
-        "output_file": str(output_dss),
+        "metrica": metrica_str,
+        "total_pontos": total_consumidores_elegiveis,
+        "total_barras": total_barras_elegiveis,
+        "barras_alocadas": sorted(list({str(item['local']['bus']).lower().split('.')[0] for item in veiculos_alocados})),
+        "comandos_dss": ev_commands,
     }
 
 
-def criar_script_evs(qtd_evs: int = 50, seed: int = 42):
-    """
-    Função legada para manter compatibilidade total com chamadas existentes.
-    """
-    return alocar_evs(quantidade=qtd_evs, seed=seed)
-
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Alocação estocástica dinâmica de Veículos Elétricos em Baixa Tensão."
+    parser = argparse.ArgumentParser(description="Alocador Universal de Veículos Elétricos em Redes OpenDSS.")
+    parser.add_argument("--circuito", "-c", type=str, required=True, help="Caminho do arquivo principal DSS da rede.")
+    parser.add_argument("--output", "-o", type=str, default=None, help="Caminho onde salvar o arquivo DSS de VEs.")
+    parser.add_argument("--qtd", "-q", "--quantidade", type=int, default=None, help="Quantidade direta/exata de VEs a alocar.")
+    parser.add_argument("--penetracao", "-p", type=float, default=None, help="Taxa de penetração em porcentagem (ex: 20.0).")
+    parser.add_argument("--base", "-b", type=str, default="residencial_bt", help="Base de cálculo: residencial_bt, barras_bt, total_barras.")
+    parser.add_argument("--seed", "-s", type=int, default=42, help="Semente pseudoaleatória (default: 42).")
+    parser.add_argument(
+        "--barras-especificas", "--barras-alvo", "--barras", nargs="+", default=None,
+        help="Lista de barras onde os VEs DEVEM ser alocados (whitelist)."
     )
     parser.add_argument(
-        "--qtd", "-n", type=int, default=None,
-        help="Quantidade absoluta de VEs a serem alocados."
-    )
-    parser.add_argument(
-        "--penetracao", "-p", type=float, default=None,
-        help="Taxa de penetração em porcentagem (ex: 20 para 20%%)."
-    )
-    parser.add_argument(
-        "--base", "-b", type=str, default="residencial_bt",
-        choices=["residencial_bt", "barras_bt", "total_barras"],
-        help="Base de cálculo da penetração (padrão: residencial_bt)."
-    )
-    parser.add_argument(
-        "--seed", "-s", type=int, default=42,
-        help="Semente pseudoaleatória (padrão: 42)."
+        "--barras-excluidas", "--ignorar-barras", nargs="+", default=None,
+        help="Lista de barras que NÃO DEVEM receber VEs (blacklist)."
     )
 
     args = parser.parse_args()
-
-    # Se nenhum parâmetro for fornecido na linha de comando, executa com 50 VEs padrão
-    qtd_final = args.qtd if (args.qtd is not None or args.penetracao is not None) else 50
-    resultado = alocar_evs(
-        quantidade=qtd_final,
+    alocar_evs(
+        quantidade=args.qtd,
         penetracao_pct=args.penetracao,
         base_calculo=args.base,
         seed=args.seed,
+        caminho_dss=Path(args.circuito),
+        output_dss=Path(args.output) if args.output else None,
+        barras_especificas=args.barras_especificas,
+        barras_excluidas=args.barras_excluidas,
     )
-    print("\n--- Resultado da Alocação ---")
-    for k, v in resultado.items():
-        print(f"  {k}: {v}")

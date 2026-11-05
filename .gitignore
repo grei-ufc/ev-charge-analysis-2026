@@ -5,11 +5,20 @@ build/
 dist/
 wheels/
 *.egg-info
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
 
 # Virtual environments
 .venv
+
+# Resultados brutos de simulação (CSVs de grande porte)
 output/*.csv
+output/**/*.csv
+output/cenarios/**/*.csv
 
 # Documentos e fontes bibliográficas de grande porte
 Fontes/
 
+# Pacote de exportação externa OpenTES
+EVs-no-OpenTES/

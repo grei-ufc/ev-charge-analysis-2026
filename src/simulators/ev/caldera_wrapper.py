@@ -87,12 +87,12 @@ class CalderaWrapper:
         soc_in = float(initial_soc) * 100.0 if initial_soc <= 1.0 else float(initial_soc)
         soc_out = float(target_soc) * 100.0 if target_soc <= 1.0 else float(target_soc)
 
-        # Trata casos limites
-        if soc_out <= soc_in:
+        # Trata casos limites (bateria já cheia ou variação de recarga desprezível)
+        if soc_out <= soc_in or soc_in >= 99.5 or (soc_out - soc_in) < 0.5:
             return []
 
-        # Limite físico
-        soc_in = max(0.0, min(soc_in, 99.9))
+        # Limite físico seguro para evitar transbordo de índice no C++
+        soc_in = max(0.0, min(soc_in, 99.0))
         soc_out = max(soc_in + 0.1, min(soc_out, 100.0))
 
         if charger_model is None:

@@ -13,10 +13,9 @@ Características principais:
    - Eletroquímica realista via Caldera ICM (C++ / IEC 61000).
 
 2. Modulação dos Sistemas Fotovoltaicos (PVs):
-   - Por padrão (`usar_pv_mosaik=False`), delega a injeção solar ao OpenDSS nativo
-     (preservando estabilidade de tensão e evitando divergências numéricas de convergência).
-   - O código dos simuladores Mosaik (`PVSimulator` + `InverterSim`) permanece
-     totalmente pronto e implementado, podendo ser ativado pelo parâmetro `--usar-pv-mosaik`.
+   - Por padrão (`usar_pv_mosaik=True`), utiliza os simuladores Mosaik (`PVSimulator` + `InverterSim`)
+     para representação detalhada de inversores inteligentes.
+   - O modo nativo do OpenDSS pode ser ativado passando a flag `--sem-pv-mosaik`.
 
 3. Controle de Reguladores de Tensão:
    - Integrado ao `RegulatorSimulator` do Mosaik para ajuste dinâmico de taps.
@@ -69,8 +68,9 @@ DATA_DIR = PROJECT_ROOT / "data" / "rede" / "ESB01S4"
 CIRCUITO_DSS = DATA_DIR / "run_ESB01S4.dss"
 EVS_DSS_PATH = DATA_DIR / "ESB01S4_evs.dss"
 OUTPUT_DIR = PROJECT_ROOT / "output"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-JSON_SAIDA = str(OUTPUT_DIR / "topologia_ESB01S4_TCC.json")
+TOPOLOGIA_DIR = OUTPUT_DIR / "topologia"
+TOPOLOGIA_DIR.mkdir(parents=True, exist_ok=True)
+JSON_SAIDA = str(TOPOLOGIA_DIR / "topologia_ESB01S4_TCC.json")
 
 SESSIONS_EV_CSV = (
     PROJECT_ROOT / "data" / "datasets" / "veiculos-eletricos" / "ev_sessions_caldera.csv"
@@ -128,10 +128,13 @@ def _run_scenario_impl(
     penetracao_pct: Optional[float] = None,
     base_calculo: str = "residencial_bt",
     seed: int = 42,
-    usar_pv_mosaik: bool = False,
+    usar_pv_mosaik: bool = True,
     nome_cenario: Optional[str] = None,
     reexecutar_alocacao: bool = False,
     mostrar_progresso: bool = False,
+    pasta_saida: Optional[Path] = None,
+    barras_especificas: Optional[list] = None,
+    barras_excluidas: Optional[list] = None,
 ):
     """
     Executa o cenário principal de co-simulação com Mosaik.
@@ -153,6 +156,9 @@ def _run_scenario_impl(
         Identificador textual para nomear o arquivo CSV de saída.
     reexecutar_alocacao: bool
         Força regeração do arquivo de VEs antes da simulação.
+    pasta_saida: Path, opcional
+        Diretório onde o CSV será salvo. Por padrão, salva em:
+        output/cenarios/seed_{seed}/ (ou output/cenarios/caso_base/ para baseline)
     """
     if not CIRCUITO_DSS.exists():
         print(f"[ERRO]: Arquivo DSS não encontrado em:\n{CIRCUITO_DSS}")
@@ -161,15 +167,25 @@ def _run_scenario_impl(
     # 1. Determinação do Identificador do Cenário e Arquivo de Saída
     if (qtd_evs == 0) or (penetracao_pct == 0.0):
         cenario_tag = "baseline"
+        nome_padrao = "result_TCC_baseline"
+        pasta_padrao = OUTPUT_DIR / "cenarios" / "caso_base"
     elif penetracao_pct is not None:
         cenario_tag = f"ev_p{int(penetracao_pct)}_{base_calculo}"
+        nome_padrao = f"result_TCC_{cenario_tag}_seed{seed}"
+        pasta_padrao = OUTPUT_DIR / "cenarios" / f"seed_{seed}"
     elif qtd_evs is not None:
         cenario_tag = f"ev_q{qtd_evs}"
+        nome_padrao = f"result_TCC_{cenario_tag}_seed{seed}"
+        pasta_padrao = OUTPUT_DIR / "cenarios" / f"seed_{seed}"
     else:
         cenario_tag = "default"
+        nome_padrao = f"result_TCC_{cenario_tag}_seed{seed}"
+        pasta_padrao = OUTPUT_DIR / "cenarios" / f"seed_{seed}"
 
-    nome_final = nome_cenario or f"result_TCC_{cenario_tag}"
-    arquivo_resultados_csv = OUTPUT_DIR / f"{nome_final}.csv"
+    nome_final = nome_cenario or nome_padrao
+    destino_dir = Path(pasta_saida) if pasta_saida is not None else pasta_padrao
+    destino_dir.mkdir(parents=True, exist_ok=True)
+    arquivo_resultados_csv = destino_dir / f"{nome_final}.csv"
 
     print("\n" + "=" * 70)
     print(f" CENÁRIO PRINCIPAL TCC: {nome_final.upper()}")
@@ -197,6 +213,8 @@ def _run_scenario_impl(
             caminho_dss=CIRCUITO_DSS,
             output_dss=EVS_DSS_PATH,
             ev_sessions_csv=SESSIONS_EV_CSV,
+            barras_especificas=barras_especificas,
+            barras_excluidas=barras_excluidas,
         )
         print(f"Alocação concluída: {info_aloc['metrica']}")
 
@@ -445,10 +463,13 @@ def run_scenario(
     penetracao_pct: Optional[float] = None,
     base_calculo: str = "residencial_bt",
     seed: int = 42,
-    usar_pv_mosaik: bool = False,
+    usar_pv_mosaik: bool = True,
     nome_cenario: Optional[str] = None,
     reexecutar_alocacao: bool = False,
     mostrar_progresso: bool = False,
+    pasta_saida: Optional[Path] = None,
+    barras_especificas: Optional[list] = None,
+    barras_excluidas: Optional[list] = None,
 ):
     """
     Despacha a execução do cenário garantindo compatibilidade com Jupyter Notebooks
@@ -485,6 +506,9 @@ def run_scenario(
                 nome_cenario=nome_cenario,
                 reexecutar_alocacao=reexecutar_alocacao,
                 mostrar_progresso=mostrar_progresso,
+                pasta_saida=pasta_saida,
+                barras_especificas=barras_especificas,
+                barras_excluidas=barras_excluidas,
             )
             return future.result()
     else:
@@ -497,6 +521,9 @@ def run_scenario(
             nome_cenario=nome_cenario,
             reexecutar_alocacao=reexecutar_alocacao,
             mostrar_progresso=mostrar_progresso,
+            pasta_saida=pasta_saida,
+            barras_especificas=barras_especificas,
+            barras_excluidas=barras_excluidas,
         )
 
 
@@ -522,12 +549,24 @@ if __name__ == "__main__":
         help="Semente pseudoaleatória (padrão: 42)."
     )
     parser.add_argument(
-        "--usar-pv-mosaik", action="store_true", default=False,
-        help="Ativa os simuladores PVSimulator e InverterSim via Mosaik (padrão: False, usa PVSystem nativo do OpenDSS)."
+        "--barras-especificas", "--barras-alvo", nargs="+", default=None,
+        help="Lista de barras onde os VEs DEVEM ser alocados (whitelist)."
+    )
+    parser.add_argument(
+        "--barras-excluidas", "--ignorar-barras", nargs="+", default=None,
+        help="Lista de barras que NÃO DEVEM receber VEs (blacklist)."
+    )
+    parser.add_argument(
+        "--sem-pv-mosaik", action="store_true", default=False,
+        help="Desativa os simuladores PVSimulator e InverterSim via Mosaik, usando PVSystem nativo do OpenDSS."
     )
     parser.add_argument(
         "--cenario-nome", "-o", type=str, default=None,
         help="Nome identificador customizado para o arquivo de resultados CSV."
+    )
+    parser.add_argument(
+        "--pasta-saida", type=str, default=None,
+        help="Diretório onde o arquivo CSV de saída será gravado."
     )
     parser.add_argument(
         "--realocar", action="store_true",
@@ -545,9 +584,12 @@ if __name__ == "__main__":
         penetracao_pct=args.penetracao,
         base_calculo=args.base,
         seed=args.seed,
-        usar_pv_mosaik=args.usar_pv_mosaik,
+        usar_pv_mosaik=not args.sem_pv_mosaik,
         nome_cenario=args.cenario_nome,
         reexecutar_alocacao=args.realocar,
         mostrar_progresso=args.progresso,
+        pasta_saida=Path(args.pasta_saida) if args.pasta_saida else None,
+        barras_especificas=args.barras_especificas,
+        barras_excluidas=args.barras_excluidas,
     )
 
