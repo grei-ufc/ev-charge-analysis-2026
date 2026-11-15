@@ -24,17 +24,17 @@ Avaliando a **Tensão Mínima Global ($V_{\min}$)** como Variável Governante (A
 
 ## 2. Tabela Síntese das Métricas Eletrotécnicas Avaliadas no Conjunto Final
 
-| Métrica Eletrotécnica | Média ($\bar{X}$) | Desvio ($s$) | Coef. Variação ($\widehat{CV}$) | Erro Obs. (95% IC) | $M^*$ ($\epsilon = 5.0%$) | $M^*$ ($\epsilon = 2.0%$) | $M^*$ ($\epsilon = 1.0%$) | Suficiente? |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **v_min_global** | 0.7095 pu | 0.01898 | 2.675% | ±4.256% | **3** | **19** | **73** | ✅ Suficiente |
-| **v_med_global** | 1.0059 pu | 0.00032 | 0.031% | ±0.050% | **1** | **1** | **1** | ✅ Suficiente |
-| **v_afetada_min** | 0.7643 pu | 0.01508 | 1.972% | ±3.138% | **2** | **10** | **40** | ✅ Suficiente |
-| **v_afetada_med** | 0.9636 pu | 0.00192 | 0.199% | ±0.317% | **1** | **1** | **1** | ✅ Suficiente |
-| **energia_ves_kwh** | 22505.1 | 758.66 | 3.371% | ±5.364% | **5** | **29** | **116** | ⚠️ Requer complemento |
-| **p_max_kw** | 1914.4 | 51.63 | 2.697% | ±4.292% | **3** | **19** | **74** | ✅ Suficiente |
-| **vdi_sub_acum** | 4027.7 | 200.48 | 4.977% | ±7.920% | **11** | **63** | **251** | ⚠️ Requer complemento |
-| **n_barras_violam_drc_sub** | 509.0 | 25.42 | 4.993% | ±7.946% | **11** | **64** | **253** | ⚠️ Requer complemento |
-| **CRITÉRIO GOVERNANTE (Abordagem A: $V_{\min}$)** | — | — | — | — | **3** | **19** | **73** | ✅ Aprovado (Convergido) |
+| Métrica Eletrotécnica | Média ($\bar{X}$) | Desvio ($s$) | Coef. Variação ($\widehat{CV}$) | Erro Obs. (95% IC) | $M^*$ ($\epsilon = 5.0%$) | Suficiente? |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **v_min_global** | 0.7095 pu | 0.01898 | 2.675% | ±4.256% | **3** | ✅ Suficiente |
+| **v_med_global** | 1.0059 pu | 0.00032 | 0.031% | ±0.050% | **1** | ✅ Suficiente |
+| **v_afetada_min** | 0.7643 pu | 0.01508 | 1.972% | ±3.138% | **2** | ✅ Suficiente |
+| **v_afetada_med** | 0.9636 pu | 0.00192 | 0.199% | ±0.317% | **1** | ✅ Suficiente |
+| **energia_ves_kwh** | 22505.1 | 758.66 | 3.371% | ±5.364% | **5** | ⚠️ Requer complemento |
+| **p_max_kw** | 1914.4 | 51.63 | 2.697% | ±4.292% | **3** | ✅ Suficiente |
+| **vdi_sub_acum** | 4027.7 | 200.48 | 4.977% | ±7.920% | **11** | ⚠️ Requer complemento |
+| **n_barras_violam_drc_sub** | 509.0 | 25.42 | 4.993% | ±7.946% | **11** | ⚠️ Requer complemento |
+| **CRITÉRIO GOVERNANTE (Abordagem A: $V_{\min}$)** | — | — | — | — | **3** | ✅ Aprovado (Convergido) |
 
 ---
 

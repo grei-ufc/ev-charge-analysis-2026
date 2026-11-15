@@ -1,20 +1,17 @@
-"""Calculador do Tamanho Amostral de Monte Carlo (Law, 2015 / Chow & Robbins, 1965 / Stein, 1945)
-===================================================================================================
+"""Dimensionamento do Tamanho Amostral de Monte Carlo (Law, 2015 / Chow & Robbins, 1965)
+=======================================================================================
 
-Este script automatiza o dimensionamento do número necessário de replicações
-independentes (sementes pseudoaleatórias) em simulações estocásticas do alimentador ESB01S4,
-focado na Tensão Mínima Global (V_min) como Variável Governante (Abordagem A),
-adotando o Procedimento Sequencial de Parada de Law (2015) e Chow & Robbins (1965).
+Determina o número mínimo necessário de replicações estocásticas independentes
+(sementes pseudoaleatórias) para simulações quase-estáticas do alimentador ESB01S4.
 
-Fundamentação:
---------------
-- Law (2007, 2015) - Simulation Modeling and Analysis (Capítulo 9: Procedimento Sequencial com Erro Relativo Especificado);
-- Chow e Robbins (1965) - On the asymptotic theory of fixed-width sequential confidence intervals for the mean;
-- Procedimento em Dois Estágios de Stein (1945);
-- Driels e Shin (2004) - Determining the Number of Iterations for Monte Carlo Simulations;
-- Banks et al. (2010) - Discrete-Event System Simulation;
-- Montgomery e Runger (2021) - Estatística Aplicada e Probabilidade para Engenheiros;
-- ANEEL (2021) - PRODIST Módulo 8 (Qualidade da Energia Elétrica).
+Metodologia:
+------------
+- Procedimento Sequencial de Parada com Erro Relativo Especificado (Law, 2015;
+  Chow e Robbins, 1965).
+- Abordagem A (Variável Governante): Adota a Tensão Mínima Global (V_min) como
+  grandeza crítica de projeto e conformidade regulatória (PRODIST Módulo 8 / ANEEL).
+- Intervalos de Confiança: Distribuição t de Student para graus de liberdade nu = k - 1.
+- Tolerância: Erro relativo máximo admissível epsilon = 5% sob 95% de confiança.
 """
 
 import argparse
@@ -56,10 +53,9 @@ def obter_ou_executar_simulacao(
     forcar: bool = False,
     somente_analisar: bool = False,
 ) -> Path:
-    """
-    Verifica se o arquivo de simulação para a semente já existe.
-    Busca na subpasta da semente (output/monte_carlo/seed_{seed}/) ou na raiz de output/.
-    Se não existir (e não for somente_analisar), executa a simulação chamando o cenário Mosaik.
+    """Localiza o arquivo CSV de simulação para a semente informada ou dispara sua execução.
+
+    Verifica diretórios de saída existentes antes de invocar a co-simulação no Mosaik.
     """
     pasta_seed = OUTPUT_DIR / "cenarios" / f"seed_{seed}"
     pasta_seed.mkdir(parents=True, exist_ok=True)
@@ -68,7 +64,7 @@ def obter_ou_executar_simulacao(
 
     arquivo_esperado = pasta_seed / f"result_TCC_{tag}.csv"
 
-    # Lista de caminhos candidatos onde o arquivo pode já existir
+    # Verificação de arquivos existentes em múltiplos caminhos de saída
     candidatos = [
         arquivo_esperado,
         pasta_seed / f"result_TCC_{tag_padrao}.csv" if seed == 42 else None,
@@ -95,7 +91,7 @@ def obter_ou_executar_simulacao(
 
     print(f"\n>>> Executando Simulação Piloto: Penetração = {penetracao_pct}% | Seed = {seed} <<<")
     
-    # Importa dinamicamente para evitar carregar o ambiente Mosaik quando for apenas pós-processar
+    # Importação sob demanda para evitar overhead do Mosaik em execuções puramente analíticas
     from scenario_ESB01S4_TCC import run_scenario
 
     run_scenario(
@@ -121,9 +117,11 @@ def calcular_estatisticas_metrica(
     confianca: float = 0.95,
     erros_admissiveis: Optional[List[float]] = None,
 ) -> Dict[str, Any]:
-    """
-    Calcula as estatísticas amostrais, o intervalo de confiança t de Student e o
-    dimensionamento amostral M* (Driels & Shin, 2004).
+    """Calcula média amostral, desvio padrão, coeficiente de variação, intervalo t e tamanho amostral M*.
+
+    Utiliza o quantil bilateral da distribuição t de Student com nu = M - 1 graus de liberdade.
+    O número mínimo de replicações requeridas para atingir o erro admissível epsilon é dado por:
+        M* = ceil( ( (t_critico * CV) / epsilon )^2 )
     """
     if erros_admissiveis is None:
         erros_admissiveis = [0.01, 0.02, 0.05]

@@ -170,3 +170,20 @@ Para garantir total integridade aos dados de pesquisa do TCC:
 2. **Cargas Desativadas Catalogadas:** [`CargasBT_Sintetico_20250139_ESB01S4_desativadas.dss`](file:///mnt/c/Users/pvict/OneDrive/TCC/ev-analysis-2026/data/rede/ESB01S4/CargasBT_Sintetico_20250139_ESB01S4_desativadas.dss) contém exatamente as 1.344 cargas desativadas removidas, permitindo auditoria elemento por elemento.
 3. **Produção Sanitizada:** [`CargasBT_Sintetico_20250139_ESB01S4.dss`](file:///mnt/c/Users/pvict/OneDrive/TCC/ev-analysis-2026/data/rede/ESB01S4/CargasBT_Sintetico_20250139_ESB01S4.dss) é o arquivo de produção utilizado pelos scripts de simulação e pelo Mosaik.
 4. **Notebook Atualizado:** O notebook [`analise_convergencia_opendss.ipynb`](file:///mnt/c/Users/pvict/OneDrive/TCC/ev-analysis-2026/notebooks/analise_convergencia_opendss.ipynb) foi pré-executado e contém todas as curvas e tabelas atualizadas.
+
+---
+
+## 7. Extensão da Auditoria Cadastral para Geração Distribuída (`UGBT_tab` e `UGMT_tab`)
+
+Em auditoria complementar realizada diretamente sobre o Geodatabase oficial da Enel Ceará (`Enel_CE_39_2024-12-31_V11_20250822-1151.gdb`), verificou-se que a mesma omissão do filtro `SIT_ATIV` pelo `bdgd2opendss` ocorria nas camadas de Geração Distribuída (`UGBT_tab` e `UGMT_tab`), além de confirmar que a inconsistência de fases nos ramais monofásicos é originária da própria BDGD:
+
+| Camada BDGD (`CTMT = 'ESB01S4'`) | Total Cadastrado | Ativos (`SIT_ATIV == 'AT'`) | Desativados (`SIT_ATIV == 'DS'`) | Potência Removida (`DS`) | Potência Ativa Mantida (`AT`) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **`UGBT_tab` (Geração BT)** | 300 | **206** | **94 (31,33%)** | $903{,}04\text{ kW}$ | $1.835{,}90\text{ kW}$ |
+| **`UGMT_tab` (Geração MT)** | 3 | **3** | **0 (0,00%)** | $0{,}00\text{ kW}$ | $525{,}00\text{ kW}$ |
+| **Consolidado GD-FV** | **303** | **209** | **94** | **$903{,}04\text{ kW}$** | **$2.360{,}90\text{ kW}$** |
+
+### Achados Complementares:
+1. **Origem Cadastral dos Nós Flutuantes:** Todas as 23 unidades geradoras originalmente trifásicas conectadas às 21 barras fisicamente monofásicas de BT (`BARRAS_MONOFASICAS_BT`) já constavam com `FAS_CON = 'ABC'` (21 registros) ou `'ABCN'` (2 registros) na própria tabela `UGBT_tab`, enquanto os respectivos ramais (`RAMLIG` / `SSDBT` / `UCBT_tab`) eram `'AN'` ou `'CN'` — confirmando que o erro de fase provém da BDGD, e não do conversor. Dessas 23 unidades, **5 possuíam `SIT_ATIV == 'DS'`** e **18 permanecem ativas (`'AT'`)** após o saneamento.
+2. **Coexistência no Mesmo `PAC`:** Identificaram-se 10 barras (`PAC`) em `UGBT_tab` nas quais coexistem unidades `'AT'` e `'DS'` (além de 1 GD `'AT'` em `PAC` cujas UCs eram `'DS'`), exigindo pareamento exato por identificador do gerador **`CEG_GD`** (`New "generator.<CEG_GD>"`), e não por barra.
+3. **Implementação e Rastreabilidade:** O filtro `SIT_ATIV == 'AT'` foi integrado ao pipeline em [`converter_gd_para_pvsystem.py`](file:///mnt/c/Users/pvict/OneDrive/TCC/ev-analysis-2026/src/ajuste-dados/codigos-rede/converter_gd_para_pvsystem.py), gerando o arquivo de auditoria `ESB01S4_gds_desativadas.dss` com os 94 geradores expurgados. As simulações de convergência e cossimulação Mosaik descritas na Seção 5 e nos demais relatórios foram executadas antes desse expurgo e aguardam re-execução para atualização numérica.

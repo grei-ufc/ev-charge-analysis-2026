@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 Script de Saneamento Cadastral: Filtragem de Consumidores Desativados (SIT_ATIV == 'DS')
-Lê a situação cadastral (SIT_ATIV) diretamente da camada UCBT_tab do Geodatabase da BDGD
-e sanitiza o arquivo de cargas de Baixa Tensão (CargasBT_Sintetico_20250139_ESB01S4.dss),
-removendo todas as unidades desativadas e preservando a integridade das cargas ativas e IP.
+Lê a situação cadastral (SIT_ATIV) diretamente das camadas UCBT_tab e UCMT_tab do
+Geodatabase da BDGD e sanitiza os arquivos de cargas de Baixa Tensão
+(CargasBT_Sintetico_20250139_ESB01S4.dss) e Média Tensão
+(CargasMT_Sintetico_20250139_ESB01S4.dss), removendo unidades desativadas e
+preservando a integridade das cargas ativas e de Iluminação Pública (IP).
 """
 
+from collections import defaultdict
 from pathlib import Path
 import re
 import shutil
@@ -20,6 +23,10 @@ REDE_DIR = BASE_DIR / "data" / "rede" / "ESB01S4"
 CARGAS_BT_DSS = REDE_DIR / "CargasBT_Sintetico_20250139_ESB01S4.dss"
 BACKUP_TODAS_DSS = REDE_DIR / "CargasBT_Sintetico_20250139_ESB01S4_todas.dss"
 CARGAS_DESATIVADAS_DSS = REDE_DIR / "CargasBT_Sintetico_20250139_ESB01S4_desativadas.dss"
+
+CARGAS_MT_DSS = REDE_DIR / "CargasMT_Sintetico_20250139_ESB01S4.dss"
+BACKUP_TODAS_MT_DSS = REDE_DIR / "CargasMT_Sintetico_20250139_ESB01S4_todas.dss"
+CARGAS_MT_DESATIVADAS_DSS = REDE_DIR / "CargasMT_Sintetico_20250139_ESB01S4_desativadas.dss"
 
 
 def extrair_situacao_cadastral_bdgd():
@@ -223,5 +230,187 @@ def sanitizar_cargas_bt():
     print(f"✅ Arquivo de cargas desativadas: {CARGAS_DESATIVADAS_DSS.name}")
 
 
+def extrair_situacao_cadastral_mt_bdgd():
+    """Lê a tabela UCMT_tab do GDB e mapeia situação cadastral preservando múltiplas unidades por PN_CON/PAC."""
+    print(f"\n📂 Abrindo Geodatabase para MT: {GDB_PATH.name}")
+    print("⏳ Consultando 'UCMT_tab' para CTMT == 'ESB01S4'...")
+
+    colunas = ["PN_CON", "PAC", "COD_ID", "CTMT", "SIT_ATIV", "CAR_INST", "DEM_CONT"]
+    df = pyogrio.read_dataframe(
+        GDB_PATH,
+        layer="UCMT_tab",
+        columns=colunas,
+        where="CTMT = 'ESB01S4'"
+    )
+
+    df["SIT_ATIV_LIMPO"] = df["SIT_ATIV"].astype(str).str.strip().str.upper()
+
+    print(f"✅ Total de UCs MT lidas no GDB: {len(df)}")
+    print(f"   - Ativas (AT): {(df['SIT_ATIV_LIMPO'] == 'AT').sum()}")
+    print(f"   - Desativadas (DS): {(df['SIT_ATIV_LIMPO'] == 'DS').sum()}")
+
+    sit_por_cod_id = {}
+    statuses_por_par = defaultdict(list)
+    statuses_por_chave = defaultdict(list)
+
+    for _, row in df.iterrows():
+        sit = row["SIT_ATIV_LIMPO"]
+        pac = str(row["PAC"]).strip() if pd.notna(row["PAC"]) else ""
+        cod_id = str(row["COD_ID"]).strip() if pd.notna(row["COD_ID"]) else ""
+        pn_con = str(row["PN_CON"]).strip() if pd.notna(row["PN_CON"]) else ""
+
+        if cod_id:
+            sit_por_cod_id[cod_id] = sit
+
+        for k in (pn_con, cod_id):
+            if k:
+                statuses_por_chave[k].append(sit)
+                if pac:
+                    statuses_por_par[(k, pac)].append(sit)
+
+    return sit_por_cod_id, statuses_por_par, statuses_por_chave
+
+
+def _resolver_situacao_mt(cod_cons, bus_raw, sit_por_cod_id, statuses_por_par, statuses_por_chave):
+    """Resolve SIT_ATIV de uma carga MT de forma conservadora contra chaves PN_CON repetidas."""
+    if cod_cons in sit_por_cod_id:
+        return sit_por_cod_id[cod_cons], "COD_ID"
+
+    cod_base = re.sub(r'_\d+$', '', cod_cons)
+    candidatos = [cod_cons] if cod_base == cod_cons else [cod_cons, cod_base]
+
+    if bus_raw:
+        for cand in candidatos:
+            sts = statuses_por_par.get((cand, bus_raw))
+            if sts:
+                conjunto = set(sts)
+                if conjunto == {"DS"}:
+                    return "DS", "PN_CON+PAC"
+                if "AT" in conjunto:
+                    if len(conjunto) > 1:
+                        print(f"   [AVISO MT] Múltiplas UCs em ({cand}, {bus_raw}) têm status mistos {sorted(conjunto)}; mantendo AT.")
+                    return "AT", "PN_CON+PAC"
+
+    for cand in candidatos:
+        sts = statuses_por_chave.get(cand)
+        if sts:
+            conjunto = set(sts)
+            if conjunto == {"DS"}:
+                return "DS", "PN_CON"
+            if "AT" in conjunto:
+                if len(conjunto) > 1:
+                    print(f"   [AVISO MT] Chave MT {cand} possui status mistos {sorted(conjunto)}; mantendo AT.")
+                return "AT", "PN_CON"
+
+    return None, "nao_encontrada"
+
+
+def sanitizar_cargas_mt():
+    """Saneia CargasMT_Sintetico_20250139_ESB01S4.dss removendo UCs MT com SIT_ATIV == 'DS'."""
+    if not CARGAS_MT_DSS.exists():
+        raise FileNotFoundError(f"Arquivo MT não encontrado: {CARGAS_MT_DSS}")
+
+    sit_por_cod_id, statuses_por_par, statuses_por_chave = extrair_situacao_cadastral_mt_bdgd()
+
+    if BACKUP_TODAS_MT_DSS.exists():
+        arquivo_fonte = BACKUP_TODAS_MT_DSS
+        print(f"ℹ️ Usando arquivo fonte original MT: {arquivo_fonte.name}")
+    else:
+        shutil.copy2(CARGAS_MT_DSS, BACKUP_TODAS_MT_DSS)
+        arquivo_fonte = BACKUP_TODAS_MT_DSS
+        print(f"💾 Backup integral MT criado em: {BACKUP_TODAS_MT_DSS.name}")
+
+    with open(arquivo_fonte, "r", encoding="utf-8") as f:
+        linhas = f.readlines()
+
+    linhas_ativas = []
+    linhas_desativadas = []
+    ucs_ativas = set()
+    ucs_desativadas = set()
+
+    stats = {
+        "total_linhas": len(linhas),
+        "cargas_ativas": 0,
+        "cargas_desativadas": 0,
+        "cargas_nao_encontradas": 0,
+        "kw_ativo_total": 0.0,
+        "kw_desativado_total": 0.0,
+    }
+
+    padrao_load = re.compile(r'New\s+"Load\.MT_([^"]+)"', re.IGNORECASE)
+    padrao_bus = re.compile(r'bus1\s*=\s*"([^".]+)', re.IGNORECASE)
+    padrao_kw = re.compile(r'kw\s*=\s*([0-9.]+)', re.IGNORECASE)
+
+    correspondencias = []
+
+    for linha in linhas:
+        texto = linha.strip()
+        if not texto or texto.startswith("!"):
+            linhas_ativas.append(linha)
+            continue
+
+        match_load = padrao_load.search(texto)
+        if not match_load:
+            linhas_ativas.append(linha)
+            continue
+
+        load_id_completo = match_load.group(1)
+        match_bus = padrao_bus.search(texto)
+        bus_raw = match_bus.group(1).strip() if match_bus else ""
+        match_kw = padrao_kw.search(texto)
+        kw_val = float(match_kw.group(1)) if match_kw else 0.0
+
+        cod_cons = re.sub(r'_M[12]$', '', load_id_completo)
+        sit, origem = _resolver_situacao_mt(
+            cod_cons, bus_raw, sit_por_cod_id, statuses_por_par, statuses_por_chave
+        )
+        correspondencias.append((load_id_completo, bus_raw, sit, origem, kw_val))
+
+        if sit == "DS":
+            linhas_desativadas.append(linha)
+            stats["cargas_desativadas"] += 1
+            stats["kw_desativado_total"] += kw_val
+            ucs_desativadas.add(cod_cons)
+        elif sit == "AT":
+            linhas_ativas.append(linha)
+            stats["cargas_ativas"] += 1
+            stats["kw_ativo_total"] += kw_val
+            ucs_ativas.add(cod_cons)
+        else:
+            linhas_ativas.append(linha)
+            stats["cargas_nao_encontradas"] += 1
+            stats["kw_ativo_total"] += kw_val
+            ucs_ativas.add(cod_cons)
+
+    with open(CARGAS_MT_DSS, "w", encoding="utf-8") as f:
+        f.writelines(linhas_ativas)
+
+    with open(CARGAS_MT_DESATIVADAS_DSS, "w", encoding="utf-8") as f:
+        f.writelines(linhas_desativadas)
+
+    print("\n🔍 Detalhamento MT (UCs desativadas e amostra de ativas):")
+    exibidas = 0
+    for load_id, bus_r, s_val, orig, kw_v in correspondencias:
+        if s_val == "DS" or exibidas < 6:
+            print(f"   • Load.MT_{load_id:16s} | bus={bus_r:16s} | kW={kw_v:7.2f} -> Status: {s_val} ({orig})")
+            if s_val != "DS":
+                exibidas += 1
+
+    print("\n" + "=" * 75)
+    print("📊 RESULTADO DO SANEAMENTO CADASTRAL MT (OpenDSS - ESB01S4)")
+    print("=" * 75)
+    print(f"• Instalações MT ativas mantidas: {len(ucs_ativas)} ({stats['cargas_ativas']} objetos _M1/_M2)")
+    print(f"• Instalações MT desativadas removidas: {len(ucs_desativadas)} ({stats['cargas_desativadas']} objetos _M1/_M2)")
+    if stats["cargas_nao_encontradas"] > 0:
+        print(f"• Objetos MT não localizados (mantidos ativos): {stats['cargas_nao_encontradas']}")
+    print(f"• Potência Ativa MT Mantida: {stats['kw_ativo_total']:.2f} kW")
+    print(f"• Potência Fantasma MT Removida: {stats['kw_desativado_total']:.2f} kW")
+    print("=" * 75)
+
+    print(f"\n✅ Arquivo MT principal sanitizado: {CARGAS_MT_DSS.name}")
+    print(f"✅ Arquivo MT de cargas desativadas: {CARGAS_MT_DESATIVADAS_DSS.name}")
+
+
 if __name__ == "__main__":
     sanitizar_cargas_bt()
+    sanitizar_cargas_mt()

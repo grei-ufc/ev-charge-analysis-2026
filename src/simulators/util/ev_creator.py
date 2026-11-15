@@ -1,15 +1,21 @@
-"""Módulo Utilitário Universal de Alocação e Criação de Veículos Elétricos (OpenDSS)
-================================================================================
+"""Alocação Estocástica e Modelagem de Veículos Elétricos no OpenDSS
+===================================================================
 
-Este módulo é responsável por alocar Veículos Elétricos (VEs) de forma estocástica,
-física e reproduzível em QUALQUER alimentador ou sistema elétrico modelado no OpenDSS.
+Aloca cargas de Veículos Elétricos (VEs) monofásicos de forma estocástica e
+reproduzível na rede de distribuição modelada no OpenDSS.
 
-Funcionalidades:
-- Alocação direta por quantidade exata de VEs (ex: quantidade=10, 50, 100);
-- Alocação proporcional por taxa de penetração (residencial, barras BT ou barras totais);
-- Alocação direcionada em barras específicas (barras_especificas / whitelist);
-- Bloqueio de barras que NÃO devem receber VEs (barras_excluidas / blacklist);
-- Compatível com redes brasileiras (BDGD) e redes IEEE (IEEE 13, 34, 123, etc.).
+Metodologia de Alocação:
+------------------------
+- Adoção Incremental Aninhada (Nested Adoption):
+  Baseada na teoria de difusão de inovações (Rogers, 1962; Bass, 1969).
+  Para uma dada semente pseudoaleatória, a ordenação de adoção é gerada uma única vez;
+  cenários de penetração crescente (ex: 10%, 20%, 30%) expandem a base de adotantes
+  preservando estritamente os consumidores alocados nos níveis anteriores.
+- Mapeamento elétrico:
+  Identifica unidades consumidoras elegíveis (cargas BT residenciais, V_base <= 1,0 kV),
+  atribuindo o VE a uma das fases existentes da unidade com conexão monofásica
+  fase-neutro em 220 V (potências nominais de 3,6 kW ou 7,2 kW).
+- Suporte a filtros de barras prioritárias (whitelist) ou bloqueadas (blacklist).
 """
 
 import argparse
@@ -29,6 +35,7 @@ CURRENT_FILE = Path(__file__).resolve()
 
 
 def _detectar_raiz_projeto() -> Path:
+    """Localiza o diretório raiz do projeto navegando pelos diretórios pai."""
     curr = CURRENT_FILE.parent
     while curr.parent != curr:
         if (curr / "pyproject.toml").exists() or (curr / "data").exists():
@@ -43,7 +50,7 @@ DEFAULT_EV_CSV = PROJECT_ROOT / 'data' / 'datasets' / 'veiculos-eletricos' / 'ev
 
 
 def _normalizar_lista_barras(lista_ou_str: Optional[Union[List[str], Set[str], str]]) -> Optional[Set[str]]:
-    """Converte listas, tuplas, conjuntos ou strings separadas por vírgula/espaço em conjunto canônico (lowercase)."""
+    """Converte listas, tuplas, conjuntos ou strings de nomes de barras em conjunto canônico (minúsculo e sem fases)."""
     if not lista_ou_str:
         return None
     if isinstance(lista_ou_str, str):
@@ -55,13 +62,22 @@ def _normalizar_lista_barras(lista_ou_str: Optional[Union[List[str], Set[str], s
     return set(tokens)
 
 
-def mapear_topologia_cargas(caminho_dss: Path, output_dss_path: Path) -> Dict[str, Any]:
-    """Compila o circuito no OpenDSS e mapeia as barras e cargas da rede.
+def _eh_iluminacao_publica(nome_carga: str) -> bool:
+    """Identifica cargas de Iluminação Pública (IPIP / PIP) para exclusão da adoção residencial."""
+    nome_lower = nome_carga.lower().strip()
+    return "ipip" in nome_lower or nome_lower.startswith(("bt_pip", "pip"))
 
-    Aplica estratégia hierárquica para suportar QUALQUER alimentador:
-    1. Cargas BT com identificador residencial (prefixo 'bt_');
-    2. Cargas gerais de Baixa Tensão (kv_base <= 1.0 kV);
-    3. Cargas gerais do alimentador (caso o sistema seja puramente MT, ex: IEEE 13).
+
+def mapear_topologia_cargas(caminho_dss: Path, output_dss_path: Path) -> Dict[str, Any]:
+    """Compila o circuito no OpenDSS e mapeia as barras e cargas elegíveis da rede.
+
+    Aplica estratégia hierárquica de identificação:
+    1. Cargas BT residenciais/elegíveis com prefixo 'bt_', excluindo Iluminação Pública (IPIP/PIP);
+    2. Cargas gerais de Baixa Tensão (kv_base <= 1.0 kV), excluindo Iluminação Pública (IPIP/PIP);
+    3. Cargas gerais do alimentador (caso a rede seja puramente MT).
+
+    Cargas multifásicas ou com medidores múltiplos (_M1/_M2) são agrupadas por
+    unidade consumidora única (uc_id).
     """
     dss = py_dss_interface.DSS()
     logger.info(f"Compilando circuito para mapeamento de cargas: {caminho_dss.name}")
@@ -112,19 +128,32 @@ def mapear_topologia_cargas(caminho_dss: Path, output_dss_path: Path) -> Dict[st
     if not todas_cargas:
         raise RuntimeError(f"Nenhuma carga (Load) encontrada no circuito OpenDSS: {caminho_dss}")
 
-    # Estratégia em cascata:
-    cargas_bt_prefix = [c for c in todas_cargas if c["nome"].lower().startswith("bt_") and c["kv_base"] <= 1.0]
-    cargas_bt_geral = [c for c in todas_cargas if c["kv_base"] <= 1.0]
+    # Seleção hierárquica das cargas residenciais BT (excluindo Iluminação Pública / IPIP):
+    cargas_ip_ignoradas = [
+        c for c in todas_cargas
+        if c["kv_base"] <= 1.0 and _eh_iluminacao_publica(c["nome"])
+    ]
+    cargas_bt_elegiveis = [
+        c for c in todas_cargas
+        if c["kv_base"] <= 1.0 and not _eh_iluminacao_publica(c["nome"])
+    ]
+    cargas_bt_prefix = [c for c in cargas_bt_elegiveis if c["nome"].lower().startswith("bt_")]
+    cargas_bt_geral = cargas_bt_elegiveis
 
     if cargas_bt_prefix:
         cargas_selecionadas = cargas_bt_prefix
-        tipo_base = "domicílios residenciais BT (prefixo bt_)"
+        tipo_base = "domicílios residenciais BT (prefixo bt_, excl. IP/IPIP)"
     elif cargas_bt_geral:
         cargas_selecionadas = cargas_bt_geral
-        tipo_base = "cargas de Baixa Tensão (kv_base <= 1 kV)"
+        tipo_base = "cargas de Baixa Tensão (kv_base <= 1 kV, excl. IP/IPIP)"
     else:
         cargas_selecionadas = todas_cargas
         tipo_base = "cargas do alimentador (rede MT)"
+
+    if cargas_ip_ignoradas:
+        logger.info(
+            f"Excluídos {len(cargas_ip_ignoradas)} objetos OpenDSS de Iluminação Pública (IPIP) do conjunto elegível de VEs."
+        )
 
     consumidores_alvo: Dict[str, Dict[str, Any]] = {}
     for c in cargas_selecionadas:
@@ -324,6 +353,9 @@ def alocar_evs(
         raise FileNotFoundError(f"Arquivo de perfis de VEs não encontrado em: {ev_sessions_csv} ou {DEFAULT_EV_CSV}")
 
     # 5. Seleção Estocástica Incremental Aninhada (Nested Adoption)
+    # A ordenação de consumidores elegíveis é determinada uma única vez para a semente informada.
+    # Cenários com maior penetração (ex: 20%) contêm estritamente todos os veículos alocados
+    # nos cenários de menor penetração (ex: 10%), refletindo a dinâmica cumulativa de adoção.
     rng = random.Random(seed)
     lista_candidatos = sorted(
         list(candidatos_consumidores.values()),
@@ -342,7 +374,8 @@ def alocar_evs(
             "fase": no_fase,
         })
 
-    # Permite alocação maior que a quantidade de barras/candidatos (múltiplos VEs por barra)
+    # Alocação cumulativa: caso a quantidade de VEs ultrapasse o total de consumidores,
+    # permite múltiplos veículos por unidade consumidora/barra mantendo a ordenação.
     veiculos_alocados = []
     contador_global = 1
     while len(veiculos_alocados) < qtd_evs:
@@ -355,8 +388,7 @@ def alocar_evs(
             veiculos_alocados.append(item_copia)
 
     logger.info(
-        f"Iniciando geração de {qtd_evs} VEs Monofásicos "
-        f"[Lógica Incremental Aninhada - {metrica_str}]..."
+        f"Alocando {qtd_evs} VEs monofásicos (Lógica Incremental Aninhada - {metrica_str})..."
     )
 
     ev_commands: List[str] = []

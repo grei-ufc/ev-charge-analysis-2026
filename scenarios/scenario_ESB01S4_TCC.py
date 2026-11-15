@@ -1,27 +1,24 @@
-"""Cenário Principal do TCC (ESB01S4 - Co-simulação Nativa com Mosaik)
-===================================================================
+"""Co-simulação Dinâmica do Alimentador ESB01S4 com Mosaik, OpenDSS e Caldera
+=============================================================================
 
-Este script constitui o cenário definitivo de co-simulação para análise do
-impacto da integração de Veículos Elétricos (VEs) no alimentador real ESB01S4.
+Implementa o ambiente de co-simulação para avaliar o impacto da recarga de
+Veículos Elétricos (VEs) e da Geração Distribuída Fotovoltaica (GD-FV) no
+alimentador de distribuição real ESB01S4 (Enel Distribuição Ceará).
 
-Características principais:
----------------------------
-1. Suporte a Múltiplos Cenários de VEs:
-   - Caso Base (0 VEs / 0% penetração).
-   - Alocação estocástica por Quantidade Fixa (ex: 20, 50, 100 VEs).
-   - Alocação por Taxa de Penetração (Adoção Domiciliar BT, Barras BT ou Total de Barras).
-   - Eletroquímica realista via Caldera ICM (C++ / IEC 61000).
-
-2. Modulação dos Sistemas Fotovoltaicos (PVs):
-   - Por padrão (`usar_pv_mosaik=True`), utiliza os simuladores Mosaik (`PVSimulator` + `InverterSim`)
-     para representação detalhada de inversores inteligentes.
-   - O modo nativo do OpenDSS pode ser ativado passando a flag `--sem-pv-mosaik`.
-
-3. Controle de Reguladores de Tensão:
-   - Integrado ao `RegulatorSimulator` do Mosaik para ajuste dinâmico de taps.
-
-4. Monitoramento Detalhado:
-   - Coleta de tensões nodais de Baixa Tensão (BT), fluxos de linha, perfis de VEs e PVs.
+Arquitetura de Co-simulação (Mosaik):
+------------------------------------
+1. Fluxo de Potência Quase-Estático (QSTS):
+   - Simulado via OpenDSSSimulator em intervalos de 10 minutos (1.008 passos em 7 dias).
+2. Modelagem de Veículos Elétricos:
+   - Perfis de recarga residencial gerados via Caldera (ICM / IEC 61000).
+   - Cargas monofásicas conectadas em 220V fase-neutro.
+3. Controle de Tensão por Reguladores:
+   - Emulação de controle de tap com temporização e banda morta via RegulatorSimulator.
+4. Geração Distribuída Fotovoltaica:
+   - Modela inversores inteligentes via PVSimulator e InverterSim com FP unitário (FP = 1,0).
+   - Opção de uso do elemento PVSystem nativo do OpenDSS (--sem-pv-mosaik).
+5. Monitoramento:
+   - Coleta de tensões de Baixa Tensão (BT) e fluxos em troncos de Média Tensão (MT).
 """
 
 import argparse
@@ -136,29 +133,33 @@ def _run_scenario_impl(
     barras_especificas: Optional[list] = None,
     barras_excluidas: Optional[list] = None,
 ):
-    """
-    Executa o cenário principal de co-simulação com Mosaik.
+    """Executa o cenário de co-simulação no Mosaik acoplando OpenDSS e Caldera.
 
     Parâmetros:
     -----------
     qtd_evs: int, opcional
-        Número fixo de VEs para alocar. Se 0, executa caso base sem VEs.
+        Quantidade absoluta de veículos elétricos a alocar. Se 0, executa o Caso Base.
     penetracao_pct: float, opcional
-        Taxa de penetração em porcentagem. Se 0.0, executa caso base sem VEs.
+        Taxa percentual de penetração de VEs. Se 0.0, executa o Caso Base.
     base_calculo: str
-        "residencial_bt" (padrão), "barras_bt" ou "total_barras".
+        Referência para a penetração: "residencial_bt" (padrão), "barras_bt" ou "total_barras".
     seed: int
-        Semente pseudoaleatória para reproducibilidade.
+        Semente pseudoaleatória para reprodutibilidade da alocação estocástica.
     usar_pv_mosaik: bool
-        Se True, utiliza os modelos de Smart Inverter e PVPanel do Mosaik.
-        Se False (padrão), utiliza o PVSystem nativo do OpenDSS.
+        Se True, modula geração solar via simuladores PVSimulator e InverterSim no Mosaik;
+        se False, utiliza a representação estática de PVSystem com curvas nativas do OpenDSS.
     nome_cenario: str, opcional
-        Identificador textual para nomear o arquivo CSV de saída.
+        Identificador textual para o arquivo CSV de saída.
     reexecutar_alocacao: bool
-        Força regeração do arquivo de VEs antes da simulação.
+        Se True, força a regeração do arquivo de cargas DSS dos VEs.
+    mostrar_progresso: bool
+        Se True, exibe o progresso temporal no console.
     pasta_saida: Path, opcional
-        Diretório onde o CSV será salvo. Por padrão, salva em:
-        output/cenarios/seed_{seed}/ (ou output/cenarios/caso_base/ para baseline)
+        Diretório de destino para gravação do arquivo de resultados CSV.
+    barras_especificas: list, opcional
+        Lista de barras prioritárias para conexão dos VEs (whitelist).
+    barras_excluidas: list, opcional
+        Lista de barras impedidas de receber VEs (blacklist).
     """
     if not CIRCUITO_DSS.exists():
         print(f"[ERRO]: Arquivo DSS não encontrado em:\n{CIRCUITO_DSS}")
@@ -471,9 +472,11 @@ def run_scenario(
     barras_especificas: Optional[list] = None,
     barras_excluidas: Optional[list] = None,
 ):
-    """
-    Despacha a execução do cenário garantindo compatibilidade com Jupyter Notebooks
-    e scripts normais, evitando colisões com event loops existentes do asyncio.
+    """Despacha a execução do cenário gerenciando o event loop do asyncio.
+
+    Quando executado dentro de ambientes com loop ativo (como Jupyter Notebooks
+    ou IPython), delega a simulação a uma thread dedicada via ThreadPoolExecutor
+    para evitar erros de reentrância do loop assíncrono do Mosaik.
     """
     # 1. Aplica nest_asyncio caso disponível
     try:

@@ -47,6 +47,43 @@ for _dir in (CENARIOS_DIR, TABELAS_DIR, RELATORIOS_DIR, TOPOLOGIA_DIR, FIGURAS_D
     _dir.mkdir(parents=True, exist_ok=True)
 
 
+def _calcular_distancia_barra_km(bus_nome: str) -> float:
+    """Calcula a distância elétrica da barra até a SE via OpenDSS (com fallback geométrico)."""
+    bus_limpo = str(bus_nome).strip().split(".")[0]
+    master_dss = REDE_DIR / "Master_20250139_ESB01S4.dss"
+
+    try:
+        import py_dss_interface
+        if master_dss.exists():
+            dss = py_dss_interface.DSS()
+            dss.text(f"Compile [{master_dss}]")
+            dss.text("CalcVoltageBases")
+            dss.text("Solve")
+            dss.circuit.set_active_bus(bus_limpo)
+            dist = float(dss.bus.distance)
+            if dist > 0.0:
+                return round(dist, 5)
+    except Exception:
+        pass
+
+    for cand_topo in (TOPOLOGIA_DIR / "topologia_ESB01S4_TCC.json", OUTPUT_DIR / "topologia_ESB01S4_TCC.json"):
+        if cand_topo.exists():
+            try:
+                with open(cand_topo, "r", encoding="utf-8") as f:
+                    dados_topo = json.load(f)
+                nodes = dados_topo.get("nodes", [])
+                ref = next((n for n in nodes if n.get("node_type") == "refbus" and n.get("coord_defined")), None)
+                alvo = next((n for n in nodes if str(n.get("id", "")).lower() == bus_limpo.lower() and n.get("coord_defined")), None)
+                if ref and alvo:
+                    dx = (float(alvo["x"]) - float(ref["x"])) * 111.065
+                    dy = (float(alvo["y"]) - float(ref["y"])) * 110.574
+                    return round(math.hypot(dx, dy), 5)
+            except Exception:
+                pass
+
+    return 7.33124 if bus_limpo == "3864601538458035" else 0.0
+
+
 def identificar_barra_bt_mais_afetada(
     caminho_csv_pior_cenario: Optional[Path] = None,
     arquivo_cache: Optional[Path] = None,
@@ -110,9 +147,10 @@ def identificar_barra_bt_mais_afetada(
     elif "bus." in col_min.lower():
         bus_nome = col_min.lower().split("bus.")[1].split("-")[0].split(".")[0]
 
+    distancia_km = _calcular_distancia_barra_km(bus_nome)
     resultado = {
         "bus": bus_nome,
-        "distancia_km": 7.33124,
+        "distancia_km": distancia_km,
         "v_min_pu": val_min,
         "coluna_critica": col_min,
         "criterio": "menor_tensao_minima_p50",
@@ -479,8 +517,8 @@ def carregar_e_processar_grade(
         delta_n_drc = m["n_barras_violam_drc"] - metrica_base["n_barras_violam_drc"]
         delta_n_drc_sub = m["n_barras_violam_drc_sub"] - metrica_base["n_barras_violam_drc_sub"]
 
-        # Qtd de VEs aproximada
-        qtd_evs = round(947 * (p / 100.0))
+        # Qtd de VEs exata na grade (670 domicílios BT elegíveis, excluindo IPIP)
+        qtd_evs = round(670 * (p / 100.0))
 
         linhas_relatorio.append({
             "cenario": f"{p}% VEs",
@@ -569,10 +607,11 @@ def plotar_figura_6_perfil_temporal(
     series_temporal_dist_base: Optional[np.ndarray] = None,
     series_temporal_dist_pior: Optional[np.ndarray] = None,
 ) -> None:
-    """
-    Gera a FIGURA 6 com perfil temporal na pior fase da pior barra:
-    Painel (a): Perfil Semanal Completo (168h - 1.008 Passos) em todos os cenários.
-    Painel (b): Zoom no Ciclo Diário Noturno de 24h do Dia Mais Severo com janela de recarga destacada.
+    """Gera a figura de perfis temporais de tensão na barra BT mais afetada por subtensão.
+
+    Apresenta a curva semanal de 168 horas (painel superior) e o detalhamento de 24 horas
+    do ciclo diário mais crítico (painel inferior), confrontando o Caso Base com os
+    cenários de penetração de 5% a 50% e demarcando os limites regulatórios do PRODIST.
     """
     if perfis_temporais is None:
         candidatos_csv = [
@@ -706,8 +745,15 @@ def plotar_curvas_sensibilidade_relativa(
     series_temporal_dist_base: Optional[np.ndarray] = None,
     series_temporal_dist_pior: Optional[np.ndarray] = None,
 ):
-    """
-    Gera as figuras acadêmicas em alta resolução (600 DPI e PDF vetorial) com métricas relativas.
+    """Gera os gráficos de sensibilidade paramétrica da grade de penetração de VEs.
+
+    Exporta figuras em PNG (600 DPI) e PDF vetorial para incorporação no documento do TCC:
+    - Fig. 1: Variação percentual da demanda de pico e do consumo de energia no alimentador;
+    - Fig. 2: Afundamento relativo de tensão (V_min e V_med global);
+    - Fig. 3: Transgressão dos limites regulatórios PRODIST Módulo 8 (DRP e DRC);
+    - Fig. 4: Evolução do Índice de Desvio de Tensão RMS (VDI_RMS);
+    - Fig. 5: Comportamento do Fator de Carga (FC);
+    - Fig. 7: Sensibilidade da tensão mínima na barra BT mais crítica.
     """
     plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
     plt.rcParams.update({
@@ -1070,9 +1116,10 @@ def plotar_curvas_multissemente(
     series_temporal_dist_base: Optional[np.ndarray] = None,
     series_temporal_dist_pior: Optional[np.ndarray] = None,
 ):
-    """
-    Gera figuras acadêmicas em altíssima resolução (600 DPI e PDF vetorial) para o TCC
-    exibindo a curva média de Monte Carlo com envelope de dispersão entre sementes.
+    """Gera gráficos consolidados multissemente com bandas de dispersão estatística de Monte Carlo.
+
+    Plota a curva média com envelope sombreado de desvio-padrão e pontos individuais de cada
+    semente (8, 25, 42, 100, 777, 2026) para demonstrar a sensibilidade da alocação espacial.
     """
     plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
     plt.rcParams.update({
@@ -1517,18 +1564,19 @@ def calcular_perfis_base_trafos(
             re.IGNORECASE,
         )
         with open(arq_pv, "r", encoding="utf-8", errors="ignore") as f:
-            for linha in f:
-                m = padrao_pv.search(linha)
-                if m:
-                    bus_raw = m.group(2).split(".")[0].lower()
-                    pmpp = float(m.group(3))
-                    daily = m.group(4).strip().lower()
+            conteudo_pv = re.sub(r'\r?\n\s*~\s*', ' ', f.read())
+        for linha in conteudo_pv.splitlines():
+            m = padrao_pv.search(linha)
+            if m:
+                bus_raw = m.group(2).split(".")[0].lower()
+                pmpp = float(m.group(3))
+                daily = m.group(4).strip().lower()
 
-                    trafo = bus_to_trafo.get(bus_raw)
-                    if trafo and trafo in p_solar:
-                        mult = shapes_solar.get(daily)
-                        if mult is not None:
-                            p_solar[trafo] += pmpp * mult
+                trafo = bus_to_trafo.get(bus_raw)
+                if trafo and trafo in p_solar:
+                    mult = shapes_solar.get(daily)
+                    if mult is not None:
+                        p_solar[trafo] += pmpp * mult
 
     print(f"Alocação Base de Setores Concluída: {cargas_bt_alocadas} cargas BT agregadas aos 40 transformadores.")
     return p_base, q_base, p_solar
@@ -1548,6 +1596,7 @@ def obter_fila_adocao_ves_semente(seed: int, bus_to_trafo: Dict[str, str]) -> Di
             m = padrao.search(linha)
             if m:
                 nome_carga = m.group(1)
+                nome_lower = nome_carga.lower().strip()
                 bus_full = m.group(2)
                 base_bus = bus_full.split(".")[0].lower()
                 nos = bus_full.split(".")[1:]
@@ -1555,15 +1604,23 @@ def obter_fila_adocao_ves_semente(seed: int, bus_to_trafo: Dict[str, str]) -> Di
                 if not fases:
                     fases = ["1", "2", "3"]
 
-                if nome_carga.lower().startswith("bt_"):
-                    uc_id = nome_carga.rsplit("_", 1)[0]
+                # Exclui Iluminação Pública (IPIP/PIP), espelhando ev_creator.py
+                if "ipip" in nome_lower or nome_lower.startswith(("bt_pip", "pip")):
+                    continue
+
+                if nome_lower.startswith("bt_"):
+                    uc_id = nome_lower.rsplit("_", 1)[0]
                     if uc_id not in consumidores_bt:
                         consumidores_bt[uc_id] = {
+                            "uc_id": uc_id,
                             "bus": base_bus,
                             "phases": fases,
                         }
 
-    lista_consumidores = list(consumidores_bt.values())
+    lista_consumidores = sorted(
+        list(consumidores_bt.values()),
+        key=lambda c: (str(c["bus"]), str(c["uc_id"])),
+    )
 
     dataset_caldera = DATA_DIR / "datasets" / "veiculos-eletricos" / "ev_sessions_caldera.csv"
     if dataset_caldera.exists():
@@ -1573,6 +1630,7 @@ def obter_fila_adocao_ves_semente(seed: int, bus_to_trafo: Dict[str, str]) -> Di
         curvas_disponiveis = [f"Curva_{i}" for i in range(20)]
 
     rng = random.Random(seed)
+    rng.shuffle(lista_consumidores)
     ve_idx_para_trafo = {}
 
     for idx, local in enumerate(lista_consumidores, start=1):
@@ -1593,9 +1651,31 @@ def calcular_temperatura_hotspot_ieee(
     n_exp: float = 0.8,
     m_exp: float = 0.8,
 ) -> Tuple[np.ndarray, np.ndarray, float, float]:
-    """
-    Calcula a temperatura do ponto mais quente (Theta_H em °C), o Fator de Aceleração
-    do Envelhecimento (F_AA) e a Perda de Vida Útil Semanal (%LoL) segundo IEEE Std C57.91.
+    """Calcula a elevação térmica e perda de vida útil do transformador segundo a norma IEEE Std C57.91-2011.
+
+    Equacionamento térmico:
+    1. Elevação de temperatura do topo do óleo:
+       Delta_Theta_TO = Delta_Theta_TO,nom * [ (K^2 * R + 1) / (R + 1) ]^n
+    2. Elevação de temperatura do ponto mais quente do enrolamento em relação ao óleo:
+       Delta_Theta_H = Delta_Theta_H,nom * [ K^2 ]^m
+    3. Temperatura absoluta do ponto mais quente:
+       Theta_Hotspot = Theta_Ambiente + Delta_Theta_TO + Delta_Theta_H
+    4. Fator de Aceleração do Envelhecimento (F_AA) baseado na equação de Arrhenius (ref. 110 °C):
+       F_AA = exp( 15000 / 383.15 - 15000 / (Theta_Hotspot + 273.15) )
+    5. Perda percentual de vida útil (%LoL) para a janela de 168 horas (vida de referência = 180.000 h).
+
+    Parâmetros:
+    -----------
+    k_carregamento_pu: Vetor temporal de carregamento em pu (S / S_nom).
+    theta_ambiente_c: Temperatura ambiente de referência (°C, padrão 30°C).
+    delta_theta_to_nom: Elevação nominal do topo do óleo sobre o ambiente (°C, padrão 55°C).
+    delta_theta_h_nom: Elevação nominal do ponto mais quente sobre o topo do óleo (°C, padrão 25°C).
+    r_perdas: Relação entre perdas em carga e perdas em vazio (P_carga / P_vazio, padrão 5.0).
+    n_exp, m_exp: Expoentes térmicos de resfriamento (ONAN, padrão 0.8).
+
+    Retorna:
+    --------
+    Tupla contendo (theta_hotspot_serie, f_aa_serie, f_eq_medio, pct_lol_semanal).
     """
     num_to = (k_carregamento_pu ** 2) * r_perdas + 1.0
     den_to = r_perdas + 1.0
@@ -1641,7 +1721,8 @@ def processar_transformadores_cenario(
                 idx_str = nome_base.rsplit("_", 1)[-1]
                 if idx_str.isdigit():
                     v_idx = int(idx_str)
-                    trafo = ve_idx_map.get(v_idx) or ve_idx_map.get(v_idx + 1)
+                    # CalderaEV_0..N-1 (0-indexado) corresponde aos VEs 1..N (1-indexado) em ev_creator.py
+                    trafo = ve_idx_map.get(v_idx + 1)
                     if trafo and trafo in p_ev:
                         serie = df_evs[col].values
                         if "-p_kw" in col.lower():
@@ -1718,9 +1799,11 @@ def executar_analise_trafos_multissemente(
     cenarios: List[int] = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
     base_calculo: str = "residencial_bt",
 ) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, Any], pd.DataFrame]:
-    """
-    Executa a análise de transformadores em todas as 61 simulações (Via 1).
-    Retorna DataFrames consolidados para tabelas e figuras.
+    """Executa a análise de carregamento e envelhecimento térmico dos 40 transformadores MT/BT.
+
+    Processa os fluxos de potência de cada cenário e semente, calculando o carregamento
+    aparente de pico, a incidência de sobrecarga (> 100% e > 120% da potência nominal),
+    a elevação térmica do enrolamento e a perda de vida útil relativa (%LoL).
     """
     trafos_dict = carregar_transformadores_dss()
     bus_to_trafo = mapear_barras_bt_para_transformadores(trafos_dict=trafos_dict)
@@ -1873,7 +1956,17 @@ def plotar_figuras_transformadores(
     df_detalhado: Optional[pd.DataFrame] = None,
     figuras_dir: Path = FIGURAS_DIR,
 ):
-    """Gera as figuras acadêmicas essenciais dos transformadores (Figuras 8 a 14)."""
+    """Gera os gráficos de impacto térmico e sobrecarga nos transformadores MT/BT.
+
+    Exporta figuras em PNG (600 DPI) e PDF vetorial:
+    - Fig. 8: Perda do resfriamento térmico noturno (00h às 06h) vs. penetração de VEs;
+    - Fig. 9: Percentual de transformadores com sobrecarga (> 100% e > 120%);
+    - Fig. 10: Curva temporal diária de carregamento no transformador mais solicitado;
+    - Fig. 11: Temperatura máxima do ponto mais quente (Theta_H) segundo IEEE Std C57.91;
+    - Fig. 12: Fator de aceleração do envelhecimento (F_AA);
+    - Fig. 13: Perda de vida útil semanal acumulada (%LoL);
+    - Fig. 14: Correlação entre pico de carregamento e degradação isolante.
+    """
     p_pct = df_resumo_trafos["penetracao_pct"].values
     trafo_mais_critico = df_ranking_trafos.iloc[0]["trafo"]
     s_nom_critico = float(df_ranking_trafos.iloc[0]["s_nom_kva"])

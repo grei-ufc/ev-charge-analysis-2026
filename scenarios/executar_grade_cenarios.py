@@ -1,29 +1,17 @@
-"""Orquestrador em Lote de Cenários de Penetração de VEs (ESB01S4)
-================================================================
+"""Execução em Lote da Grade Paramétrica de Penetração de VEs (ESB01S4)
+=====================================================================
 
-Este script executa sequencialmente a grade paramétrica de cenários de penetração
-de Veículos Elétricos (0% a 50% em passos de 5%) sobre os 1.914 domicílios BT
-do alimentador real ESB01S4 da Neoenergia Cosern.
+Executa sequencialmente a simulação temporal da grade de penetração de Veículos
+Elétricos (0% a 50%, passos de 5%) sobre os domicílios de Baixa Tensão (BT) do
+alimentador real ESB01S4 da Enel Distribuição Ceará.
 
-Recursos:
----------
-1. Execução automatizada e sequencial dos cenários (5%, 10%, 15%, ..., 50%).
-2. Pula automaticamente cenários cujos arquivos de resultados já existam (a menos
-   que a flag `--forcar` seja especificada).
-3. Cronometra o tempo de execução individual e total.
-4. Gera um relatório consolidado em JSON (`output/resumo_grade_cenarios.json`)
-   e uma tabela formatada no console.
-
-Uso:
-----
-    # Executar toda a grade padrão (5% a 50% de 5 em 5%):
-    uv run python scenarios/executar_grade_cenarios.py
-
-    # Executar apenas cenários específicos:
-    uv run python scenarios/executar_grade_cenarios.py --cenarios 5 15 30 50
-
-    # Forçar re-execução de todos os cenários existentes:
-    uv run python scenarios/executar_grade_cenarios.py --forcar
+O script oferece:
+1. Execução automatizada de cenários para uma ou múltiplas sementes pseudoaleatórias.
+2. Isolamento de cada simulação em subprocesso independente, garantindo liberação
+   de memória e reset do estado interno das bibliotecas C (OpenDSS e Caldera).
+3. Verificação de arquivos pré-existentes para evitar simulações redundantes (com
+   opção de re-execução forçada via flag --forcar).
+4. Consolidação de métricas de execução e tempos em relatório JSON e tabela em console.
 """
 
 import argparse
@@ -35,7 +23,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
-# Garante que a raiz do projeto e 'src/' estejam no path de importação
+# Inclusão da raiz do projeto e do diretório src no sys.path
 CURRENT_DIR = Path(__file__).parent.resolve()
 PROJECT_ROOT = CURRENT_DIR.parent
 SRC_DIR = PROJECT_ROOT / "src"
@@ -48,12 +36,16 @@ from scenarios.scenario_ESB01S4_TCC import OUTPUT_DIR
 
 # Grade padrão de simulações (10 cenários de VEs; Caso Base 0% é tratado como baseline)
 CENARIOS_PADRAO = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-DOMICILIOS_BT_TOTAL = 947  # 947 Unidades Consumidoras únicas mapeadas a partir das 1.914 cargas _M1/_M2 no OpenDSS
+DOMICILIOS_BT_TOTAL = 670  # 670 UCs BT elegíveis mapeadas no OpenDSS (1.340 objetos _M1/_M2, excluindo IPIP)
 
 
 
 def obter_nome_arquivo_cenario(penetracao_pct: float, base_calculo: str, seed: int = 42) -> Path:
-    """Retorna o caminho padrão do arquivo CSV de saída para a taxa e semente dadas."""
+    """Retorna o caminho do arquivo CSV de resultados para o cenário e semente informados.
+
+    Verifica locais onde simulações prévias possam ter sido gravadas antes de
+    retornar o caminho padrão de destino.
+    """
     if penetracao_pct == 0.0:
         pasta_base = OUTPUT_DIR / "cenarios" / "caso_base"
         pasta_base.mkdir(parents=True, exist_ok=True)
@@ -85,7 +77,7 @@ def obter_nome_arquivo_cenario(penetracao_pct: float, base_calculo: str, seed: i
 
 
 def calcular_qtd_evs(penetracao_pct: float, total_domicilios: int = DOMICILIOS_BT_TOTAL) -> int:
-    """Calcula o número inteiro exato de VEs para o percentual residencial dado."""
+    """Calcula o número de veículos elétricos correspondente à taxa de penetração."""
     return round(total_domicilios * (penetracao_pct / 100.0))
 
 
@@ -99,10 +91,11 @@ def executar_simulacao_subprocesso(
     pasta_saida: Optional[Path] = None,
     mostrar_progresso: bool = False,
 ) -> None:
-    """
-    Executa o cenário em um subprocesso Python 100% isolado.
-    Ao término de cada simulação, o processo é encerrado pelo sistema operacional,
-    destruindo todo o heap C/C++ (OpenDSS e Caldera) e liberando 100% da memória RAM.
+    """Executa um cenário em subprocesso Python isolado.
+
+    O isolamento em subprocesso assegura que o estado global das bibliotecas
+    OpenDSS (Direct-DLL) e Caldera C++ seja limpo pelo sistema operacional ao
+    término da rodada, evitando acúmulo de memória e vazamento de ponteiros entre passos.
     """
     script_cenario = CURRENT_DIR / "scenario_ESB01S4_TCC.py"
     cmd = [
@@ -138,9 +131,24 @@ def executar_grade(
     apenas_baseline: bool = False,
     usar_pv_mosaik: bool = True,
 ) -> Dict:
-    """
-    Executa em lote a lista de cenários de penetração especificados para uma ou mais sementes,
-    incluindo por padrão a simulação preliminar do Caso Base (0% VEs / Baseline).
+    """Executa a grade de cenários de penetração de VEs para as sementes especificadas.
+
+    Parâmetros:
+    -----------
+    cenarios: Lista de percentuais de penetração a simular (ex: [5, 10, ..., 50]).
+    base_calculo: Base de referência para cálculo da quantidade de VEs ("residencial_bt").
+    sementes: Lista de sementes pseudoaleatórias para simulações de Monte Carlo.
+    seed: Semente única (quando fornecida, substitui a lista de sementes).
+    forcar: Se True, reexecuta cenários mesmo que o arquivo CSV já exista no disco.
+    mostrar_progresso: Se True, habilita exibição do progresso temporal do Mosaik.
+    executar_baseline: Se True, executa preliminarmente o Caso Base (0% de VEs).
+    apenas_baseline: Se True, encerra o fluxo logo após executar o Caso Base.
+    usar_pv_mosaik: Se True, utiliza os modelos de inversor e painel fotovoltaico via Mosaik;
+                    se False, utiliza a modelagem nativa de PVSystem do OpenDSS.
+
+    Retorna:
+    --------
+    Dicionário com o sumário de execução de todos os cenários e tempos registrados.
     """
     if seed is not None:
         lista_sementes = [seed]
@@ -155,7 +163,7 @@ def executar_grade(
     pasta_cenarios.mkdir(parents=True, exist_ok=True)
 
     print("\n" + "=" * 80)
-    print(" ORQUESTRADOR EM LOTE: GRADE PARAMÉTRICA DE VEs MULTISSEMENTES (ESB01S4)")
+    print(" EXECUÇÃO EM LOTE: GRADE DE CENÁRIOS DE VEs MULTISSEMENTES (ESB01S4)")
     print("=" * 80)
     print(f" Data/Hora de Início : {data_inicio_str}")
     print(f" Base de Cálculo     : {base_calculo} ({DOMICILIOS_BT_TOTAL} domicílios)")
@@ -423,11 +431,11 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--sem-baseline", action="store_true", default=False,
-        help="Não executa a etapa preliminar do Caso Base (0% VEs), simulando apenas a grade de penetração."
+        help="Não executa a etapa preliminar do Caso Base (0%% VEs), simulando apenas a grade de penetração."
     )
     parser.add_argument(
         "--apenas-baseline", "--baseline-only", action="store_true", default=False,
-        help="Executa exclusivamente o Caso Base (0% VEs) na subpasta caso_base/ e encerra."
+        help="Executa exclusivamente o Caso Base (0%% VEs) na subpasta caso_base/ e encerra."
     )
     parser.add_argument(
         "--sem-pv-mosaik", action="store_true", default=False,

@@ -1,3 +1,12 @@
+"""Simulador Mosaik para Veículos Elétricos com Motor Físico Caldera (C++)
+========================================================================
+
+Interface de co-simulação Mosaik para modelagem detalhada da recarga de Veículos
+Elétricos (VEs). Utiliza as curvas físicas calculadas pelo módulo compilado C++
+Caldera ICM (Idaho National Laboratory), contemplando a dinâmica eletroquímica de
+baterias Li-ion (etapas CC/CV, tapering) e fator de potência estocástico (IEC 61000).
+"""
+
 import math
 import os
 import sys
@@ -25,14 +34,14 @@ META = {
         "CalderaEV": {
             "public": True,
             "params": [
-                "profile_name",  # Ex: User_12_semana_1_7p2kW
-                "csv_path",      # Opcional: Caminho para ev_sessions_caldera.csv
+                "profile_name",  # Identificador do perfil semanal no catálogo (ex: User_12_semana_1_7p2kW)
+                "csv_path",      # Caminho opcional para o arquivo de sessões de recarga
             ],
             "attrs": [
-                "P_kw",          # Potência Ativa demandada da rede AC (kW)
-                "Q_kvar",        # Potência Reativa (kVAr)
-                "fp",            # Fator de Potência estocástico [0.98, 1.00]
-                "is_charging",   # Status booleano indicando recarga ativa
+                "P_kw",          # Potência ativa demandada da rede AC (kW)
+                "Q_kvar",        # Potência reativa consumida pelo carregador (kvar)
+                "fp",            # Fator de potência do carregador [0.98 a 1.00]
+                "is_charging",   # Sinalizador de estado de recarga ativa (True/False)
             ],
         },
     },
@@ -40,36 +49,37 @@ META = {
 
 
 class CalderaEVModel:
-    """
-    Representação física de uma entidade de Veículo Elétrico na co-simulação.
-    Armazena a série temporal pré-calculada de recarga (10.080 minutos) com base
-    nas físicas de bateria, inversores e tapering do Caldera ICM (C++).
+    """Modelo de veículo elétrico para co-simulação temporal no Mosaik.
+
+    Armazena a série temporal pré-calculada de recarga (resolução de 1 minuto ao
+    longo de 10.080 minutos / 7 dias) e calcula em cada passo a potência ativa
+    injetada e a respectiva potência reativa indutiva decorrente do fator de potência.
     """
 
     def __init__(self, eid: str, profile_name: str, power_series: np.ndarray, fp: float = 1.0):
         self.eid = eid
         self.profile_name = profile_name
-        self.power_series = power_series  # Array de 10080 minutos
+        self.power_series = power_series  # Série temporal em minutos (10.080 minutos por semana)
         self.total_minutes = len(power_series)
         self.fp = float(fp)
 
-        # tan(phi) = sqrt(1 - fp^2) / fp para cálculo de potência reativa indutiva (IEC 61000)
+        # Cálculo da tangente do ângulo de fase: tan(phi) = sqrt(1 - fp^2) / fp
         if 0.0 < self.fp < 1.0:
             self.tan_phi = math.sqrt(1.0 - self.fp**2) / self.fp
         else:
             self.tan_phi = 0.0
 
-        # Estados dinâmicos expostos ao Mosaik
+        # Estados elétricos instantâneos expostos ao Mosaik
         self.P_kw = 0.0
         self.Q_kvar = 0.0
         self.is_charging = False
 
     def update_step(self, current_minute: int):
-        # Trata repetições cíclicas de semana se a simulação passar de 7 dias
+        """Atualiza a potência ativa e reativa para o minuto corrente da simulação."""
         idx = current_minute % self.total_minutes
         self.P_kw = float(self.power_series[idx])
         self.is_charging = self.P_kw > 0.05
-        # Potência reativa indutiva estocástica conforme normas IEC 61000-3-2 e IEC 61000-3-12
+        # Reativo indutivo conforme normas IEC 61000-3-2 e IEC 61000-3-12
         if self.is_charging:
             self.Q_kvar = round(float(self.P_kw * self.tan_phi), 4)
         else:
@@ -77,9 +87,7 @@ class CalderaEVModel:
 
 
 class CalderaEVSim(mosaik_api_v3.Simulator):
-    """
-    Simulador Mosaik para Veículos Elétricos com motor físico Caldera ICM.
-    """
+    """Simulador Mosaik para despacho de cargas de Veículos Elétricos com física Caldera."""
 
     def __init__(self):
         super().__init__(META)
@@ -90,14 +98,14 @@ class CalderaEVSim(mosaik_api_v3.Simulator):
         self.events_df: pd.DataFrame = None
 
     def init(self, sid, time_resolution=1.0, step_size=600, inputs_dir=None, **kwargs):
+        """Inicializa o simulador e carrega a interface com os módulos C++ do Caldera."""
         self.sid = sid
         self.step_size = step_size
-
-        # Inicializa o motor físico do C++
         self.wrapper = CalderaWrapper(inputs_dir=inputs_dir)
         return self.meta
 
     def create(self, num, model, **model_params):
+        """Instancia entidades de VE a partir de perfis de recarga especificados."""
         if model != "CalderaEV":
             raise ValueError(f"Modelo desconhecido: {model}. Esperado: 'CalderaEV'")
 

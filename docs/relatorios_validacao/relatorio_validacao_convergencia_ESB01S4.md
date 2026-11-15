@@ -8,6 +8,10 @@
 - `relatorio_diagnostico_ESB01S4.md` (Diagnóstico preliminar - 19/10/2026)
 - `relatorio_auditoria_bdgd_consumidores_desativados.md` (Auditoria Cadastral BDGD - 22/10/2026)
 
+> [!WARNING]
+> **Atualização Posterior do Pipeline de GD-FV (`SIT_ATIV == 'AT'`):**  
+> A validação numérica de 22/10/2026 registrada neste documento foi realizada antes da extensão do filtro `SIT_ATIV == 'AT'` às camadas `UGBT_tab` e `UGMT_tab` no script `converter_gd_para_pvsystem.py`. Após o expurgo das **94 unidades BT desativadas** ($903{,}04\text{ kW}$), o alimentador passou de 303 para **209 PVs ativos** ($2.360{,}90\text{ kW}$ nominais; com **18** unidades ativas dentre os 23 registros originais com nó flutuante). Os resultados dos cenários abaixo refletem o estado anterior ao expurgo na GD-FV e aguardam re-execução dos testes.
+
 ---
 
 ## 1. Resumo Executivo

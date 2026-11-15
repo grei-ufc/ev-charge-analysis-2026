@@ -38,7 +38,7 @@ Diferente de abordagens tradicionais baseadas em redes sintéticas ou sistemas-t
 * **Escala do Circuito:**
   * **2.210 barras de Baixa Tensão** monitoradas por fase;
   * **1.914 cargas secundárias** agregadas em **947 Unidades Consumidoras (domicílios)** residenciais;
-  * **303 sistemas de microgeração fotovoltaica (PVs)** ativos, totalizando mais de **3,16 MWp** de geração distribuída integrada;
+  * **209 sistemas de geração distribuída fotovoltaica (PVs) ativos** (`SIT_ATIV == 'AT'`: 206 em BT somando $1.835{,}90\text{ kW}$ e 3 em MT somando $525{,}00\text{ kW}$, totalizando **$2.360{,}90\text{ kW}$** / **$2{,}36\text{ MW}$** nominais após o expurgo de 94 unidades BT desativadas = $903{,}04\text{ kW}$);
   * **Linha Tronco Principal (`smt_1071706`):** Maior fluxo de entrada do alimentador, com demanda máxima de **$1.393,5\text{ kW}$** e **$130.345,8\text{ kWh}$** semanais.
 
 ---
@@ -71,6 +71,9 @@ Para garantir a validade estatística das conclusões estocásticas sem incorrer
 ---
 
 ## 📊 Síntese dos Resultados e Limiares de Hosting Capacity
+
+> [!NOTE]
+> **Atualização do Saneamento de GD-FV (`SIT_ATIV == 'AT'`):** Os resultados numéricos da tabela abaixo (bem como a demanda base de $1.393{,}5\text{ kW}$ citada na subseção anterior) referem-se à execução anterior com os 303 registros de GD-FV da BDGD. Após a atualização do script `converter_gd_para_pvsystem.py` para expurgar os 94 PVs desativados de BT (mantendo **209 PVs ativos**, $2{,}36\text{ MW}$), torna-se necessária a re-execução das simulações para atualizar os indicadores desta tabela.
 
 Simulação semanal (1.008 passos de 10 min) executada sobre toda a grade paramétrica:
 

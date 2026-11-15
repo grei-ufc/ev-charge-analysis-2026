@@ -8,6 +8,10 @@
 **Ambiente:** Python 3.12 (`uv`), OpenDSS via `py-dss-interface`, Mosaik 3.5.0, Caldera ICM (C++ Engine)  
 **Regime dos Inversores:** **Modo Pass-through / FP Unitário ($FP = 1,0$ e $Q = 0$) — Controles Volt-VAr e Volt-Watt desligados**  
 
+> [!WARNING]
+> **Atualização Posterior ao Relatório (Saneamento `SIT_ATIV == 'AT'` nas Tabelas de GD):**  
+> Este relatório consolida a campanha executada em outubro/2026 antes da aplicação do filtro `SIT_ATIV == 'AT'` às camadas `UGBT_tab` e `UGMT_tab` em `converter_gd_para_pvsystem.py`. Na atualização posterior do saneamento cadastral da GD-FV, dos **303** registros brutos foram expurgados **94 geradores BT com `SIT_ATIV == 'DS'`** ($903{,}04\text{ kW}$), restando **209 PVs ativos** ($206\text{ BT} + 3\text{ MT} = 2.360{,}90\text{ kW}$ nominais), sendo que dos 23 geradores originalmente com nó flutuante na base bruta, **5 eram `'DS'` e 18 permanecem ativos**. Todas as métricas de fluxo de potência e Mosaik abaixo aguardam re-execução com o novo `ESB01S4_pv.dss`.
+
 ---
 
 ## 1. Sumário Executivo Integrado

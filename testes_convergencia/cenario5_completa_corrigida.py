@@ -3,13 +3,13 @@
 """
 Cenário 5: Rede MT + BT Completa Corrigida (PVs Corrigidos + Cargas com vminpu=0.80)
 Aplica todas as correções identificadas no diagnóstico:
-- 23 PVSystems convertidos para monofásicos (.1.4 ou .3.4 com kV=0.22 e conn=Wye);
-- Inclusão explícita de conn=Delta nos 274 PVSystems trifásicos de BT;
+- Filtragem cadastral SIT_ATIV == 'AT' nas cargas BT e MT (UCBT_tab e UCMT_tab)
+  e nos geradores distribuídos (UGBT_tab + UGMT_tab), expurgando UCs e PVs 'DS';
+- Conversão dos geradores em barras monofásicas BT para phases=1 (.1.4 ou .3.4,
+  kV=0.22 e conn=Wye) e inclusão explícita de conn=Delta nos PVSystems trifásicos;
 - Ajuste de Vminpu=0.80 e Vmaxpu=1.20 nos PVSystems;
-- Ajuste de vminpu=0.80 em todas as 3.238 cargas de Baixa Tensão;
+- Ajuste de vminpu=0.80 nas cargas de Baixa Tensão;
 - Reordenação da chamada de CalcVoltageBases antes de Set mode=Daily.
-Resultado esperado: 100% de convergência nos 144 passos diários, média de ~5.6 iterações
-e tensões estabilizadas entre 0.59 e 1.055 pu.
 """
 
 from pathlib import Path

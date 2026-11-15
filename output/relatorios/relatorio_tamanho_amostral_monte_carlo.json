@@ -11,9 +11,7 @@
     ],
     "confianca": 0.95,
     "erros_admissiveis": [
-      0.05,
-      0.02,
-      0.01
+      0.05
     ],
     "convergencia_atingida": true,
     "barra_mais_afetada_id": "3864601538458035",
@@ -95,16 +93,6 @@
           "epsilon": 0.05,
           "M_requerido": 3,
           "suficiente": true
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 19,
-          "suficiente": false
-        },
-        "1.0%": {
-          "epsilon": 0.01,
-          "M_requerido": 73,
-          "suficiente": false
         }
       }
     },
@@ -131,16 +119,6 @@
       "dimensionamento_por_erro": {
         "5.0%": {
           "epsilon": 0.05,
-          "M_requerido": 1,
-          "suficiente": true
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 1,
-          "suficiente": true
-        },
-        "1.0%": {
-          "epsilon": 0.01,
           "M_requerido": 1,
           "suficiente": true
         }
@@ -171,16 +149,6 @@
           "epsilon": 0.05,
           "M_requerido": 2,
           "suficiente": true
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 10,
-          "suficiente": false
-        },
-        "1.0%": {
-          "epsilon": 0.01,
-          "M_requerido": 40,
-          "suficiente": false
         }
       }
     },
@@ -207,16 +175,6 @@
       "dimensionamento_por_erro": {
         "5.0%": {
           "epsilon": 0.05,
-          "M_requerido": 1,
-          "suficiente": true
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 1,
-          "suficiente": true
-        },
-        "1.0%": {
-          "epsilon": 0.01,
           "M_requerido": 1,
           "suficiente": true
         }
@@ -247,16 +205,6 @@
           "epsilon": 0.05,
           "M_requerido": 5,
           "suficiente": false
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 29,
-          "suficiente": false
-        },
-        "1.0%": {
-          "epsilon": 0.01,
-          "M_requerido": 116,
-          "suficiente": false
         }
       }
     },
@@ -285,16 +233,6 @@
           "epsilon": 0.05,
           "M_requerido": 3,
           "suficiente": true
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 19,
-          "suficiente": false
-        },
-        "1.0%": {
-          "epsilon": 0.01,
-          "M_requerido": 74,
-          "suficiente": false
         }
       }
     },
@@ -323,16 +261,6 @@
           "epsilon": 0.05,
           "M_requerido": 11,
           "suficiente": false
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 63,
-          "suficiente": false
-        },
-        "1.0%": {
-          "epsilon": 0.01,
-          "M_requerido": 251,
-          "suficiente": false
         }
       }
     },
@@ -360,16 +288,6 @@
         "5.0%": {
           "epsilon": 0.05,
           "M_requerido": 11,
-          "suficiente": false
-        },
-        "2.0%": {
-          "epsilon": 0.02,
-          "M_requerido": 64,
-          "suficiente": false
-        },
-        "1.0%": {
-          "epsilon": 0.01,
-          "M_requerido": 253,
           "suficiente": false
         }
       }

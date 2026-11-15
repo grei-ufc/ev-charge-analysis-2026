@@ -1,3 +1,12 @@
+"""Interface Python para o Motor Eletroquímico Caldera ICM (C++)
+================================================================
+
+Encapsula as chamadas aos módulos compilados em C++ do simulador Caldera
+(Idaho National Laboratory) para geração de perfis de recarga com resolução
+minutal, contemplando características elétricas de carregadores (EVSE) e
+baterias (fases de Corrente Constante / Tensão Constante - CC/CV e tapering).
+"""
+
 import os
 import sys
 from pathlib import Path
@@ -18,13 +27,13 @@ except ImportError as e:
 
 
 class CalderaWrapper:
-    """
-    Wrapper Python para encapsular a física do Caldera C++ (Idaho National Laboratory).
+    """Encapsula a interface com as bibliotecas C++ do Caldera.
+
     Responsável por:
-    - Carregar o inventário de veículos e carregadores (EV_inputs.csv e EVSE_inputs.csv).
-    - Inicializar a fábrica de perfis de recarga com discretização temporal (60s).
-    - Mapear veículos às suas respectivas Wallboxes de mercado.
-    - Gerar curvas físicas com a fase CC/CV (Constant Current / Constant Voltage) e tapering.
+    - Carregar o inventário de veículos e estações de recarga (EV_inputs.csv e EVSE_inputs.csv);
+    - Inicializar a fábrica de perfis com passo temporal de 60 segundos;
+    - Mapear cada modelo de veículo ao carregador correspondente;
+    - Gerar curvas dinâmicas de recarga em função dos estados de carga inicial e final (SoC).
     """
 
     CHARGER_MAP = {
@@ -37,7 +46,6 @@ class CalderaWrapper:
 
     def __init__(self, inputs_dir: Optional[str] = None, timestep_sec: float = 60.0):
         if inputs_dir is None:
-            # Caminho padrão dentro do projeto
             project_root = CURRENT_DIR.parent.parent.parent
             inputs_dir = str(project_root / "data" / "datasets" / "veiculos-eletricos")
 
@@ -45,16 +53,13 @@ class CalderaWrapper:
         self.timestep_sec = float(timestep_sec)
         self._profile_cache: Dict[Tuple[str, str, float, float], List[float]] = {}
 
-        # Inicializa o motor físico do C++
-        # O construtor de 4 argumentos gera automaticamente a fábrica de perfis na memória
-        print(f"[CalderaWrapper] Inicializando fábrica física de perfis em: {self.inputs_dir}")
+        # Inicializa a interface C++ com discretização temporal uniforme
         self._cp_interface = Caldera_ICM_Aux.CP_interface_v2(
             self.inputs_dir,
-            self.timestep_sec,  # L1 timestep (segundos)
-            self.timestep_sec,  # L2 timestep (segundos)
-            self.timestep_sec,  # HPC timestep (segundos)
+            self.timestep_sec,  # Passo temporal L1 (segundos)
+            self.timestep_sec,  # Passo temporal L2 (segundos)
+            self.timestep_sec,  # Passo temporal HPC (segundos)
         )
-        print("[CalderaWrapper] Motor C++ inicializado e calibrado com sucesso!")
 
     def get_charger_for_vehicle(self, vehicle_model: str) -> str:
         """Determina a Wallbox oficial associada à montadora do veículo."""

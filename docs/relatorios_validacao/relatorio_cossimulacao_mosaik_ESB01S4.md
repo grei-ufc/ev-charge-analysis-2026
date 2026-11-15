@@ -6,6 +6,10 @@
 **Ambiente de Execução:** Mosaik 3.5.0 nativo (Python 3.12 / WSL2 Ubuntu) com OpenDSS e Caldera ICM C++  
 **Regime de Operação dos Inversores:** **Modo Pass-through / FP Unitário ($FP = 1,0$ e $Q = 0$) — Controles Volt-VAr e Volt-Watt desligados**  
 
+> [!WARNING]
+> **Registro Histórico Anterior ao Expurgo de GDs Desativadas (`UGBT_tab` `SIT_ATIV == 'AT'`):**  
+> Os resultados deste relatório (303 PVs, $3.228{,}11\text{ kW}$ DC, $89{,}08\text{ MWh}$, $V_{\max} = 1{,}2077\text{ pu}$) referem-se à execução piloto antes da extensão do filtro `SIT_ATIV == 'AT'` para a geração distribuída em `converter_gd_para_pvsystem.py` (que expurgou 94 PVs BT `'DS'` = $903{,}04\text{ kW}$, mantendo **209 PVs ativos** = $2.360{,}90\text{ kW}$). Os valores de simulação permanecem preservados como registro histórico até a re-execução completa da cossimulação.
+
 ---
 
 ## 1. Sumário Executivo

@@ -6,11 +6,11 @@ Este documento estabelece a fundamentação metodológica, as formulações mate
 
 ## 1. Justificativa Epistemológica: O Princípio do Isolamento da Variável Experimental
 
-A análise convencional de fluxo de potência frequentemente reporta grandezas absolutas (por exemplo: *"a rede apresentou 2.800 horas de tensão crítica"* ou *"o pico foi de 1.800 kW"*). Em redes reais complexas que já possuem geração distribuída fotovoltaica (GD-FV) massiva integrada — como o alimentador ESB01S4, com 303 sistemas solares ativos —, essa abordagem introduz graves vieses analíticos:
+A análise convencional de fluxo de potência frequentemente reporta grandezas absolutas (por exemplo: *"a rede apresentou 2.800 horas de tensão crítica"* ou *"o pico foi de 1.800 kW"*). Em redes reais complexas que já possuem geração distribuída fotovoltaica (GD-FV) massiva integrada — como o alimentador ESB01S4, com 209 sistemas solares ativos —, essa abordagem introduz graves vieses analíticos:
 
 1. **Vieses Pré-existentes na Rede:** No Caso Base (0 VEs), o alimentador já opera com transgressões severas de sobretensão diurna ($\text{DRP}_{\text{sob}}$ e $\text{DRC}_{\text{sob}}$) decorrentes da injeção solar em barras residenciais no meio do dia (11h00 às 14h00), bem como problemas prévios de desbalanceamento e baixo fator de potência na linha tronco.
 2. **Atribuição Indevida de Causalidade:** Avaliar apenas números absolutos atribuiria erroneamente aos Veículos Elétricos problemas de qualidade de energia causados pela geração solar diurna ou pela impedância natural de ramais longos.
-3. **Isolamento da Causa-Efeito:** Ao mensurar o impacto de forma **diferencial ($\Delta$) e relativa ($\% \Delta$)** contra a simulação síncrona do Caso Base ($0\text{ VEs}$), a influência da topologia, das cargas residenciais existentes e dos 303 sistemas fotovoltaicos é cancelada algebricamente. O resultado isola com 100% de precisão **o efeito causado EXCLUSIVAMENTE pela adição da frota veicular**.
+3. **Isolamento da Causa-Efeito:** Ao mensurar o impacto de forma **diferencial ($\Delta$) e relativa ($\% \Delta$)** contra a simulação síncrona do Caso Base ($0\text{ VEs}$), a influência da topologia, das cargas residenciais existentes e dos 209 sistemas fotovoltaicos ativos é cancelada algebricamente. O resultado isola com 100% de precisão **o efeito causado EXCLUSIVAMENTE pela adição da frota veicular**.
 4. **Universalidade e Comparabilidade Internacional:** A variação percentual normalizada ($\% \Delta$) independe da potência nominal da subestação, permitindo a comparação direta dos resultados deste TCC com pesquisas internacionais de referência (CLEMENT-NYNS; HAESEN; DRIESEN, 2010; RAHMAN et al., 2022).
 
 ---
@@ -100,7 +100,7 @@ $$\text{VDI}_i^2(t) = (V_i(t) - 1{,}0)^2$$
 * **Acréscimo Relativo Exclusivo de Subtensão ($\% \Delta \text{VDI}_{\text{sub}}$):**
   $$\text{VDI}_{\text{sub}}(t) = \sum_{i,\, V_i < 1{,}0} (1{,}0 - V_i(t))^2$$
   $$\% \Delta \text{VDI}_{\text{sub}}(p) = \frac{\text{VDI}_{\text{sub}}(p) - \text{VDI}_{\text{sub}}(\text{base})}{\text{VDI}_{\text{sub}}(\text{base})} \times 100\%$$
-  *(Esta métrica isola perfeitamente o distúrbio noturno dos VEs, sem contaminação pela sobretensão gerada pelos 303 PVs).*
+  *(Esta métrica isola perfeitamente o distúrbio noturno dos VEs, sem contaminação pela sobretensão gerada pelos 209 PVs ativos).*
 
 ---
 
