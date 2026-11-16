@@ -27,7 +27,9 @@ import concurrent.futures
 import contextlib
 import os
 from pathlib import Path
+import re
 from typing import Optional
+import uuid
 
 import mosaik
 import pandas as pd
@@ -120,6 +122,36 @@ SIM_CONFIG = {
 }
 
 
+@contextlib.contextmanager
+def _arquivos_execucao_isolados():
+    """Cria arquivos temporários de VEs, circuito DSS e topologia isolados por execução."""
+    exec_uid = f"pid{os.getpid()}_{uuid.uuid4().hex[:6]}"
+    evs_dss_exec = DATA_DIR / f"ESB01S4_evs_{exec_uid}.dss"
+    circuito_exec = DATA_DIR / f"run_ESB01S4_{exec_uid}.dss"
+    json_tmp = TOPOLOGIA_DIR / f"topologia_ESB01S4_TCC_{exec_uid}.json"
+
+    txt_run = CIRCUITO_DSS.read_text(encoding="utf-8")
+    txt_run_isolado, n_subs = re.subn(
+        r'(?im)^(\s*Redirect\s+)("?ESB01S4_evs\.dss"?)',
+        rf"\g<1>{evs_dss_exec.name}",
+        txt_run,
+    )
+    if n_subs == 0:
+        raise RuntimeError(f"Diretiva 'Redirect ESB01S4_evs.dss' não encontrada em {CIRCUITO_DSS}")
+
+    evs_dss_exec.write_text("! Placeholder temporario de VEs\n", encoding="utf-8")
+    circuito_exec.write_text(txt_run_isolado, encoding="utf-8")
+
+    try:
+        yield circuito_exec, evs_dss_exec, json_tmp
+    finally:
+        for arq_tmp in (circuito_exec, evs_dss_exec, json_tmp):
+            try:
+                arq_tmp.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+
 def _run_scenario_impl(
     qtd_evs: Optional[int] = None,
     penetracao_pct: Optional[float] = None,
@@ -132,6 +164,46 @@ def _run_scenario_impl(
     pasta_saida: Optional[Path] = None,
     barras_especificas: Optional[list] = None,
     barras_excluidas: Optional[list] = None,
+):
+    """Wrapper com arquivos temporários isolados por processo/execução."""
+    if not CIRCUITO_DSS.exists():
+        print(f"[ERRO]: Arquivo DSS não encontrado em:\n{CIRCUITO_DSS}")
+        return
+
+    with _arquivos_execucao_isolados() as (circuito_exec, evs_dss_exec, json_tmp):
+        return _executar_scenario_isolado(
+            qtd_evs=qtd_evs,
+            penetracao_pct=penetracao_pct,
+            base_calculo=base_calculo,
+            seed=seed,
+            usar_pv_mosaik=usar_pv_mosaik,
+            nome_cenario=nome_cenario,
+            reexecutar_alocacao=reexecutar_alocacao,
+            mostrar_progresso=mostrar_progresso,
+            pasta_saida=pasta_saida,
+            barras_especificas=barras_especificas,
+            barras_excluidas=barras_excluidas,
+            circuito_exec=circuito_exec,
+            evs_dss_exec=evs_dss_exec,
+            json_tmp=json_tmp,
+        )
+
+
+def _executar_scenario_isolado(
+    qtd_evs: Optional[int] = None,
+    penetracao_pct: Optional[float] = None,
+    base_calculo: str = "residencial_bt",
+    seed: int = 42,
+    usar_pv_mosaik: bool = True,
+    nome_cenario: Optional[str] = None,
+    reexecutar_alocacao: bool = False,
+    mostrar_progresso: bool = False,
+    pasta_saida: Optional[Path] = None,
+    barras_especificas: Optional[list] = None,
+    barras_excluidas: Optional[list] = None,
+    circuito_exec: Path = CIRCUITO_DSS,
+    evs_dss_exec: Path = EVS_DSS_PATH,
+    json_tmp: Optional[Path] = None,
 ):
     """Executa o cenário de co-simulação no Mosaik acoplando OpenDSS e Caldera.
 
@@ -202,7 +274,7 @@ def _run_scenario_impl(
 
     if (qtd_evs == 0) or (penetracao_pct == 0.0):
         print("Configurando CASO BASE (Sem Veículos Elétricos)...")
-        with open(EVS_DSS_PATH, "w", encoding="utf-8") as f:
+        with open(evs_dss_exec, "w", encoding="utf-8") as f:
             f.write("! Caso Base sem Veiculos Eletricos\n")
     elif deve_alocar:
         print("Configurando alocação estocástica de Veículos Elétricos...")
@@ -211,21 +283,29 @@ def _run_scenario_impl(
             penetracao_pct=penetracao_pct,
             base_calculo=base_calculo,
             seed=seed,
-            caminho_dss=CIRCUITO_DSS,
-            output_dss=EVS_DSS_PATH,
+            caminho_dss=circuito_exec,
+            output_dss=evs_dss_exec,
             ev_sessions_csv=SESSIONS_EV_CSV,
             barras_especificas=barras_especificas,
             barras_excluidas=barras_excluidas,
         )
         print(f"Alocação concluída: {info_aloc['metrica']}")
+    elif EVS_DSS_PATH.exists() and evs_dss_exec != EVS_DSS_PATH:
+        evs_dss_exec.write_text(EVS_DSS_PATH.read_text(encoding="utf-8"), encoding="utf-8")
 
-    # 3. Exportação e Atualização da Topologia
+    # 3. Exportação e Atualização Atômica da Topologia
     print("Atualizando topologia do cenário...", flush=True)
+    destino_topo = json_tmp if json_tmp is not None else JSON_SAIDA
     with suprimir_stdout_c():
-        exportar_topologia(CIRCUITO_DSS, JSON_SAIDA)
+        exportar_topologia(circuito_exec, destino_topo)
+    if json_tmp is not None and json_tmp.exists():
+        try:
+            os.replace(json_tmp, JSON_SAIDA)
+        except OSError:
+            pass
 
-    # 4. Inicialização da Co-simulação no Mosaik
-    with mosaik.World(SIM_CONFIG, mosaik_config={"start_timeout": 60}) as world:
+    # 4. Inicialização da Co-simulação no Mosaik (porta efêmera para múltiplos terminais)
+    with mosaik.World(SIM_CONFIG, mosaik_config={"addr": ("127.0.0.1", 0), "start_timeout": 60}) as world:
         print("\n--- Inicializando Co-simulação Nativa Mosaik ---", flush=True)
         print(f"  Modo PV: {'Simuladores Mosaik (Smart Inverter)' if usar_pv_mosaik else 'OpenDSS Nativo (Estável)'}")
         print(f"  Arquivo de saída: {arquivo_resultados_csv.name}")
@@ -236,7 +316,7 @@ def _run_scenario_impl(
         # Se usar PV Mosaik, ativa bypass das curvas nativas no OpenDSS; caso contrário, desativa o bypass.
         dss_sim = world.start(
             "DSS",
-            topofile=str(CIRCUITO_DSS),
+            topofile=str(circuito_exec),
             step_size=STEP_SIZE,
             bypass_native_pv_curves=usar_pv_mosaik,
         )
