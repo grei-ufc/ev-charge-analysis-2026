@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Cenário 4: Rede MT + BT com Apenas PVs Corrigidos (Cargas BT com vminpu=0.5)
-Aplica a correção dos 23 PVSystems monofásicos e conn=Delta nos PVs trifásicos,
+Aplica a correção dos 18 PVSystems monofásicos ativos (20 no total) e conn=Delta nos PVs trifásicos,
 mas mantém as Cargas BT com vminpu=0.5.
 Demonstra que a correção dos PVs elimina as sobretensões de 16 pu, mas o colapso
 numérico por oscilação de vminpu=0.5 no transformador TRF_TOK5079A ainda causa divergência
@@ -41,7 +41,7 @@ def rodar_cenario4(salvar_json=True):
 
     res = executar_simulacao_diaria(dss, n_passos=144, step_size="10m")
     res["cenario"] = "Cenário 4: Apenas PVs Corrigidos (Cargas com vminpu=0.5)"
-    res["descricao"] = "Master + CargasBT (vminpu=0.5) + PVs corrigidos (23 monofásicos + conn=Delta) + EVs"
+    res["descricao"] = "Master + CargasBT (vminpu=0.5) + PVs corrigidos (18 reconfigurados / 20 monofásicos + conn=Delta) + EVs"
 
     imprimir_tabela_resumo(res["cenario"], res)
 

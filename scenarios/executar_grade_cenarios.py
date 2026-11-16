@@ -36,7 +36,7 @@ from scenarios.scenario_ESB01S4_TCC import OUTPUT_DIR
 
 # Grade padrão de simulações (10 cenários de VEs; Caso Base 0% é tratado como baseline)
 CENARIOS_PADRAO = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-DOMICILIOS_BT_TOTAL = 670  # 670 UCs BT elegíveis mapeadas no OpenDSS (1.340 objetos _M1/_M2, excluindo IPIP)
+DOMICILIOS_BT_TOTAL = 676  # 676 UCs BT elegíveis mapeadas no OpenDSS (1.352 objetos _M1/_M2, excluindo IPIP)
 
 
 

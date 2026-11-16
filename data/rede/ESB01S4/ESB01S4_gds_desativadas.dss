@@ -1,0 +1,191 @@
+! Geradores Distribuídos expurgados por SIT_ATIV != 'AT' na BDGD (ESB01S4)
+! Total removido: 94 geradores (903.04 kW nominais)
+
+! SIT_ATIV=DS kw=3.4
+New "generator.GD.CE.000.261.496" phases=3 bus1=3860847038464984.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=3.4 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.002.308.055" phases=3 bus1=1051627TR.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.001.449.651" phases=3 bus1=3872857938465621.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.2
+New "generator.GD.CE.000.004.736" phases=3 bus1=3857980038462787.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.2 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.001.318.672" phases=3 bus1=3860555038460220.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=12.0
+New "generator.GD.CE.001.433.411" phases=3 bus1=3862884638459269.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=12.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=15.0
+New "generator.GD.CE.002.773.904" phases=3 bus1=3860569938475554.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=15.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.000.579.493" phases=3 bus1=3858568938462887.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.000.373.325" phases=3 bus1=3872270138465982.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=4.0
+New "generator.GD.CE.000.703.572" phases=3 bus1=3860647538472476.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=4.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=9.0
+New "generator.GD.CE.000.947.242" phases=3 bus1=3859444738464301.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=9.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=25.0
+New "generator.GD.CE.001.587.592" phases=3 bus1=3859901838463243.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=25.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=9.0
+New "generator.GD.CE.000.800.303" phases=3 bus1=1051627TR.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=9.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.001.615.786" phases=3 bus1=3858980438460981.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.4
+New "generator.GD.CE.001.013.134" phases=3 bus1=3858807938464405.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.4 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.000.874.200" phases=3 bus1=1051627TR.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=10.0
+New "generator.GD.CE.001.435.020" phases=3 bus1=3856590438465250.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=10.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.276.199" phases=3 bus1=3859807738464381.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.366.236" phases=3 bus1=3859158338460523.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.4
+New "generator.GD.CE.001.530.762" phases=3 bus1=3857094038463534.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.4 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=3.18
+New "generator.GD.CE.000.005.939" phases=3 bus1=3882341738456221.1.2.3.4 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=3.18 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.000.497.190" phases=3 bus1=3857773338459146.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=9.0
+New "generator.GD.CE.000.982.354" phases=3 bus1=3860546038466232.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=9.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.000.179.311" phases=3 bus1=3858960038473881.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.4
+New "generator.GD.CE.001.364.552" phases=3 bus1=3856380038463820.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.4 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.000.687.706" phases=3 bus1=3860894038474223.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=15.0
+New "generator.GD.CE.002.872.655" phases=3 bus1=3859783038461978.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=15.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.000.212.913" phases=3 bus1=3859782138464343.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.741.026" phases=3 bus1=3860847038464984.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.001.414.085" phases=3 bus1=3856780038463309.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.001.412.172" phases=3 bus1=3858591038464492.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=4.5
+New "generator.GD.CE.000.534.500" phases=3 bus1=3858861938464009.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=4.5 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=4.0
+New "generator.GD.CE.002.713.685" phases=3 bus1=1051627TR.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=4.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.4
+New "generator.GD.CE.001.062.877" phases=3 bus1=3858396038474723.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.4 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=9.0
+New "generator.GD.CE.000.929.450" phases=3 bus1=64573208TR.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=9.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.001.640.201" phases=3 bus1=3859408038469133.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.5
+New "generator.GD.CE.000.548.215" phases=3 bus1=3859593738462369.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.5 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.0
+New "generator.GD.CE.002.371.586" phases=3 bus1=3862935038467411.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.002.301.661" phases=3 bus1=3858315838458686.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.000.675.972" phases=3 bus1=3856908038464009.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=4.0
+New "generator.GD.CE.001.935.731" phases=3 bus1=3883986438453401.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=4.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=18.0
+New "generator.GD.CE.001.189.987" phases=3 bus1=3859863638474474.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=18.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=9.1
+New "generator.GD.CE.001.704.939" phases=1 bus1=3859890438473835.1.4 basefreq=60 conn=Wye kv=0.2193931022920578 pf=0.92 kw=9.1 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=16.0
+New "generator.GD.CE.001.496.406" phases=3 bus1=3858218938460615.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=16.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.000.447.355" phases=3 bus1=3884063238450020.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=30.0
+New "generator.GD.CE.000.853.987" phases=3 bus1=3859949038461539.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=30.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.001.062.918" phases=3 bus1=3860092338463420.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=10.0
+New "generator.GD.CE.002.772.332" phases=3 bus1=208976986.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=10.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.002.874.119" phases=3 bus1=3860538738472182.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.5
+New "generator.GD.CE.001.615.179" phases=3 bus1=3860552038463720.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.5 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.633.439" phases=3 bus1=3873012638463811.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.3
+New "generator.GD.CE.000.373.573" phases=3 bus1=3859682138473528.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.3 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.001.366.412" phases=3 bus1=3856590438465250.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=15.0
+New "generator.GD.CE.002.773.869" phases=3 bus1=3859259438463027.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=15.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=11.61
+New "generator.GD.CE.001.125.143" phases=3 bus1=3860545838465899.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=11.61 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=2.5
+New "generator.GD.CE.000.469.791" phases=3 bus1=3863693538457530.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=2.5 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.002.864.770" phases=3 bus1=3863293338455738.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.2
+New "generator.GD.CE.000.497.147" phases=3 bus1=3859148238473223.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.2 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.000.326.779" phases=3 bus1=3873191638463928.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=9.0
+New "generator.GD.CE.001.119.893" phases=3 bus1=3861855038461926.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=9.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.2
+New "generator.GD.CE.000.030.117" phases=3 bus1=3860206838473510.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.2 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=9.72
+New "generator.GD.CE.000.652.733" phases=3 bus1=3861224038474487.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=9.72 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=11.4
+New "generator.GD.CE.000.221.554" phases=3 bus1=3857743838462634.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=11.4 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.002.632.012" phases=3 bus1=3860527938466196.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.002.612.589" phases=3 bus1=3882341738456221.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=3.0
+New "generator.GD.CE.000.497.277" phases=3 bus1=3882341738456221.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=3.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=10.0
+New "generator.GD.CE.000.773.128" phases=3 bus1=3858499038460895.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=10.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.614.206" phases=3 bus1=3873397138464000.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.000.688.755" phases=3 bus1=3860198438474636.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.833.926" phases=3 bus1=3863730038469381.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.000.080.476" phases=3 bus1=3858547038474456.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=36.0
+New "generator.GD.CE.001.724.375" phases=3 bus1=3877073338462431.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=36.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.637.922" phases=3 bus1=3859486438464468.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=11.0
+New "generator.GD.CE.000.172.892" phases=3 bus1=3871772738466153.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=11.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.19
+New "generator.GD.CE.001.740.934" phases=3 bus1=3880822638457276.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.19 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.2
+New "generator.GD.CE.001.774.536" phases=3 bus1=3858547838474254.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.2 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=50.0
+New "generator.GD.CE.001.935.314" phases=3 bus1=3882341738456221.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=50.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=10.0
+New "generator.GD.CE.001.154.062" phases=3 bus1=3856460038463781.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=10.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=20.0
+New "generator.GD.CE.001.504.095" phases=3 bus1=3860756638469748.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=20.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=3.0
+New "generator.GD.CE.000.497.194" phases=3 bus1=3882341738456221.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=3.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.002.523.948" phases=3 bus1=3882341738456221.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.4
+New "generator.GD.CE.000.846.169" phases=3 bus1=3882341738456221.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.4 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=10.2
+New "generator.GD.CE.000.534.817" phases=3 bus1=3860635938472313.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=10.2 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=20.0
+New "generator.GD.CE.001.570.204" phases=3 bus1=3859076738460280.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=20.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=15.11
+New "generator.GD.CE.001.569.724" phases=3 bus1=3859486438464468.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=15.11 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=50.0
+New "generator.GD.CE.001.828.358" phases=3 bus1=3859319038467161.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=50.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=6.0
+New "generator.GD.CE.001.984.930" phases=3 bus1=3858695438474436.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=6.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=4.0
+New "generator.GD.CE.000.078.870" phases=3 bus1=3857402338459128.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=4.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.001.569.219" phases=3 bus1=3857830238463361.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=8.0
+New "generator.GD.CE.000.058.416" phases=3 bus1=1051627TR.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=8.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=5.0
+New "generator.GD.CE.002.503.773" phases=3 bus1=3860847038464984.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=5.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.0
+New "generator.GD.CE.001.437.362" phases=3 bus1=3857743838462634.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=18.0
+New "generator.GD.CE.001.787.914" phases=3 bus1=1051627TR.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=18.0 daily=default_pv_daily_bt
+! SIT_ATIV=DS kw=7.03
+New "generator.GD.CE.002.483.219" phases=3 bus1=3882173138456871.1.2.3 basefreq=60 conn=Delta kv=0.38 pf=0.92 kw=7.03 daily=default_pv_daily_bt

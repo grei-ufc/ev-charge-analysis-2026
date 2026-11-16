@@ -1,0 +1,2 @@
+New "Load.MT_4636467_M1" bus1="3873819538464264.1.2.3" phases=3 conn=Delta model=2 kv=13.800000000 kw = 18.4856785 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_4636467_M1"  
+New "Load.MT_4636467_M2" bus1="3873819538464264.1.2.3" phases=3 conn=Delta model=3 kv=13.800000000 kw = 18.4856785 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_4636467_M2" 

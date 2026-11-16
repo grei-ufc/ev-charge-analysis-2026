@@ -36,8 +36,6 @@ New "Load.MT_198413080_6_M1" bus1="3871897438465872.1.2.3" phases=3 conn=Delta m
 New "Load.MT_198413080_6_M2" bus1="3871897438465872.1.2.3" phases=3 conn=Delta model=3 kv=13.800000000 kw = 67.022038 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_198413080_6_M2" 
 New "Load.MT_266138434_2_M1" bus1="3870426438467670.1.2.3" phases=3 conn=Delta model=2 kv=13.800000000 kw = 0.0 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_266138434_2_M1"  
 New "Load.MT_266138434_2_M2" bus1="3870426438467670.1.2.3" phases=3 conn=Delta model=3 kv=13.800000000 kw = 0.0 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_266138434_2_M2" 
-New "Load.MT_4636467_M1" bus1="3873819538464264.1.2.3" phases=3 conn=Delta model=2 kv=13.800000000 kw = 18.4856785 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_4636467_M1"  
-New "Load.MT_4636467_M2" bus1="3873819538464264.1.2.3" phases=3 conn=Delta model=3 kv=13.800000000 kw = 18.4856785 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_4636467_M2" 
 New "Load.MT_198413080_7_M1" bus1="3871897438465872.1.2.3" phases=3 conn=Delta model=2 kv=13.800000000 kw = 26.1783145 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_198413080_7_M1"  
 New "Load.MT_198413080_7_M2" bus1="3871897438465872.1.2.3" phases=3 conn=Delta model=3 kv=13.800000000 kw = 26.1783145 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_198413080_7_M2" 
 New "Load.MT_258104247_2_M1" bus1="3864919738468224.1.2.3" phases=3 conn=Delta model=2 kv=13.800000000 kw = 56.821338 pf=0.92 status=variable vmaxpu=1.5 vminpu=0.5 daily="LS_MT_258104247_2_M1"  

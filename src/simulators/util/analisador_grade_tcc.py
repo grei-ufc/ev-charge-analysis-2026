@@ -517,8 +517,8 @@ def carregar_e_processar_grade(
         delta_n_drc = m["n_barras_violam_drc"] - metrica_base["n_barras_violam_drc"]
         delta_n_drc_sub = m["n_barras_violam_drc_sub"] - metrica_base["n_barras_violam_drc_sub"]
 
-        # Qtd de VEs exata na grade (670 domicílios BT elegíveis, excluindo IPIP)
-        qtd_evs = round(670 * (p / 100.0))
+        # Qtd de VEs exata na grade (676 domicílios BT elegíveis, excluindo IPIP)
+        qtd_evs = round(676 * (p / 100.0))
 
         linhas_relatorio.append({
             "cenario": f"{p}% VEs",

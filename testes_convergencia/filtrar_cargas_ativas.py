@@ -23,19 +23,84 @@ REDE_DIR = BASE_DIR / "data" / "rede" / "ESB01S4"
 CARGAS_BT_DSS = REDE_DIR / "CargasBT_Sintetico_20250139_ESB01S4.dss"
 BACKUP_TODAS_DSS = REDE_DIR / "CargasBT_Sintetico_20250139_ESB01S4_todas.dss"
 CARGAS_DESATIVADAS_DSS = REDE_DIR / "CargasBT_Sintetico_20250139_ESB01S4_desativadas.dss"
+AUX_CARGA_BT_CSV = REDE_DIR / "csv_files" / "AuxCargaBT_ESB01S4.csv"
 
 CARGAS_MT_DSS = REDE_DIR / "CargasMT_Sintetico_20250139_ESB01S4.dss"
 BACKUP_TODAS_MT_DSS = REDE_DIR / "CargasMT_Sintetico_20250139_ESB01S4_todas.dss"
 CARGAS_MT_DESATIVADAS_DSS = REDE_DIR / "CargasMT_Sintetico_20250139_ESB01S4_desativadas.dss"
 
 
-def extrair_situacao_cadastral_bdgd():
-    """Lê a tabela UCBT_tab do GDB e mapeia situação cadastral e transformador por RAMAL, PN_CON, PAC e COD_ID."""
+def _mapear_bt_via_aux(df_ucbt: pd.DataFrame):
+    """Pareia 1-a-1 cada CodConsBT de AuxCargaBT com UCBT_tab via energia mensal.
+
+    Evita colisões em ramais compartilhados por múltiplas UCs (sufixos _1, _2...)
+    com situações cadastrais mistas ('AT' e 'DS').
+    """
+    if not AUX_CARGA_BT_CSV.exists():
+        return {}, {}
+
+    ene_cols = [f"ENE_{i:02d}" for i in range(1, 13)]
+    mwh_cols = [f"EnerMedid{i:02d}_MWh" for i in range(1, 13)]
+
+    aux = pd.read_csv(AUX_CARGA_BT_CSV, sep=";", dtype=str)
+    aux = aux[
+        (aux["CodAlim"] == "ESB01S4")
+        & (~aux["CodConsBT"].str.contains("ip", case=False, na=False))
+    ].copy()
+    for c in mwh_cols:
+        aux[c] = pd.to_numeric(aux[c], errors="coerce").fillna(0.0)
+
+    df_nz = df_ucbt.copy()
+    for c in ene_cols:
+        df_nz[c] = pd.to_numeric(df_nz[c], errors="coerce").fillna(0.0)
+    df_nz = df_nz[df_nz[ene_cols].sum(axis=1) > 0].copy()
+
+    fp_buckets = defaultdict(list)
+    for _, row in df_nz.iterrows():
+        ramal = str(row["RAMAL"]).strip() if pd.notna(row["RAMAL"]) else ""
+        trf = row["UNI_TR_MT_STR"]
+        tip_cc = str(row["TIP_CC"]).strip() if pd.notna(row["TIP_CC"]) else ""
+        fp = (ramal, trf, tip_cc, tuple(round(float(row[c]), 3) for c in ene_cols))
+        fp_buckets[fp].append((row["SIT_ATIV_LIMPO"], trf))
+
+    mapa_codcons_sit = {}
+    mapa_codcons_trf = {}
+    colisoes_mistas = 0
+
+    for _, row in aux.iterrows():
+        cod_cons = str(row["CodConsBT"]).strip()
+        cod_base = re.sub(r"_\d+$", "", cod_cons)
+        trf = str(row["CodTrafo"]).strip()
+        tip_cc = str(row["TipCrvaCarga"]).strip()
+        fp = (cod_base, trf, tip_cc, tuple(round(float(row[c]) * 1000.0, 3) for c in mwh_cols))
+        matches = fp_buckets.get(fp)
+        if not matches:
+            continue
+        sits = {s for s, _ in matches}
+        if len(sits) == 1:
+            sit, trf_gdb = matches[0]
+            mapa_codcons_sit[cod_cons] = sit
+            mapa_codcons_trf[cod_cons] = trf_gdb
+        else:
+            colisoes_mistas += 1
+
+    print(
+        f"✅ Pareamento 1-a-1 BT via {AUX_CARGA_BT_CSV.name}: "
+        f"{len(mapa_codcons_sit)}/{len(aux)} UCs identificadas sem colisão"
+        + (f" ({colisoes_mistas} colisões mistas)" if colisoes_mistas else "")
+    )
+    return mapa_codcons_sit, mapa_codcons_trf
+
+
+def extrair_situacao_cadastral_bdgd(retornar_mapa_codcons: bool = False):
+    """Lê a tabela UCBT_tab do GDB e mapeia situação cadastral e transformador por CodConsBT e chaves gerais."""
     print(f"📂 Abrindo Geodatabase: {GDB_PATH.name}")
     print("⏳ Consultando 'UCBT_tab' para CTMT == 'ESB01S4'...")
 
     # CTMT DEVE estar em columns para que o filtro where funcione no GDAL
-    colunas = ["RAMAL", "PN_CON", "PAC", "COD_ID", "CTMT", "UNI_TR_MT", "SIT_ATIV", "CAR_INST"]
+    colunas = [
+        "RAMAL", "PN_CON", "PAC", "COD_ID", "CTMT", "UNI_TR_MT", "SIT_ATIV", "CAR_INST", "TIP_CC",
+    ] + [f"ENE_{i:02d}" for i in range(1, 13)]
     df = pyogrio.read_dataframe(
         GDB_PATH,
         layer="UCBT_tab",
@@ -53,6 +118,8 @@ def extrair_situacao_cadastral_bdgd():
     print(f"   - Exemplos de PN_CON: {df['PN_CON'].dropna().head(5).tolist()}")
     print(f"   - Exemplos de PAC: {df['PAC'].dropna().head(5).tolist()}")
 
+    mapa_codcons_sit, mapa_codcons_trf = _mapear_bt_via_aux(df)
+
     mapa_sit = {}
     mapa_trf = {}
 
@@ -60,7 +127,7 @@ def extrair_situacao_cadastral_bdgd():
         sit = row["SIT_ATIV_LIMPO"]
         trf = row["UNI_TR_MT_STR"]
 
-        # Registra todas as chaves possíveis para garantir match
+        # Registra chaves gerais como fallback para entradas não cobertas pelo AuxCargaBT
         chaves = []
         for col in ["RAMAL", "PN_CON", "PAC", "COD_ID"]:
             val = row[col]
@@ -68,9 +135,7 @@ def extrair_situacao_cadastral_bdgd():
                 sval = str(val).strip()
                 if sval:
                     chaves.append(sval)
-                    # Também versão sem sufixos
                     chaves.append(re.sub(r'_\d+$', '', sval))
-                    # Versão numérica
                     m_num = re.search(r'(\d+)', sval)
                     if m_num:
                         chaves.append(m_num.group(1))
@@ -79,11 +144,15 @@ def extrair_situacao_cadastral_bdgd():
             mapa_sit[k] = sit
             mapa_trf[k] = trf
 
+    if retornar_mapa_codcons:
+        return mapa_sit, mapa_trf, mapa_codcons_sit, mapa_codcons_trf
     return mapa_sit, mapa_trf
 
 
 def sanitizar_cargas_bt():
-    mapa_sit, mapa_trf = extrair_situacao_cadastral_bdgd()
+    mapa_sit, mapa_trf, mapa_codcons_sit, mapa_codcons_trf = extrair_situacao_cadastral_bdgd(
+        retornar_mapa_codcons=True
+    )
 
     if not CARGAS_BT_DSS.exists():
         raise FileNotFoundError(f"Arquivo não encontrado: {CARGAS_BT_DSS}")
@@ -153,12 +222,14 @@ def sanitizar_cargas_bt():
         cod_num = match_num.group(1) if match_num else ""
 
         sit = (
-            mapa_sit.get(cod_cons)
+            mapa_codcons_sit.get(cod_cons)
+            or mapa_sit.get(cod_cons)
             or mapa_sit.get(cod_base)
             or (mapa_sit.get(cod_num) if cod_num else None)
         )
         trf = (
-            mapa_trf.get(cod_cons)
+            mapa_codcons_trf.get(cod_cons)
+            or mapa_trf.get(cod_cons)
             or mapa_trf.get(cod_base)
             or (mapa_trf.get(cod_num) if cod_num else None)
             or ""
@@ -208,7 +279,10 @@ def sanitizar_cargas_bt():
     print("📊 RESULTADO DO SANEAMENTO CADASTRAL (OpenDSS - ESB01S4)")
     print("=" * 75)
     print(f"• Total de linhas processadas: {stats['total_linhas']}")
-    print(f"• Cargas ATIVAS mantidas: {stats['cargas_ativas']} objetos OpenDSS (inclui {stats['cargas_ip']} de IP)")
+    print(
+        f"• Cargas consumidoras ATIVAS mantidas: {stats['cargas_ativas']} objetos OpenDSS "
+        f"(+ {stats['cargas_ip']} objetos de IP = {stats['cargas_ativas'] + stats['cargas_ip']} total)"
+    )
     print(f"• Cargas DESATIVADAS removidas: {stats['cargas_desativadas']} objetos OpenDSS")
     if stats['cargas_nao_encontradas'] > 0:
         print(f"• Cargas não localizadas (mantidas ativas por precaução): {stats['cargas_nao_encontradas']}")

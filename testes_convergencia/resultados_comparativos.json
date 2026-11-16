@@ -6,8 +6,8 @@
     "media_iteracoes": 2.07,
     "min_iteracoes": 2,
     "max_iteracoes": 4,
-    "vmin_pu_global": 1.0146,
-    "vmax_pu_global": 1.042,
+    "vmin_pu_global": 1.0149,
+    "vmax_pu_global": 1.0421,
     "cenario": "Cenário 1: Apenas Rede MT",
     "descricao": "SegmentosMT, ChavesMT, ReguladorMT, CargasMT_Sintetico, GD_MT"
   },
@@ -43,25 +43,25 @@
   },
   {
     "passos_totais": 144,
-    "passos_convergidos": 58,
-    "pct_convergencia": 40.28,
-    "media_iteracoes": 92.14,
-    "min_iteracoes": 4,
+    "passos_convergidos": 0,
+    "pct_convergencia": 0.0,
+    "media_iteracoes": 150.0,
+    "min_iteracoes": 150,
     "max_iteracoes": 150,
     "vmin_pu_global": 0.01,
-    "vmax_pu_global": 1.1128,
+    "vmax_pu_global": 1.0616,
     "cenario": "Cenário 4: Apenas PVs Corrigidos (Cargas com vminpu=0.5)",
-    "descricao": "Master + CargasBT (vminpu=0.5) + PVs corrigidos (23 monofásicos + conn=Delta) + EVs"
+    "descricao": "Master + CargasBT (vminpu=0.5) + PVs corrigidos (18 reconfigurados / 20 monofásicos + conn=Delta) + EVs"
   },
   {
     "passos_totais": 144,
     "passos_convergidos": 144,
     "pct_convergencia": 100.0,
-    "media_iteracoes": 3.23,
-    "min_iteracoes": 3,
-    "max_iteracoes": 4,
+    "media_iteracoes": 3.33,
+    "min_iteracoes": 2,
+    "max_iteracoes": 5,
     "vmin_pu_global": 0.01,
-    "vmax_pu_global": 1.1183,
+    "vmax_pu_global": 1.0784,
     "cenario": "Cenário 5: Rede MT + BT Completa Corrigida",
     "descricao": "Master + CargasBT (vminpu=0.80) + PVs corrigidos (monofásicos + conn=Delta) + EVs"
   }
