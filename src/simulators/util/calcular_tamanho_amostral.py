@@ -52,6 +52,7 @@ def obter_ou_executar_simulacao(
     base_calculo: str = "residencial_bt",
     forcar: bool = False,
     somente_analisar: bool = False,
+    mostrar_progresso: bool = True,
 ) -> Path:
     """Localiza o arquivo CSV de simulação para a semente informada ou dispara sua execução.
 
@@ -100,7 +101,7 @@ def obter_ou_executar_simulacao(
         seed=seed,
         nome_cenario=f"result_TCC_{tag}",
         reexecutar_alocacao=True,
-        mostrar_progresso=False,
+        mostrar_progresso=mostrar_progresso,
         pasta_saida=pasta_seed,
     )
 
@@ -230,6 +231,11 @@ def avaliar_passos_sequenciais(
     return passos
 
 
+def _fmt_pt(val: float, casas: int = 2) -> str:
+    """Formata número decimal com vírgula para textos em português."""
+    return f"{val:.{casas}f}".replace(".", ",")
+
+
 def gerar_relatorio_md(
     resultados: Dict[str, Any],
     sementes: List[int],
@@ -238,12 +244,21 @@ def gerar_relatorio_md(
 ) -> str:
     """Gera texto em Markdown com tabelas do procedimento sequencial e minuta pronta para o TCC."""
     M = len(sementes)
+    cfg = resultados.get("configuracao", {})
     metricas = resultados["metricas"]
     m_vmin = metricas["v_min_global"]
-    erros = resultados.get("configuracao", {}).get("erros_admissiveis", [0.05])
+    confianca = float(cfg.get("confianca", 0.95))
+    alpha = 1.0 - confianca
+    confianca_pct = _fmt_pt(confianca * 100.0, 1).rstrip("0").rstrip(",")
+    alpha_str = _fmt_pt(alpha, 2)
+    alpha_meio_str = _fmt_pt(alpha / 2.0, 3)
+
+    erros = cfg.get("erros_admissiveis", [0.05])
     eps_formatados = [f"{eps*100:.1f}%" for eps in erros]
     eps_chave_primaria = eps_formatados[0]
-    eps_primario_val = erros[0]
+    eps_primario_val = float(erros[0])
+    eps_primario_pct_pt = _fmt_pt(eps_primario_val * 100.0, 1)
+    eps_primario_val_pt = _fmt_pt(eps_primario_val, 2)
 
     # Cabeçalhos dinâmicos para os erros avaliados
     headers_m = " | ".join([f"$M^*$ ($\\epsilon = {ef}$)" for ef in eps_formatados])
@@ -255,7 +270,7 @@ def gerar_relatorio_md(
         desv_str = f"{res['desvio_padrao']:.5f}" if "v_" in k else f"{res['desvio_padrao']:.2f}"
         cv_str = f"{res['coeficiente_variacao_pct']:.3f}%"
         err_str = f"±{res['erro_relativo_observado_pct']:.3f}%"
-        
+
         m_cols = " | ".join([
             f"**{res['dimensionamento_por_erro'][ef]['M_requerido']}**"
             for ef in eps_formatados
@@ -270,7 +285,8 @@ def gerar_relatorio_md(
         f"**{m_vmin['dimensionamento_por_erro'][ef]['M_requerido']}**"
         for ef in eps_formatados
     ])
-    vmin_suf = m_vmin["dimensionamento_por_erro"][eps_chave_primaria]["suficiente"]
+    vmin_suf = bool(m_vmin["dimensionamento_por_erro"][eps_chave_primaria]["suficiente"])
+    convergencia_atingida = bool(cfg.get("convergencia_atingida", vmin_suf))
     status_vmin = "✅ Aprovado (Convergido)" if vmin_suf else "⚠️ Requer complemento"
     m_vmin_primario = m_vmin["dimensionamento_por_erro"][eps_chave_primaria]["M_requerido"]
 
@@ -287,33 +303,89 @@ def gerar_relatorio_md(
                 f"**{p['M_requerido']}** | {stat_passo} |"
             )
         tabela_passos_md = "\n".join(linhas_seq)
+        if convergencia_atingida:
+            obs_dinamica = (
+                f"Simultaneamente, o Coeficiente de Variação estabilizou em "
+                f"$\\widehat{{CV}} = {_fmt_pt(m_vmin['coeficiente_variacao_pct'], 2)}\\%$, "
+                f"permitindo que o tamanho requerido $M^*(k) = {m_vmin_primario}$ convergisse "
+                f"abaixo de $k = {M}$ e satisfizesse a condição ótima de parada com erro observado "
+                f"de $\\pm {_fmt_pt(m_vmin['erro_relativo_observado_pct'], 2)}\\% \\le {eps_primario_pct_pt}\\%$."
+            )
+        else:
+            obs_dinamica = (
+                f"Entretanto, com $\\widehat{{CV}} = {_fmt_pt(m_vmin['coeficiente_variacao_pct'], 2)}\\%$ "
+                f"nas {M} sementes executadas, o erro relativo observado "
+                f"($\\pm {_fmt_pt(m_vmin['erro_relativo_observado_pct'], 2)}\\%$) permaneceu acima da "
+                f"tolerância primária de $\\epsilon = {eps_primario_pct_pt}\\%$ (que requer $M^* = {m_vmin_primario}$)."
+            )
+
         secao_sequencial_md = f"""
 ## 1. Evolução Passo a Passo do Procedimento Sequencial de Parada (Law, 2015 / Chow & Robbins, 1965)
 
-Avaliando a **Tensão Mínima Global ($V_{{\\min}}$)** como Variável Governante (Abordagem A) sob tolerância $\\epsilon = {eps_primario_val*100:.1f}\\%$ e 95% de confiança:
+Avaliando a **Tensão Mínima Global ($V_{{\\min}}$)** como Variável Governante (Abordagem A) sob tolerância $\\epsilon = {eps_primario_pct_pt}\\%$ e {confianca_pct}% de confiança:
 
-| Passo ($k$) | Semente | $V_{{\\min}}$ Indiv. | $\\bar{{V}}_{{\\min}}$ Acum. | Desvio ($s$) | $\\widehat{{CV}}$ (%) | $t_{{0,025; k-1}}$ | Erro Obs. (%) | $M^*(k)$ Req. | Condição de Parada ($k \\ge M^*$)? |
+| Passo ($k$) | Semente | $V_{{\\min}}$ Indiv. | $\\bar{{V}}_{{\\min}}$ Acum. | Desvio ($s$) | $\\widehat{{CV}}$ (%) | $t_{{{alpha_meio_str}; k-1}}$ | Erro Obs. (%) | $M^*(k)$ Req. | Condição de Parada ($k \\ge M^*$)? |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 {tabela_passos_md}
 
 > **Observação Metodológica sobre a Dinâmica Sequencial:**
-> Conforme demonstrado por Chow e Robbins (1965) e Law (2015), o aumento do número de replicações $k$ expande os graus de liberdade $\\nu = k - 1$, reduzindo o quantil $t$ de Student de forma acentuada. Simultaneamente, a estabilidade física da rede preserva o Coeficiente de Variação ($\\\\widehat{{CV}} \\approx 5\\% - 6\\%$), de modo que o tamanho requerido $M^*(k)$ decresce até cruzar com a contagem real $k$, ativando a condição ótima de parada sem o superdimensionamento conservador de pilotos estáticos.
+> Conforme demonstrado por Chow e Robbins (1965) e Law (2015), o aumento do número de replicações $k$ expande os graus de liberdade $\\nu = k - 1$, reduzindo o quantil $t$ de Student de forma acentuada. {obs_dinamica}
 """
+
+    # Síntese dinâmica para a minuta textual do TCC
+    vmin_media_pt = _fmt_pt(m_vmin["media"], 4)
+    vmin_desv_pt = _fmt_pt(m_vmin["desvio_padrao"], 5)
+    vmin_cv_pt = _fmt_pt(m_vmin["coeficiente_variacao_pct"], 3)
+    vmin_t_pt = _fmt_pt(m_vmin["t_critico"], 3)
+    vmin_err_pt = _fmt_pt(m_vmin["erro_relativo_observado_pct"], 2)
+
+    m_vmed = metricas.get("v_med_global", {}).get("dimensionamento_por_erro", {}).get(eps_chave_primaria, {}).get("M_requerido", "—")
+    m_pmax = metricas.get("p_max_kw", {}).get("dimensionamento_por_erro", {}).get(eps_chave_primaria, {}).get("M_requerido", "—")
+    m_eves = metricas.get("energia_ves_kwh", {}).get("dimensionamento_por_erro", {}).get(eps_chave_primaria, {}).get("M_requerido", "—")
+
+    secundarias_atendidas = []
+    for ef, info_ef in m_vmin["dimensionamento_por_erro"].items():
+        if ef != eps_chave_primaria and info_ef.get("suficiente"):
+            secundarias_atendidas.append(f"$\\epsilon = {ef.replace('.', ',')}$ ($M^* = {info_ef['M_requerido']} \\le {M}$)")
+
+    if convergencia_atingida and vmin_suf:
+        conclusao_parada_md = (
+            f"Para {confianca_pct}% de confiança estatística ($\\alpha = {alpha_str}$) e tolerância de erro de "
+            f"$\\epsilon = {eps_primario_pct_pt}\\%$ (${eps_primario_val_pt}$), a condição de parada ótima de "
+            f"Chow-Robbins foi satisfeita em **$M = {M}$ replicações** "
+            f"($\\bar{{V}}_{{\\min}} = {vmin_media_pt}\\text{{ pu}}$, $s = {vmin_desv_pt}\\text{{ pu}}$, "
+            f"$\\widehat{{CV}} = {vmin_cv_pt}\\%$, $t_{{{alpha_meio_str}; {M-1}}} = {vmin_t_pt}$, "
+            f"erro observado de $\\pm {vmin_err_pt}\\%$ e $M^* = {m_vmin_primario} \\le {M}$)."
+        )
+    else:
+        comp_sec = (
+            f" Por outro lado, para {' e '.join(secundarias_atendidas)}, a suficiência amostral foi plenamente atingida dentro do lote executado."
+            if secundarias_atendidas
+            else ""
+        )
+        conclusao_parada_md = (
+            f"Para {confianca_pct}% de confiança estatística ($\\alpha = {alpha_str}$) e tolerância primária "
+            f"de $\\epsilon = {eps_primario_pct_pt}\\%$ (${eps_primario_val_pt}$), o lote de **$M = {M}$ replicações** "
+            f"obteve $\\bar{{V}}_{{\\min}} = {vmin_media_pt}\\text{{ pu}}$, $s = {vmin_desv_pt}\\text{{ pu}}$, "
+            f"$\\widehat{{CV}} = {vmin_cv_pt}\\%$, $t_{{{alpha_meio_str}; {M-1}}} = {vmin_t_pt}$ e erro relativo "
+            f"observado de $\\pm {vmin_err_pt}\\%$, não atingindo o alvo primário de {eps_primario_pct_pt}% "
+            f"(que requereria $M^* = {m_vmin_primario}$ replicações).{comp_sec}"
+        )
 
     texto = f"""# Relatório de Dimensionamento Amostral de Monte Carlo (Law, 2015 / Chow & Robbins, 1965)
 
 - **Cenário Avaliado:** {penetracao:.1f}% de Penetração de VEs (Cenário de Estresse Máximo)
 - **Número Total de Sementes Executadas ($n$):** {M} replicações independentes
 - **Sementes Executadas:** `{sementes}`
-- **Nível de Confiança Adotado:** 95% ($\\alpha = 0,05$, quantil bilateral final $t_{{0,025; {M-1}}} = {m_vmin['t_critico']:.3f}$)
-- **Erro Relativo Máximo Admissível Adotado:** $\\epsilon = {eps_primario_val*100:.1f}\\%$ ({eps_primario_val}) — tolerância padrão de engenharia para grandezas estocásticas
+- **Nível de Confiança Adotado:** {confianca_pct}% ($\\alpha = {alpha_str}$, quantil bilateral final $t_{{{alpha_meio_str}; {M-1}}} = {m_vmin['t_critico']:.3f}$)
+- **Erro Relativo Máximo Admissível Adotado:** $\\epsilon = {eps_primario_pct_pt}\\%$ (${eps_primario_val_pt}$) — critério primário de precisão estocástica
 - **Critério de Decisão:** **Abordagem A (Variável Governante: Tensão Mínima Global $V_{{\\min}}$)** — respaldada pelo PRODIST Módulo 8 (ANEEL, 2021) e literatura clássica (LAW, 2015; CHOW & ROBBINS, 1965)
 {secao_sequencial_md}
 ---
 
 ## 2. Tabela Síntese das Métricas Eletrotécnicas Avaliadas no Conjunto Final
 
-| Métrica Eletrotécnica | Média ($\\bar{{X}}$) | Desvio ($s$) | Coef. Variação ($\\widehat{{CV}}$) | Erro Obs. (95% IC) | {headers_m} | Suficiente? |
+| Métrica Eletrotécnica | Média ($\\bar{{X}}$) | Desvio ($s$) | Coef. Variação ($\\widehat{{CV}}$) | Erro Obs. ({confianca_pct}% IC) | {headers_m} | Suficiente? |
 | :--- | :---: | :---: | :---: | :---: | {separadores_m} | :---: |
 {tabela_md}
 | **CRITÉRIO GOVERNANTE (Abordagem A: $V_{{\\min}}$)** | — | — | — | — | {m_vmin_cols} | {status_vmin} |
@@ -328,11 +400,11 @@ Avaliando a **Tensão Mínima Global ($V_{{\\min}}$)** como Variável Governante
 >
 > Em sistemas de distribuição de energia elétrica com múltiplas saídas, adota-se a **Abordagem A (Variável Governante)** recomendada por Law (2015) e Banks et al. (2010), elegendo a **Tensão Mínima Global ($V_{{\\min}}$)** como grandeza primária de projeto. Do ponto de vista físico e regulatório (PRODIST Módulo 8 / ANEEL, 2021), a conformidade do alimentador, as violações críticas e a determinação da Capacidade de Hospedagem (*Hosting Capacity*) são estritamente governadas pelo ponto de maior afundamento de tensão do circuito. Como qualquer barra $i$ opera com tensão superior ou igual ao mínimo global ($V_i(t) \\ge V_{{\\min}}(t)$ para todo $i$ e $t$), controlar o erro amostral sobre a variável governante garante a blindagem estatística de toda a rede.
 >
-> No procedimento sequencial, simulações quase-estáticas (QSTS horárias ao longo de 168 horas) foram executadas iterativamente para uma sequência de sementes pseudoaleatórias independentes (`{sementes}`). A cada passo $k$ ($k \\ge 2$), recalcularam-se a média $\\bar{{V}}_{{\\min}}(k)$, o desvio padrão $s_k$, o coeficiente de variação $\\widehat{{CV}}_k$ e os graus de liberdade $\\nu_k = k - 1$, atualizando o quantil $t_{{\\alpha/2, \\nu_k}}$ e avaliando a condição analítica de parada:
+> No procedimento sequencial, simulações quase-estáticas (QSTS em passos de 10 minutos ao longo de 168 horas) foram executadas iterativamente para uma sequência de sementes pseudoaleatórias independentes (`{sementes}`). A cada passo $k$ ($k \\ge 2$), recalcularam-se a média $\\bar{{V}}_{{\\min}}(k)$, o desvio padrão $s_k$, o coeficiente de variação $\\widehat{{CV}}_k$ e os graus de liberdade $\\nu_k = k - 1$, atualizando o quantil $t_{{\\alpha/2, \\nu_k}}$ e avaliando a condição analítica de parada:
 >
 > $$k \\ge M^*(k) = \\left\\lceil \\left( \\frac{{t_{{\\alpha/2, k-1}} \\cdot \\widehat{{CV}}_{{V_{{\\min}}}}}}{{\\epsilon}} \\right)^2 \\right\\rceil \\quad \\iff \\quad \\frac{{t_{{\\alpha/2, k-1}} \\cdot s_k}}{{\\bar{{V}}_{{\\min}}(k) \\sqrt{{k}}}} \\le \\epsilon$$
 >
-> Para 95% de confiança estatística ($\\alpha = 0,05$) e tolerância de erro de $\\epsilon = {eps_primario_val*100:.1f}\\%$ ($0,05$), a condição de parada ótima de Chow-Robbins foi satisfeita, consolidando o tamanho amostral de **$M = {M}$ replicações**. Demonstrou-se simultaneamente que as grandezas agregadas sistêmicas (tensão média nodal, demanda de pico no tronco e energia total de recarga) alcançaram convergência plena logo nas primeiras rodadas ($M^* = 1$).
+> {conclusao_parada_md} Para o mesmo alvo $\\epsilon = {eps_primario_pct_pt}\\%$, as grandezas agregadas apresentaram tamanhos requeridos de $M^* = {m_vmed}$ para tensão média nodal, $M^* = {m_pmax}$ para demanda de pico no tronco e $M^* = {m_eves}$ para energia total de recarga dos VEs.
 """
     return texto
 
@@ -378,6 +450,10 @@ def main():
     parser.add_argument(
         "--somente-analisar", action="store_true", default=False,
         help="Apenas analisa arquivos CSV existentes, sem disparar novas simulações."
+    )
+    parser.add_argument(
+        "--sem-progresso", action="store_true", default=False,
+        help="Oculta a barra de progresso do Mosaik durante as simulações."
     )
 
     args = parser.parse_args()
@@ -434,6 +510,7 @@ def main():
                 base_calculo=base,
                 forcar=args.forcar,
                 somente_analisar=args.somente_analisar,
+                mostrar_progresso=not args.sem_progresso,
             )
         except FileNotFoundError as e:
             if args.somente_analisar:

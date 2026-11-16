@@ -220,13 +220,13 @@ def _run_scenario_impl(
         print(f"Alocação concluída: {info_aloc['metrica']}")
 
     # 3. Exportação e Atualização da Topologia
-    print("Atualizando topologia do cenário...")
+    print("Atualizando topologia do cenário...", flush=True)
     with suprimir_stdout_c():
         exportar_topologia(CIRCUITO_DSS, JSON_SAIDA)
 
     # 4. Inicialização da Co-simulação no Mosaik
     with mosaik.World(SIM_CONFIG, mosaik_config={"start_timeout": 60}) as world:
-        print("\n--- Inicializando Co-simulação Nativa Mosaik ---")
+        print("\n--- Inicializando Co-simulação Nativa Mosaik ---", flush=True)
         print(f"  Modo PV: {'Simuladores Mosaik (Smart Inverter)' if usar_pv_mosaik else 'OpenDSS Nativo (Estável)'}")
         print(f"  Arquivo de saída: {arquivo_resultados_csv.name}")
 
@@ -451,7 +451,7 @@ def _run_scenario_impl(
         )
 
         # 4.6. Execução da Simulação
-        print(f"\nInicializando simulação de {N_PASSOS} passos (Step={STEP_SIZE}s, Total={DIAS_SIMULACAO} dias)...")
+        print(f"\nInicializando simulação de {N_PASSOS} passos (Step={STEP_SIZE}s, Total={DIAS_SIMULACAO} dias)...", flush=True)
         with suprimir_stdout_c():
             world.run(until=END_TIME, print_progress=mostrar_progresso)
         print(f"\nSimulação concluída com sucesso! Resultados em: {arquivo_resultados_csv.name}")
