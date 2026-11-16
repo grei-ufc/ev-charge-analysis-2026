@@ -155,7 +155,7 @@ def executar_grade(
     elif sementes is not None:
         lista_sementes = sementes
     else:
-        lista_sementes = [8, 25, 42, 100, 777, 2026]
+        lista_sementes = [8, 25, 2026, 42, 100, 777, 1234, 5555, 9999, 12345]
 
     inicio_total = time.perf_counter()
     data_inicio_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -272,7 +272,8 @@ def executar_grade(
             arquivo_csv = obter_nome_arquivo_cenario(p, base_calculo, seed=s)
             ja_existe = arquivo_csv.exists() and arquivo_csv.stat().st_size > 1024
 
-            progresso_str = f"[{idx_global:02d}/{total_tarefas:02d}] Seed {s} | Cenário {p:02d}% ({qtd_evs} VEs)"
+            p_fmt = f"{int(p):02d}" if float(p).is_integer() else f"{p:g}"
+            progresso_str = f"[{idx_global:02d}/{total_tarefas:02d}] Seed {s} | Cenário {p_fmt}% ({qtd_evs} VEs)"
             print("\n" + "-" * 80)
             print(f" {progresso_str}")
             print(f" Arquivo Alvo: {arquivo_csv.name}")
@@ -414,8 +415,9 @@ if __name__ == "__main__":
         help="Base de cálculo da penetração (padrão: residencial_bt)."
     )
     parser.add_argument(
-        "--sementes", "--seeds", "-s", nargs="+", type=int, default=[8, 25, 42, 100, 777, 2026],
-        help="Lista de sementes pseudoaleatórias a executar (padrão: 8 25 42 100 777 2026)."
+        "--sementes", "--seeds", "-s", nargs="+", type=int,
+        default=[8, 25, 2026, 42, 100, 777, 1234, 5555, 9999, 12345],
+        help="Lista de sementes pseudoaleatórias a executar (padrão: 8 25 2026 42 100 777 1234 5555 9999 12345)."
     )
     parser.add_argument(
         "--seed", type=int, default=None,

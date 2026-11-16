@@ -1003,7 +1003,7 @@ def plotar_curvas_sensibilidade_relativa(
 
 
 def carregar_e_processar_multissemente(
-    sementes: List[int] = [8, 25, 42, 100, 777, 2026],
+    sementes: List[int] = [8, 25, 2026, 42, 100, 777, 1234, 5555, 9999, 12345],
     cenarios: List[int] = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
     base_calculo: str = "residencial_bt",
     output_dir: Path = OUTPUT_DIR,
@@ -1119,7 +1119,7 @@ def plotar_curvas_multissemente(
     """Gera gráficos consolidados multissemente com bandas de dispersão estatística de Monte Carlo.
 
     Plota a curva média com envelope sombreado de desvio-padrão e pontos individuais de cada
-    semente (8, 25, 42, 100, 777, 2026) para demonstrar a sensibilidade da alocação espacial.
+    semente (8, 25, 2026, 42, 100, 777, 1234, 5555, 9999, 12345) para demonstrar a sensibilidade da alocação espacial.
     """
     plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
     plt.rcParams.update({
@@ -1795,7 +1795,7 @@ def processar_transformadores_cenario(
 
 
 def executar_analise_trafos_multissemente(
-    sementes: List[int] = [8, 25, 42, 100, 777, 2026],
+    sementes: List[int] = [8, 25, 2026, 42, 100, 777, 1234, 5555, 9999, 12345],
     cenarios: List[int] = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
     base_calculo: str = "residencial_bt",
 ) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, Any], pd.DataFrame]:
@@ -2370,8 +2370,9 @@ if __name__ == "__main__":
         help="Semente individual a processar (padrão: 42)."
     )
     parser.add_argument(
-        "--sementes", nargs="+", type=int, default=[8, 25, 42, 100, 777, 2026],
-        help="Lista de sementes para análise multissemente (padrão: 8 25 42 100 777 2026)."
+        "--sementes", nargs="+", type=int,
+        default=[8, 25, 2026, 42, 100, 777, 1234, 5555, 9999, 12345],
+        help="Lista de sementes para análise multissemente (padrão: 8 25 2026 42 100 777 1234 5555 9999 12345)."
     )
     parser.add_argument(
         "--multissemente", "--todas-sementes", "-m", action="store_true", default=True,
